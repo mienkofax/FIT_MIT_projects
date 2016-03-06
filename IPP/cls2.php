@@ -13,7 +13,7 @@ class customException extends Exception {
 		public $code;
 
 		public function __construct($message, $code) {
-			$this->message = $message;
+			$this->message = $message."\n";
 			$this->code = $code;
 		}
 		public function printError() {
@@ -40,7 +40,8 @@ class InputArgv {
 	public $prettyXml = 4;
 	public $details = false;
 	public $detailName = NULL;
-	public $search = null;
+	public $search = NULL;
+	public $conflicts = NULL;
 
 	/**
 	 * Naplni vnutornu strukturu zadanymi argumentami.
@@ -82,7 +83,7 @@ class InputArgv {
 	 * @return		bool
 	 */
 	private function parseArguments($argv) {
-		$shortopts = "h::i:o:p::d::s:";
+		$shortopts = "h::i:o:p::d::s:c::";
 
 		$longopts = array(
 			"help::", // --help
@@ -90,13 +91,15 @@ class InputArgv {
 			"output:", // --output=file
 			"pretty-xml::", // --pretty-xml=k
 			"details::", // --details=class_uses
-			"search:" // --search=XPATH
+			"search:", // --search=XPATH
+			"conflicts::" // --conflicts
 		);
 
 		// Parsovanie argumentov
 		$options = getopt($shortopts, $longopts);
 
 		// Ak sa zadal neplatny argument typu: -hxxxxx
+		//TODO otestovat s --helpxxx
 		if (array_key_exists('h', $options))
 			if (is_bool($options['h']) === false)
 				throw new customException("Bad input arguments. Try --help.", self::E_ARG);
@@ -118,7 +121,7 @@ class InputArgv {
 				throw new customException("Bad input arguments. Try --help.", self::E_ARG);
 
 			$this->getHelp();
-			exit(OK);
+			exit(self::OK);
 		}
 
 		// Kontrola kratkych prepinacov a dlhyzch prepinacov: --output=file -o=file
@@ -152,15 +155,15 @@ class InputArgv {
 			if (is_writable($options['output'])) {
 				// Vytvori subor pre zapis, ak sa nepodari skonci chybou
 				if ( !($fw = fopen($options['output'], "w")) )
-					throw new customException("Bad output file.", self::OUTPUT_FILE);
+					throw new customException("Bad output file.", self::E_OUTPUT_FILE);
 			} else {
 				// Ak existuje ale nie je pre zapis, skonci chybou
 				if (file_exists($options['output']))
-					throw new customException("Bad output file.", self::OUTPUT_FILE);
+					throw new customException("Bad output file.", self::E_OUTPUT_FILE);
 
 				// Subor neexistuje, vytvori sa ak sa nepodari, skonci chybou
 				if ( !($fw = fopen($options['output'], "w")) )
-					throw new customException("Bad output file.", self::OUTPUT_FILE);
+					throw new customException("Bad output file.", self::E_OUTPUT_FILE);
 			}
 			$this->output = $options['output'];
 		}
@@ -192,6 +195,12 @@ class InputArgv {
 
 			$this->search = $options['search'];
 		}
+
+		if (array_key_exists("conflicts", $options)) {
+			$this->conflicts = true;
+			if (is_bool($options['conflicts']) === false)
+				throw new customException("Bad input arguments. Try --help.", self::E_ARG);
+		}
 	}
 }
 
@@ -200,6 +209,7 @@ class InputArgv {
  * informacie o triede, ktore sa daju ziskat zo vstupneho suboru.
  */
  class TemplateClass{
+	private $conflicts = false;
 	/* Nazov spracovanej triedy */
 	public $name;
 
@@ -235,8 +245,9 @@ class InputArgv {
 	 */
 	public $attributesArray = array();
 
-	function __construct($name) {
+	function __construct($name, $conflicts) {
 		$this->name = $name;
+		$this->conflicts = $conflicts;
 	}
 
 	/* Nastavenie ci je trieda abstraktna */
@@ -258,12 +269,12 @@ class InputArgv {
 
 	/* Pridanie atributu do triedy */
 	function addAttributeClass($accessModifier, $attributeType, $dataType, $name) {
-		array_push($this->attributesArray, array("modifier" => $accessModifier, "attributeType" => $attributeType, "type" => $dataType, "name" => $name, "priority" => true, "parentClass" => $this->name));
+		array_push($this->attributesArray, array("modifier" => $accessModifier, "attributeType" => $attributeType, "type" => $dataType, "name" => $name, "priority" => true, "parentClass" => $this->name, "conflicts" => false));
 	}
 
 	/* Pridanie metody do triedy */
 	function addClassMethod($accessModifier, $methodType, $dataType, $name) {
-		array_push($this->methodArray, array("modifier" => $accessModifier, "methodType" => $methodType, "type" => $dataType, "name" => $name, "virtualPure" => false, "priority" => true, "parentClass" => $this->name));
+		array_push($this->methodArray, array("modifier" => $accessModifier, "methodType" => $methodType, "type" => $dataType, "name" => $name, "virtualPure" => false, "priority" => true, "parentClass" => $this->name, "conflicts" => false));
 	}
 
 	/* Pridanie tiredy, z ktorej sa dedi */
@@ -285,10 +296,11 @@ class InputArgv {
 	}
 
 	/* Definovanie, z ktorej triedy sa ma dedit atribut/metoda */
-	function addUsing($usingClass, $using) {
+	function addUsing($usingClass, $using, $modifier) {
 		// Odstraneni neziaducej metody
 		foreach ($this->methodArray as $key => $value) {
 			if ($value["name"] ==  $using) {
+				$this->methodArray[$key]["modifier"] = "private";
 				if ($value["parentClass"] == $usingClass->name) {
 					//TODO osetrit aby sa rovnali aj argumenty
 				} else
@@ -298,9 +310,12 @@ class InputArgv {
 
 		// Odstraneni neziaduceho atributu
 		foreach ($this->attributesArray as $key => $value) {
-			if ($value["name"] ==  $using &&
-				$value["parentClass"] != $usingClass->name)
-				unset($this->attributesArray[$key]);
+			if ($value["name"] ==  $using ) {
+				$this->attributesArray[$key]["modifier"] = $modifier;
+
+				if ($value["parentClass"] != $usingClass->name)
+					unset($this->attributesArray[$key]);
+			}
 		}
 	}
 
@@ -326,6 +341,7 @@ class InputArgv {
 	function CopyClass($from, $accessModifier) {
 		// Kopirovanie atributov
 		foreach ($from->attributesArray as $key => $value) {
+			if ($value["conflicts"]) continue;
 			array_push($this->attributesArray, $value);
 
 			$lastIndex = $this->getLastAttributeIndex();
@@ -335,12 +351,13 @@ class InputArgv {
 				$this->attributesArray[$lastIndex]["modifier"] = $accessModifier;
 			if ($accessModifier == "protected") {
 				if ($this->attributesArray[$lastIndex]["modifier"] != "private")
-					$this->attributesArray[$lastIndex]["modifier"] =$accessModifier;
+					$this->attributesArray[$lastIndex]["modifier"] = $accessModifier;
 			}
 		}
 
 		// Kopirovanie metod a argumentov metod
 		foreach ($from->methodArray as $key => $value) {
+			if ($value["conflicts"]) continue;
 			array_push($this->methodArray, $value);
 
 			$lastIndex = $this->getLastMethodIndex();
@@ -350,7 +367,7 @@ class InputArgv {
 				$this->methodArray[$lastIndex]["modifier"] = $accessModifier;
 			if ($accessModifier == "protected") {
 				if ($this->methodArray[$lastIndex]["modifier"] != "private")
-					$this->methodArray[$lastIndex]["modifier"] =$accessModifier;
+					$this->methodArray[$lastIndex]["modifier"] = $accessModifier;
 			}
 
 			// Kopirovanie argumentov metody
@@ -403,8 +420,12 @@ class InputArgv {
 				if ($value["parentClass"] != $value2["parentClass"] &&
 					$value["name"] == $value2["name"] &&
 					$value["parentClass"] != $this->name &&
-					$value2["parentClass"] != $this->name )
-					throw new customException("Confict.", 21);
+					$value2["parentClass"] != $this->name ) {
+						if ($this->conflicts)
+							$this->methodArray[$key]["conflicts"] = true;
+						else
+							throw new customException("Conflict.", 21);
+					}
 			}
 		}
 
@@ -415,7 +436,10 @@ class InputArgv {
 					$value["name"] == $value2["name"] &&
 					$value["parentClass"] != $this->name &&
 					$value2["parentClass"] != $this->name )
-					throw new customException("Confict.", 21);
+					if ($this->conflicts)
+						$this->attributesArray[$key]["conflicts"] = true;
+					else
+						throw new customException("Conflict.", 21);
 			}
 		}
 	}
@@ -445,11 +469,13 @@ class ParseInputFile {
 	private $positionInFile = 0;
 	private $EOF = false;
 	private $file;
+	private $conflicts = false;
 
 	private $whiteSpace = array(" ", "\t", "\n", "\r", "\0", "\x0B");
-	private $accessModifiers = array("public", "private", "protected");
+	private $accessModifiers = array("public", "protected", "private");
 	private $methodType = array("static", "virtual");
 	private $dataTypes = array("void", "int", "float", "long");
+
 
 	private $model;
 
@@ -458,8 +484,9 @@ class ParseInputFile {
 	 * Ulozenie deskriptora na aktualne spracovany subor.
 	 * @param		$file		vstupny subor
 	 */
-	public function __construct($file) {
+	public function __construct($file, $conflicts) {
 		$this->file = file_get_contents($file);
+		$this->conflicts = $conflicts;
 	}
 
 	/**
@@ -566,7 +593,7 @@ class ParseInputFile {
 				$data = preg_replace('/\s+/', '', $data);
 
 				// Pridany nazov triedy do objektu
-				$this->model[$data] = new TemplateClass($data);
+				$this->model[$data] = new TemplateClass($data, $this->conflicts);
 
 				$actClass = $data;
 				if ($this->GetPreviousChar() == ":")
@@ -587,8 +614,8 @@ class ParseInputFile {
 					$this->model[$actClass]->AddParentClass($data[0], $data[1]);
 				} else {
 					$this->model[$data[0]]->addChild($actClass);
-					$this->model[$actClass]->CopyClass($this->model[$data[0]], "public");
-					$this->model[$actClass]->AddParentClass("public", $data[0]);
+					$this->model[$actClass]->CopyClass($this->model[$data[0]], "private");
+					$this->model[$actClass]->AddParentClass("private", $data[0]);
 				}
 
 				if ($this->GetPreviousChar() == ",")
@@ -689,7 +716,7 @@ class ParseInputFile {
 				$data = str_replace("::", " ", $data);
 				$data = preg_split('/\s+/', $data,  NULL, PREG_SPLIT_NO_EMPTY);
 
-				$this->model[$actClass]->addUsing($this->model[$data[0]], $data[1]);
+				$this->model[$actClass]->addUsing($this->model[$data[0]], $data[1], $accessModifier);
 
 				$actState = self::S_BODY;
 			}
@@ -722,8 +749,11 @@ class ParseInputFile {
 	} // Koniec metody
 
 	// Generovanie vystupnute XML - B
-	function generateB($xmlB, $className) {
+	function generateB($xmlB, $className, $conflict) {
 		if (!count($this->model)) return;
+
+		if (is_null($className) && count($this->model) > 1)
+			$xmlB->startElement("model");
 
 		// Prechod triedami
 		foreach($this->model as $name => $tmp) {
@@ -733,14 +763,16 @@ class ParseInputFile {
 		$xmlB->writeAttribute("kind", $this->model[$name]->getKind());
 
 		// Dedicnost
-		$xmlB->startElement("inheritance");
-		foreach ($this->model[$name]->parentClassName as $inheritance) {
-			$xmlB->startElement("from");
-			$xmlB->writeAttribute("name", $inheritance["name"]);
-			$xmlB->writeAttribute("privacy", $inheritance["modifier"]);
+		if (count($this->model[$name]->parentClassName)) {
+			$xmlB->startElement("inheritance");
+			foreach ($this->model[$name]->parentClassName as $inheritance) {
+				$xmlB->startElement("from");
+				$xmlB->writeAttribute("name", $inheritance["name"]);
+				$xmlB->writeAttribute("privacy", $inheritance["modifier"]);
+				$xmlB->endElement();
+			}
 			$xmlB->endElement();
 		}
-		$xmlB->endElement();
 
 		foreach ($this->accessModifiers as $modifier) {
 			$methodModifier = false;
@@ -833,6 +865,8 @@ class ParseInputFile {
 
 	// Vygenerovanie xml suboru podla zadania - XML A
 	function generateA($xmlA) {
+		if (is_null($this->model)) return;
+
 		$xmlA->startElement('model');
 		foreach ($this->model as $value) {
 			if (!count($value->parentClassName)) {
@@ -891,10 +925,8 @@ class ParseInputFile {
 try {
 	$args = new InputArgv($argv); // Parsovanie argumentov
 
-	$par = new ParseInputFile($args->input);
+	$par = new ParseInputFile($args->input, $args->conflicts);
 	$par->ParseInput();
-
-	$var = "a";
 
 	$xml = new XMLWriter();
 	$xml->openMemory();
@@ -903,12 +935,9 @@ try {
 	$xml->setIndentString(str_repeat(" ", $args->prettyXml));
 
 	if (!$args->details) {
-
 		$par->generateA($xml);
 	} else {
-		$xml->startElement("model");
-		$par->generateB($xml, $args->detailName);
-		$xml->endElement();
+		$par->generateB($xml, $args->detailName, false);
 	}
 
 	$xml->endDocument();
@@ -942,4 +971,11 @@ catch (customException $e)
 	echo $e->printError();
 	exit($e->getCode());
 }
+//TODO dorobit kontrolu argumentov
+//TODO dorobit pridanie tried do typu premennych
+//TODO doplnit typy premennych
+//TODO dorobit vypis confliktov
+//TODO otestovat --helpxxxxx
+//TODO doplnit testy
+
 ?>
