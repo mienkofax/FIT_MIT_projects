@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+    <class name="A" kind="concrete">
+        <private>
+            <methods>
+                <method name="a" type="int" scope="instance">
+                    <virtual pure="no"/>
+                    <arguments>
+                        <argument name="" type="double"/>
+                    </arguments>
+                </method>
+            </methods>
+        </private>
+    </class>
+    <class name="B" kind="abstract">
+        <private>
+            <methods>
+                <method name="b" type="int" scope="instance">
+                    <virtual pure="yes"/>
+                    <arguments>
+                        <argument name="" type="float"/>
+                        <argument name="" type="int"/>
+                    </arguments>
+                </method>
+                <method name="e" type="float" scope="instance">
+                    <virtual pure="no"/>
+                    <arguments/>
+                </method>
+            </methods>
+        </private>
+    </class>
+    <class name="C" kind="concrete">
+        <private>
+            <methods>
+                <method name="c" type="bool" scope="instance">
+                    <arguments>
+                        <argument name="" type="double"/>
+                    </arguments>
+                </method>
+            </methods>
+        </private>
+    </class>
+</model>

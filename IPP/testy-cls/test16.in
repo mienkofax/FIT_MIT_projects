@@ -1,0 +1,12 @@
+class A{
+  virtual int a(double);
+};
+
+class B{
+  virtual int b(float, int) = 0;
+  virtual float e(void);
+};
+
+class C{
+  bool c(double){}
+};

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+    <class name="A" kind="concrete">
+        <private>
+            <attributes>
+                <attribute name="a" type="int" scope="instance"/>
+                <attribute name="x" type="int" scope="instance"/>
+            </attributes>
+            <methods>
+                <method name="b" type="bool" scope="instance">
+                    <arguments/>
+                </method>
+            </methods>
+        </private>
+    </class>
+    <class name="B" kind="concrete">
+        <inheritance>
+            <from name="A" privacy="private"/>
+        </inheritance>
+        <public>
+            <attributes>
+                <attribute name="c" type="float" scope="instance"/>
+                <attribute name="a" type="int" scope="instance"/>
+            </attributes>
+            <methods>
+                <method name="d" type="int" scope="instance">
+                    <arguments>
+                        <argument name="e" type="double &amp;"/>
+                    </arguments>
+                </method>
+                <method name="b" type="bool" scope="instance">
+                    <arguments/>
+                </method>
+            </methods>
+        </public>
+        <private>
+            <attributes>
+                <attribute name="x" type="int" scope="instance">
+                    <from name="A"/>
+                </attribute>
+            </attributes>
+        </private>
+    </class>
+    <class name="C" kind="concrete">
+        <inheritance>
+            <from name="B" privacy="private"/>
+        </inheritance>
+        <protected>
+            <methods>
+                <method name="b" type="bool" scope="instance">
+                    <arguments>
+                        <argument name="a" type="int"/>
+                    </arguments>
+                </method>
+            </methods>
+        </protected>
+        <private>
+            <attributes>
+                <attribute name="x" type="int" scope="instance">
+                    <from name="A"/>
+                </attribute>
+                <attribute name="c" type="float" scope="instance">
+                    <from name="B"/>
+                </attribute>
+                <attribute name="a" type="int" scope="instance">
+                    <from name="B"/>
+                </attribute>
+            </attributes>
+            <methods>
+                <method name="d" type="int" scope="instance">
+                    <from name="B"/>
+                    <arguments/>
+                </method>
+            </methods>
+        </private>
+    </class>
+</model>

@@ -8,4 +8,3 @@ class B {
 
 class C : public A, public B {
 };
-class X : C {}

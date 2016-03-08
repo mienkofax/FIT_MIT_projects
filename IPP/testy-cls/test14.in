@@ -1,0 +1,19 @@
+class B{
+  int a;
+  int hj;
+protected:
+  double b();
+  int c(int d, int e);
+  float f(int, double);
+  int g(void);
+  int asdf;
+public:
+  double *h;
+  float i;
+  static int l;
+
+  bool j(int &k){}
+  static double m();
+  virtual float n(int);
+  virtual int o(void) = 0;
+};

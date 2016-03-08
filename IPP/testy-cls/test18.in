@@ -1,0 +1,16 @@
+class A{
+  int a(int b);
+  virtual double c() = 0;
+
+  double x;
+};
+
+class B: protected A{
+  int *a(int &b, double d);
+  virtual double c();
+
+  double x;
+};
+
+class C: public A, B{
+};

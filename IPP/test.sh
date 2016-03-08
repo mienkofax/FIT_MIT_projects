@@ -189,12 +189,14 @@ echo $SEPARATOR
 
 
 echoTest "TEST-XML: 01/OK - ${REF_OUTPUT_DIR}/test01.in"
+echoTest " - vypis bazove triedy"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test01.in -o=$JEXAMXML_INPUT
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test01.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
 check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-XML: 02/OK - ${REF_OUTPUT_DIR}/test02.in"
+echoTest " - vypis dedici tridy"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test02.in -o=$JEXAMXML_INPUT --details=A
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test02.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
@@ -202,6 +204,7 @@ check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-XML: 03/OK - ${REF_OUTPUT_DIR}/test03.in"
+echoTest " - vypis dedici tridy"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test03.in -o=$JEXAMXML_INPUT --details=D
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test03.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
@@ -209,6 +212,7 @@ check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-XML: 04/OK - ${REF_OUTPUT_DIR}/test04.in"
+echoTest " - dedeni ciste virtualni metody => vsechny tridy abstraktni"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test04.in -o=$JEXAMXML_INPUT
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test04.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
@@ -216,20 +220,23 @@ check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-XML: 05/OK - ${REF_OUTPUT_DIR}/test05.in"
+echoTest " - prepsani ciste virtualni metody => dedici tridy nejsou abstraktni"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test05.in -o=$JEXAMXML_INPUT
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test05.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
 check "OK"
 echo $SEPARATOR
 
-echoTest "TEST-XML: 06/OK - ${REF_OUTPUT_DIR}/test06.in"
+echoTest "TEST-XML: 06/ERR - ${REF_OUTPUT_DIR}/test06.in"
+echoTest " - dedici schema diamant => konflikt pri dedeni"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test06.in -o=$JEXAMXML_INPUT --details=D
-check "OK"
-$JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test06.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
+check "ERR"
+diff  $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test06.out
 check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-XML: 07/OK - ${REF_OUTPUT_DIR}/test07.in"
+echoTest " - dedici schema diamant => zabraneni konfliktu prepsanim konf. clenu"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test07.in -o=$JEXAMXML_INPUT --details=D
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test07.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
@@ -237,6 +244,7 @@ check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-XML: 08/OK - ${REF_OUTPUT_DIR}/test08.in"
+echoTest " - reseni konfliktu pri dedeni kl. slovem using"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test08.in -o=$JEXAMXML_INPUT --details=C
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test08.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
@@ -244,6 +252,7 @@ check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-XML: 09/OK - ${REF_OUTPUT_DIR}/test09.in"
+echoTest " - ukazka hlubsiho vypisu lesu dedicnosti"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test09.in -o=$JEXAMXML_INPUT
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test09.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
@@ -251,6 +260,7 @@ check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-XML: 10/OK - ${REF_OUTPUT_DIR}/test10.in"
+echoTest " - vypsani detailu vsech trid v souboru"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test10.in -o=$JEXAMXML_INPUT --details
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test10.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
@@ -258,6 +268,7 @@ check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-XML: 11/OK - ${REF_OUTPUT_DIR}/test11.in"
+echoTest " - Vyhledavani pomoci XPath"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test11.in -o=$JEXAMXML_INPUT --details --search="/model/class[*/attributes/attribute/@name='var']/@name"
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test11.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
@@ -265,13 +276,84 @@ check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-XML: 12/OK - ${REF_OUTPUT_DIR}/test12.in"
+echoTest " - BONUS: vypis konfliktniho clenu ve tride"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test12.in -o=$JEXAMXML_INPUT  --details=C --conflicts
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test12.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
 check "OK"
 echo $SEPARATOR
 
+echoTest "TEST-XML: 13/OK - ${REF_OUTPUT_DIR}/test13.in"
+echoTest " - vypis jednej triedy v strome dedicnosti"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test13.in -o=$JEXAMXML_INPUT
+check "OK"
+$JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test13.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
+check "OK"
+echo $SEPARATOR
 
+echoTest "TEST-XML: 14/OK - ${REF_OUTPUT_DIR}/test14.in"
+echoTest " - vypis jednej triedy v strome dedicnosti - deklarace/definice metod, dereference/reference, static, virtual"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test14.in -o=$JEXAMXML_INPUT --details
+check "OK"
+$JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test14.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
+check "OK"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 15/OK - ${REF_OUTPUT_DIR}/test15.in"
+echoTest " - vypis jednej triedy v strome dedicnosti - redefinice atributu/metod, pretazovanie metod"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test15.in -o=$JEXAMXML_INPUT --details
+check "OK"
+$JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test15.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
+check "OK"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 16/OK - ${REF_OUTPUT_DIR}/test16.in"
+echoTest " - vypis jednej triedy v strome dedicnosti - virtual a pure"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test16.in -o=$JEXAMXML_INPUT --details
+check "OK"
+$JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test16.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
+check "OK"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 17/OK - ${REF_OUTPUT_DIR}/test17.in"
+echoTest " - vypis jednej triedy v strome dedicnosti - redefinice atributu/metod, pretazovanie metod"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test17.in -o=$JEXAMXML_INPUT --details
+check "OK"
+$JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test17.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
+check "OK"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 18/ERR - ${REF_OUTPUT_DIR}/test18.in"
+echoTest " - konflikt v metodach"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test18.in -o=$JEXAMXML_INPUT --details
+check "ERR"
+diff  $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test18.out
+check "OK"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 19/OK - ${REF_OUTPUT_DIR}/test19.in"
+echoTest " - vypis konfliktnych metod/atributov"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test19.in -o=$JEXAMXML_INPUT --details --conflicts
+check "OK"
+$JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test19.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
+check "OK"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 20/OK - ${REF_OUTPUT_DIR}/test20.in"
+echoTest " - vypis konfliktnych metod/atributov -len v bazovej triede"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test20.in -o=$JEXAMXML_INPUT --details --conflicts
+check "OK"
+$JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test20.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
+check "OK"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 21/OK - ${REF_OUTPUT_DIR}/test21.in"
+echoTest " - test datoveho typu, typ je definovana trieda"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test21.in -o=$JEXAMXML_INPUT --details
+check "OK"
+$JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test21.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
+check "OK"
+echo $SEPARATOR
 # Koniec testov XML parsovania
 ##################################
 

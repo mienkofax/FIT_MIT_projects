@@ -1,0 +1,19 @@
+class A{
+  private:
+    int a;
+    bool b(void);
+    int x;
+};
+
+class B : A{
+  public:
+    float c;
+    int d(double &e);
+    int a;
+    bool b(void);
+};
+
+class C: B{
+  protected:
+    bool b(int a);   
+};

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+    <class name="A" kind="concrete"/>
+    <class name="B" kind="concrete">
+        <private>
+            <attributes>
+                <attribute name="mojaTrieda" type="A" scope="instance"/>
+            </attributes>
+        </private>
+    </class>
+</model>

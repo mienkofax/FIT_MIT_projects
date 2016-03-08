@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+    <class name="A" kind="abstract">
+        <private>
+            <attributes>
+                <attribute name="x" type="double" scope="instance"/>
+            </attributes>
+            <methods>
+                <method name="a" type="int" scope="instance">
+                    <arguments>
+                        <argument name="b" type="int"/>
+                    </arguments>
+                </method>
+                <method name="c" type="double" scope="instance">
+                    <virtual pure="yes"/>
+                    <arguments/>
+                </method>
+            </methods>
+        </private>
+    </class>
+    <class name="B" kind="concrete">
+        <inheritance>
+            <from name="A" privacy="protected"/>
+        </inheritance>
+        <private>
+            <attributes>
+                <attribute name="x" type="double" scope="instance"/>
+            </attributes>
+            <methods>
+                <method name="a" type="int *" scope="instance">
+                    <arguments>
+                        <argument name="b" type="int &amp;"/>
+                        <argument name="d" type="double"/>
+                    </arguments>
+                </method>
+                <method name="c" type="double" scope="instance">
+                    <virtual pure="no"/>
+                    <arguments/>
+                </method>
+            </methods>
+        </private>
+    </class>
+    <class name="C" kind="abstract">
+        <inheritance>
+            <from name="A" privacy="public"/>
+            <from name="B" privacy="private"/>
+        </inheritance>
+        <conflicts>
+            <member name="a">
+                <class name="A">
+                    <private>
+                        <method name="a" type="int" scope="instance"/>
+                    </private>
+                </class>
+                <class name="B">
+                    <private>
+                        <method name="a" type="int *" scope="instance"/>
+                    </private>
+                </class>
+            </member>
+            <member name="c">
+                <class name="A">
+                    <private>
+                        <method name="c" type="double" scope="instance"/>
+                    </private>
+                </class>
+                <class name="B">
+                    <private>
+                        <method name="c" type="double" scope="instance"/>
+                    </private>
+                </class>
+            </member>
+        </conflicts>
+    </class>
+</model>

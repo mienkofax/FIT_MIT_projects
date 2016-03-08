@@ -1,0 +1,11 @@
+class A{
+ 
+  double x;
+};
+
+class B:  A{
+	double x;
+};
+
+class C:  A, B{
+};
