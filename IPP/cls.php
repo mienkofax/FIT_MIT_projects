@@ -1,5 +1,6 @@
 <?php
 
+#CLS:xtisov00
 /**
  * @author Peter Tisovcik <xtisov00@stud.fit.vutbr.cz>
  */
@@ -99,7 +100,6 @@ class InputArgv {
 		$options = getopt($shortopts, $longopts);
 
 		// Ak sa zadal neplatny argument typu: -hxxxxx
-		//TODO otestovat s --helpxxx
 		if (array_key_exists('h', $options))
 			if (is_bool($options['h']) === false)
 				throw new customException("Bad input arguments. Try --help.", self::E_ARG);
@@ -273,6 +273,18 @@ class InputArgv {
 
 	/* Pridanie metody do triedy */
 	function addClassMethod($accessModifier, $methodType, $dataType, $name) {
+		// Konstruktor
+		if ($this->name == $dataType) {
+			$name = $dataType;
+			$dataType = "";
+		}
+
+		// Destruktor
+		if (("~".$this->name) == $dataType) {
+			$name = $dataType;
+			$dataType = "";
+		}
+
 		array_push($this->methodArray, array("modifier" => $accessModifier, "methodType" => $methodType, "type" => $dataType, "name" => $name, "virtualPure" => false, "priority" => true, "parentClass" => $this->name, "conflicts" => false));
 	}
 
@@ -356,6 +368,8 @@ class InputArgv {
 
 		// Kopirovanie metod a argumentov metod
 		foreach ($from->methodArray as $key => $value) {
+			if ($from->name == $value["type"] || ("~".$from->name) == $value["type"]) continue;
+
 			if ($value["conflicts"]) continue;
 			array_push($this->methodArray, $value);
 
@@ -370,7 +384,7 @@ class InputArgv {
 			}
 
 			// Kopirovanie argumentov metody
-			if (count($this->argsMethodArray))
+			if (array_key_exists($key, $from->argsMethodArray))
 			$this->argsMethodArray[$lastIndex] = $from->argsMethodArray[$key];
 		}
 	}
@@ -390,7 +404,7 @@ class InputArgv {
 			}
 		}
 
-		//TODO kontrola ci sa neredefinovali premenne - otestovat
+		// Kontrola ci sa neredefinovali atributy
 		foreach ($this->attributesArray as $key => $value) {
 			foreach ($this->attributesArray as $key2 => $value2) {
 				// Odstranenie prepisanej metody
@@ -620,6 +634,7 @@ class ParseInputFile {
 
 				$actClass = $data;
 				$this->dataTypes[] = $data;
+				$this->dataTypes[] = "~".$data;
 				if ($this->GetPreviousChar() == ":")
 					$actState = self::S_INHERITANCE;
 				else
@@ -780,9 +795,8 @@ class ParseInputFile {
 	function generateB($xmlB, $className, $conflict) {
 		if (!count($this->model)) return;
 
-		if (is_null($className) && count($this->model) > 1)
+		if (is_null($className))
 			$xmlB->startElement("model");
-
 
 		foreach($this->model as $name => $tmp) {
 		if (!is_null($className) && $className != $name) continue;
@@ -837,7 +851,6 @@ class ParseInputFile {
 						}
 				}
 			}
-			//var_dump($data);
 
 			$oldName = array();
 
@@ -1038,6 +1051,7 @@ class ParseInputFile {
 		if (is_null($this->model)) return;
 
 		$xmlA->startElement('model');
+
 		foreach ($this->model as $value) {
 			if (!count($value->parentClassName)) {
 				$xmlA->startElement("class");
@@ -1146,11 +1160,6 @@ catch (customException $e)
 	echo $e->printError();
 	exit($e->getCode());
 }
+
 //TODO dorobit kontrolu argumentov
-//TODO dorobit pridanie tried do typu premennych
-
-//TODO konstruktory
-
-
-
 ?>
