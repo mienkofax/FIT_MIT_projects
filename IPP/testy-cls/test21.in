@@ -1,5 +1,9 @@
-class A {};
+class A {
+	A();
+	~A();
+};
 
 class B {
 	A mojaTrieda;
+
 }

@@ -1,61 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<class name="B" kind="abstract">
-    <public>
-        <attributes>
-            <attribute name="h" type="double *" scope="instance"/>
-            <attribute name="i" type="float" scope="instance"/>
-            <attribute name="l" type="int" scope="static"/>
-        </attributes>
-        <methods>
-            <method name="j" type="bool" scope="instance">
-                <arguments>
-                    <argument name="k" type="int &amp;"/>
-                </arguments>
-            </method>
-            <method name="m" type="double" scope="static">
-                <arguments/>
-            </method>
-            <method name="n" type="float" scope="instance">
-                <virtual pure="no"/>
-                <arguments>
-                    <argument name="" type="int"/>
-                </arguments>
-            </method>
-            <method name="o" type="int" scope="instance">
-                <virtual pure="yes"/>
-                <arguments/>
-            </method>
-        </methods>
-    </public>
-    <protected>
-        <attributes>
-            <attribute name="asdf" type="int" scope="instance"/>
-        </attributes>
-        <methods>
-            <method name="b" type="double" scope="instance">
-                <arguments/>
-            </method>
-            <method name="c" type="int" scope="instance">
-                <arguments>
-                    <argument name="d" type="int"/>
-                    <argument name="e" type="int"/>
-                </arguments>
-            </method>
-            <method name="f" type="float" scope="instance">
-                <arguments>
-                    <argument name="" type="int"/>
-                    <argument name="" type="double"/>
-                </arguments>
-            </method>
-            <method name="g" type="int" scope="instance">
-                <arguments/>
-            </method>
-        </methods>
-    </protected>
-    <private>
-        <attributes>
-            <attribute name="a" type="int" scope="instance"/>
-            <attribute name="hj" type="int" scope="instance"/>
-        </attributes>
-    </private>
-</class>
+<model>
+    <class name="B" kind="abstract">
+        <public>
+            <attributes>
+                <attribute name="h" type="double *" scope="instance"/>
+                <attribute name="i" type="float" scope="instance"/>
+                <attribute name="l" type="int" scope="static"/>
+            </attributes>
+            <methods>
+                <method name="j" type="bool" scope="instance">
+                    <arguments>
+                        <argument name="k" type="int &amp;"/>
+                    </arguments>
+                </method>
+                <method name="m" type="double" scope="static">
+                    <arguments/>
+                </method>
+                <method name="n" type="float" scope="instance">
+                    <virtual pure="no"/>
+                    <arguments>
+                        <argument name="" type="int"/>
+                    </arguments>
+                </method>
+                <method name="o" type="int" scope="instance">
+                    <virtual pure="yes"/>
+                    <arguments/>
+                </method>
+            </methods>
+        </public>
+        <protected>
+            <attributes>
+                <attribute name="asdf" type="int" scope="instance"/>
+            </attributes>
+            <methods>
+                <method name="b" type="double" scope="instance">
+                    <arguments/>
+                </method>
+                <method name="c" type="int" scope="instance">
+                    <arguments>
+                        <argument name="d" type="int"/>
+                        <argument name="e" type="int"/>
+                    </arguments>
+                </method>
+                <method name="f" type="float" scope="instance">
+                    <arguments>
+                        <argument name="" type="int"/>
+                        <argument name="" type="double"/>
+                    </arguments>
+                </method>
+                <method name="g" type="int" scope="instance">
+                    <arguments/>
+                </method>
+            </methods>
+        </protected>
+        <private>
+            <attributes>
+                <attribute name="a" type="int" scope="instance"/>
+                <attribute name="hj" type="int" scope="instance"/>
+            </attributes>
+        </private>
+    </class>
+</model>

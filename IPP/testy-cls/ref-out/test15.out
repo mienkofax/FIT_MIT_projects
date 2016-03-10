@@ -69,7 +69,9 @@
             <methods>
                 <method name="d" type="int" scope="instance">
                     <from name="B"/>
-                    <arguments/>
+                    <arguments>
+                        <argument name="e" type="double &amp;"/>
+                    </arguments>
                 </method>
             </methods>
         </private>

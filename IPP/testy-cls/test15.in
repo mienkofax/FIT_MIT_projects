@@ -15,5 +15,5 @@ class B : A{
 
 class C: B{
   protected:
-    bool b(int a);   
+    bool b(int a);
 };

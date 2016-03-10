@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-    <class name="A" kind="concrete"/>
+    <class name="A" kind="concrete">
+        <private>
+            <methods>
+                <method name="A" type="" scope="instance">
+                    <arguments/>
+                </method>
+                <method name="~A" type="" scope="instance">
+                    <arguments/>
+                </method>
+            </methods>
+        </private>
+    </class>
     <class name="B" kind="concrete">
         <private>
             <attributes>

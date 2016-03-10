@@ -2,7 +2,7 @@
 
 INTERPRET=php
 FLAGS='-d open_basedir=""'
-FILE=cls2.php
+FILE=cls.php
 
 JEXAMXML_INTERPRET="java -jar jexamxml.jar"
 JEXAMXML_OPTIONS=cls_options
@@ -348,7 +348,7 @@ check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-XML: 21/OK - ${REF_OUTPUT_DIR}/test21.in"
-echoTest " - test datoveho typu, typ je definovana trieda"
+echoTest " - test datoveho typu, typ je definovana trieda, konstruktor, destruktor"
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test21.in -o=$JEXAMXML_INPUT --details
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test21.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
