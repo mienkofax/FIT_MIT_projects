@@ -1,5 +1,29 @@
 Archive:  xtisov00-CLS.zip
  extracting: rozsireni               
   inflating: cls.php                 
-HELP MSGdos2unix: converting file rozsireni to file rozsireni.lf in Unix format ...
+  inflating: CLS-doc.pdf             
+CLS: Skript pro analyzu hlavickovych souboru jazyka C++11 a nasledny XML vystup.
+Autor: Peter Tisovcik <xtisov00@fit.vutbr.cz>
+
+	--help, -h
+		vypis napovedy
+
+	--input=file, -i=file
+		vstupni hlavickovy soubor jazyka C++11
+
+	--output=file, -o=file
+		vystupni soubor, do ktereho se ulozi XML vystup, pokud neni zadany pouzije se stdout
+
+	--pretty-xml=n, -p=n
+		pocet mezer v zanoreni XML souboru, pokud nebude zadany n=4
+
+	--details=class, -d=class
+		vypise detaily o zadane tride, pokud neni zadana class tak je vypsan detail o vsech tridach
+
+	--search=XPATH, -s=XPATH
+		retezec, ktery reprezentuje XPATH vyraz
+
+	--conflicts, -c
+		vypis konfliktnich clenu
+dos2unix: converting file rozsireni to file rozsireni.lf in Unix format ...
 dos2unix: converting file ./cls.php to Unix format ...

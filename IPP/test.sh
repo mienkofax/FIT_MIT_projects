@@ -2,7 +2,7 @@
 
 INTERPRET=php
 FLAGS='-d open_basedir=""'
-FILE=cls3.php
+FILE=cls.php
 
 JEXAMXML_INTERPRET="java -jar jexamxml.jar"
 JEXAMXML_OPTIONS=cls_options

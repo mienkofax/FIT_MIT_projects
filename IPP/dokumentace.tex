@@ -1,0 +1,83 @@
+\documentclass[10pt,a4paper,final]{article}
+% cestina a fonty
+\usepackage[czech]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage{times}
+% odsazeni prvniho radku
+\usepackage{indentfirst}
+% balicky pro odkazy
+\usepackage[bookmarksopen,colorlinks,plainpages=false,urlcolor=blue,
+unicode,linkcolor=black]{hyperref}
+\usepackage{url}
+% obrazky
+\usepackage[dvipdf]{graphicx}
+% velikost stranky
+\usepackage[top=3.5cm, left=2.5cm, text={17cm, 24cm}, ignorefoot]{geometry}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  % nastaveni cislovani
+  \pagestyle{plain}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+  
+  % nastaveni mezery mezi odstavci a odsazeni prvniho radku
+  \setlength{\parindent}{1cm}
+  \setlength{\parskip}{0.5cm plus4mm minus3mm}
+  
+  \noindent
+  Dokumentace úlohy CLS: C++ Classes v PHP 5 do IPP 2015/2016 \\
+  Jméno a příjmení: Peter Tisovčík \\
+  Login: xtisov00 \\
+  
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \section{Úvod} \label{uvod}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Tato dokumentace popisuje implementaci skriptu v jazyce PHP 5. Úkolem vytvořeného skriptu je analýza hlavičkových souborů jazyka C++11 a jejich následná reprezentace pomocí XML syntaxe. V dokumentaci se nachází popis implementace zpracování parametrů programu, parsování vstupního hlavičkového souboru a následného generování výstupního souboru v XML formátu.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \section{Zpracování parametrů} \label{zpracovani-parametru}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ke zpracování vstupních parametrů slouží v PHP funkce \texttt{getopt()}, která načte parametry na základě zadaných přepínačů. Samotná funkce \texttt{getopt()} však nestačí k ošetření všech možností, které ze zadání vyplývají. Tyto nedostatky řeší třída \texttt{InputArgv}.
+
+Tato třída ošetřuje situace, kdy jsou zadány nesprávné argumenty, nesprávné parametry argumentů jako například neexistující vstupní soubor, zadání nesprávné hodnoty přepínače \texttt{pretty-xml}, zadání krátkých přepínačů a jejich kolize s dlouhými přepínači.
+	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \section{Načtení hlavičkového souboru C++11} \label{nacitanie-suboru}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Pro usnadnění zpracování vstupního hlavičkového souboru slouží třída \texttt{ParseInputFile}. Třída obsahuje metodu \texttt{ParseInput()}, která v sobě implementuje konečný automat, na základě kterého se analyzují jednotlivé části vstupního souboru.
+
+Konečný automat využívá při své analýze metodu \texttt{ReadTo()}, jejímž parametrem je pole znaků, po které má načítat. Zanalyzované části vstupního souboru se následně ukládají do pole objektů typu \texttt{TemplateClass}, které reprezentují třídu ve vstupním hlavičkovém souboru. Třída v sobě obsahuje všechny potřebné informace, které budou později potřeba pro generování výstupního XML souboru.
+
+Mezi nejdůležitější metody, které se používají v konečném automatu, patří metoda \texttt{CopyClass()}, která se využívá při dědičnosti a zkopíruje informace o metodách a atributech do aktuální třídy. Další velmi důležitou metodou je \texttt{CheckClass()}, která umožňuje redefinovat metody a atributy. Zároveň tato metoda volá metodu \texttt{CheckConflict()}, která kontroluje, zda nenastaly konflikty při dědění.  Nachází se tu i metoda \texttt{addUsing()} pro zpřístupnění metody či atributu v daném jmenném prostoru, díky které je možno předejít konfliktům. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \section{Generování výstupního XML} \label{generovanie-xml}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pro generování XML výstupu byla použita třída \texttt{XMLWriter}. Objekt z této třídy reprezentoval strukturu vstupního souboru, která byla uložena v poli objektů pro analyzované třídy - \texttt{TemplateClass}. Na výstup mohly být vygenerovány tři typy XML výstupů. Struktura byla podobná, avšak každý typ v sobě ukrýval jiná úskalí.
+
+Strom dědičnosti popisuje dědičnost mezi třídami, pro vygenerování tohoto výstupu byla použita metoda \texttt{generateB()}, která rekurzivně prohledává jednotlivé objekty zpracovaných tříd a na výstup vypisuje potřebné informace. Při zpracování vstupního souboru bylo třeba správně identifikovat, zda sa jedná o abstraktní nebo konkrétní metodu. Dalším typem byl výpis detailů o zadané třídě či třídách. Zde bylo třeba ošetřit, aby se zbytečně nevypisovaly některé elementy, které v sobě již neobsahovaly další detaily. Dále bylo potřeba zajistit, aby se nevypisovaly zděděné privátní členy. Posledním typem byl výpis \texttt{XPath} struktury, který však bylo nutné převést zpět do XML objektu a správně naformátovat odsazení.
+
+   
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \section{Výpis konfliktů} \label{konfliktne-cleny}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Rozhodl jsem se implementovat i bonusový úkol CFL, jehož cílem bylo vypsat konfliktní členy. Pro implementaci tohoto rozšíření bylo nutné přidat nový přepínač \texttt{--conflicts}. Dále bylo nutné omezit chybová hlášení při nalezení konfliktu při zadání tohoto přepínače. Také bylo třeba konfliktní typy správně identifikovat, o což se stará metoda \texttt{CheckConflict()}. Největší pozornost byla věnována implementaci XML výstupu s konfliktními členy. Při tomto výpisu bylo potřební zjistit, ve kterých třídách se konfliktní typy nacházejí, a jejich správný výpis, který generuje metoda \texttt{generateB()}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+\end{document}

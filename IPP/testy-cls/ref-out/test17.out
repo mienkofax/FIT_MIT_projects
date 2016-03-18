@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
     <class name="A" kind="abstract">
-        <public>
-            <attributes>
-                <attribute name="c" type="double" scope="instance"/>
-            </attributes>
-        </public>
         <private>
             <methods>
                 <method name="a" type="int" scope="instance">
@@ -24,11 +19,6 @@
         <inheritance>
             <from name="A" privacy="protected"/>
         </inheritance>
-        <protected>
-            <attributes>
-                <attribute name="c" type="double" scope="instance"/>
-            </attributes>
-        </protected>
         <private>
             <methods>
                 <method name="a" type="int *" scope="instance">
