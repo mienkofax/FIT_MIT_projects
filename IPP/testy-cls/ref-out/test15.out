@@ -33,13 +33,6 @@
                 </method>
             </methods>
         </public>
-        <private>
-            <attributes>
-                <attribute name="x" type="int" scope="instance">
-                    <from name="A"/>
-                </attribute>
-            </attributes>
-        </private>
     </class>
     <class name="C" kind="concrete">
         <inheritance>
@@ -56,9 +49,6 @@
         </protected>
         <private>
             <attributes>
-                <attribute name="x" type="int" scope="instance">
-                    <from name="A"/>
-                </attribute>
                 <attribute name="c" type="float" scope="instance">
                     <from name="B"/>
                 </attribute>

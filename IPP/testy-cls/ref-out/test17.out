@@ -52,20 +52,6 @@
             <attributes>
                 <attribute name="c" type="bool" scope="instance"/>
             </attributes>
-            <methods>
-                <method name="a" type="int *" scope="instance">
-                    <from name="B"/>
-                    <arguments>
-                        <argument name="b" type="int &amp;"/>
-                        <argument name="d" type="double"/>
-                    </arguments>
-                </method>
-                <method name="c" type="double" scope="instance">
-                    <from name="B"/>
-                    <virtual pure="no"/>
-                    <arguments/>
-                </method>
-            </methods>
         </private>
     </class>
 </model>

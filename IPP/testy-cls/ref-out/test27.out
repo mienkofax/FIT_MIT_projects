@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+    <class name="A" kind="concrete">
+        <private>
+            <attributes>
+                <attribute name="a" type="int" scope="instance"/>
+            </attributes>
+        </private>
+    </class>
+    <class name="B" kind="concrete">
+        <inheritance>
+            <from name="A" privacy="public"/>
+        </inheritance>
+        <private>
+            <attributes>
+                <attribute name="b" type="int" scope="instance"/>
+            </attributes>
+        </private>
+    </class>
+    <class name="C" kind="concrete">
+        <private>
+            <methods>
+                <method name="a" type="int" scope="instance">
+                    <arguments/>
+                </method>
+            </methods>
+        </private>
+    </class>
+    <class name="D" kind="concrete">
+        <inheritance>
+            <from name="C" privacy="public"/>
+        </inheritance>
+        <private>
+            <methods>
+                <method name="b" type="int" scope="instance">
+                    <arguments/>
+                </method>
+            </methods>
+        </private>
+    </class>
+</model>

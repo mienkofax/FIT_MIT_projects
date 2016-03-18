@@ -2,7 +2,7 @@
 
 INTERPRET=php
 FLAGS='-d open_basedir=""'
-FILE=cls.php
+FILE=cls3.php
 
 JEXAMXML_INTERPRET="java -jar jexamxml.jar"
 JEXAMXML_OPTIONS=cls_options
@@ -161,9 +161,9 @@ $INTERPRET $FLAGS $FILE -o=file --input=$INPUT_FILE
 check "OK"
 echo $SEPARATOR
 
-echoTest "TEST-ARG: 17/OK - kratky prepinac -h"
+echoTest "TEST-ARG: 17/ERR - kratky prepinac -h"
 $INTERPRET $FLAGS $FILE -h --input=$INPUT_FILE
-check "OK"
+check "ERR"
 echo $SEPARATOR
 
 echoTest "TEST-ARG: 18/OK - kratky prepinac -p"
@@ -202,6 +202,7 @@ check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test02.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
 check "OK"
 echo $SEPARATOR
+
 
 echoTest "TEST-XML: 03/OK - ${REF_OUTPUT_DIR}/test03.in"
 echoTest " - vypis dedici tridy"
@@ -285,7 +286,7 @@ echo $SEPARATOR
 
 echoTest "TEST-XML: 13/OK - ${REF_OUTPUT_DIR}/test13.in"
 echoTest " - vypis jednej triedy v strome dedicnosti"
-$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test13.in -o=$JEXAMXML_INPUT
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test13.in -o=$JEXAMXML_INPUT --details=B
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test13.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
 check "OK"
@@ -352,6 +353,49 @@ echoTest " - test datoveho typu, typ je definovana trieda, konstruktor, destrukt
 $INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test21.in -o=$JEXAMXML_INPUT --details
 check "OK"
 $JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test21.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
+check "OK"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 22/OK - ${REF_OUTPUT_DIR}/test22.in"
+echoTest " - test dedicnosti privatnych premennych"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test22.in -o=$JEXAMXML_INPUT
+check "OK"
+$JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test22.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
+check "OK"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 23/OK - ${REF_OUTPUT_DIR}/test23.in"
+echoTest " - chyba, neexistuje trieda, s ktorej sa ma dedit"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test23.in -o=$JEXAMXML_INPUT
+check "ERR"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 24/ERR - ${REF_OUTPUT_DIR}/test24.in"
+echoTest " - chyba, neexistuje datovy typ atributu"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test24.in -o=$JEXAMXML_INPUT
+check "ERR"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 25/ERR - ${REF_OUTPUT_DIR}/test25.in"
+echoTest " - chyba, neexistuje datovy typ metody"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test25.in -o=$JEXAMXML_INPUT
+check "ERR"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 26/OK - ${REF_OUTPUT_DIR}/test26.in"
+echoTest " - Pokud class
+neexistuje, bude na výstup vypsána pouze XML hlavička."
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test26.in -o=$JEXAMXML_INPUT --details=UUUU
+check "OK"
+diff  $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test26.out
+check "OK"
+echo $SEPARATOR
+
+echoTest "TEST-XML: 27/OK - ${REF_OUTPUT_DIR}/test27.in"
+echoTest " - test dedicnosti privatnych premennych"
+$INTERPRET $FLAGS $FILE --input=$REF_INPUT_DIR/test27.in -o=$JEXAMXML_INPUT --details
+check "OK"
+$JEXAMXML_INTERPRET $JEXAMXML_INPUT ${REF_OUTPUT_DIR}/test27.out $JEXAMXML_DELTA  $JEXAMXML_OPTIONS
 check "OK"
 echo $SEPARATOR
 # Koniec testov XML parsovania

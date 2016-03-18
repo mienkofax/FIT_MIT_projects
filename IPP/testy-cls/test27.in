@@ -1,0 +1,2 @@
+class A{ int a;}; class B:public A {int b;};
+class C{ int a();}; class D:public C {int b();};
