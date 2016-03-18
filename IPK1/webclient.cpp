@@ -287,4 +287,5 @@ int main(int argc, char *argv[]) {
 }
 //TODO dopisat help
 //TODO dopisat chybove spravy
-//TODO dorobit ukladanie 
+//TODO dorobit ukladanie
+//TODO dorobit aby to bralo nazov suboru z url
