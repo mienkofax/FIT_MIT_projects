@@ -119,15 +119,16 @@ int parseURL(TUrlData *url_data, string tmp) {
 	else
 		url_data->path = "/";
 
+//		cout << "hostname:: " << url_data->url << endl;
+//		cout << "path:: " << url_data->path << endl;
+//		cout << "port:: " << url_data->port << endl;
 	return 0;
 }
 
 int parseArg(TUrlData *url_data, int argc, char *argv[]) {
-
 	if (argc < 2 || argc >3)
 		return E_ARGV;
-
-	if (argc == 2)
+	if (argc == 2 || argc == 3)
 		parseURL(url_data, argv[1]);
 
 	if (argc == 3)
@@ -135,7 +136,7 @@ int parseArg(TUrlData *url_data, int argc, char *argv[]) {
 
 	return 0;
 }
-
+\
 /* Pripojenie klienta k serveru */
 int connectClient(TUrlData url_data, int *client_socket) {
 	struct sockaddr_in sin;
@@ -174,7 +175,10 @@ int sendRequest(TUrlData url_data, int socket, string *s, int *chunked) {
 	req.append(" " + url_data.http_ver + "\r\n");
 	req.append("Host: " + url_data.url + "\r\n");
 	req.append("Connection: close\r\n");
-	req.append("User-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36 OPR/35.0.2066.92\r\n\r\n");
+	req.append("Content-Encoding: gzip\r\n\r\n");
+	//req.append("User-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36 OPR/35.0.2066.92\r\n\r\n");
+
+	cout << endl << req << endl;
 
 	/* Odoslanie poziadavky */
 	if (write(socket, req.c_str(), req.size()) < 0)
@@ -230,8 +234,27 @@ int redirect(string data, TUrlData *url_data) {
 /* Ulozenie dat do suboru */
 int saveData(string msg) {
 	ofstream file;
+	const char *s = msg.substr(0,msg.find("\n")).c_str();
+	char *end = NULL;
+
+	// Spracovanie chunk spravy ak sa podarilo nacitat cislo
+	if (s != end) {
+		int chunk = 0, i;
+		string output = "";
+
+		do {
+			i = msg.find("\n"); // Najdenie velkosti
+			chunk = strtoul(msg.substr(0,i).c_str(), NULL, 16); //hex->dec
+			msg.erase(0, i+1); // Odstranenie chunku + zarovnania
+
+			output += msg.substr(0, chunk); // Skopirovanie udajov
+			msg.erase(0, chunk+2); // Odstranenie skopironych udajov + \n\r
+		} while(chunk > 0);
+		msg = output;
+	}
+
+	file.open("peto.html", ios::out | ios::binary);
 	file << msg;
-	file.write(msg.c_str(), msg.length());
 	file.close();
 
 	return 0;
@@ -240,7 +263,7 @@ int saveData(string msg) {
 int main(int argc, char *argv[]) {
 	int sock, chunked = 0;
 	string msg = "";
-	TUrlData url_data = {80, "", "/", "index.html", "HTTP/1.0", "GET"};
+	TUrlData url_data = {80, "", "/", "index.html", "HTTP/1.1", "GET"};
 	int err = 0;
 	int redir = 0;
 
