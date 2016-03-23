@@ -49,18 +49,58 @@ enum code {
 	E_CLOSESOCK,
 	E_NOTFOUND,
 	E_SERVER,
-	E_OTHER_ERR,
 	E_NOT_SUPP,
 	E_LINK,
 	E_ARGV,
 	E_UNKNOWN
 };
 
+string errMsg[] = {
+	"",
+	"",
+	"socket",
+	"hostname",
+	"connect",
+	"in send to",
+	"in receive",
+	"close socket",
+	"not found",
+	"not supported",
+	"bad link",
+	"bad argument",
+	"unknown err"
+};
+
 /* Vypis chybovej spravy na stderr */
 void printErrMsg(int err_code) {
-	//cerr << msg;
-	cout << "====Chyba====" << err_code << endl;
-	exit(10);
+	cerr << "Error: " << errMsg[err_code] << endl;
+	exit(err_code);
+}
+
+/* Nahradenie povodneho stringy vovym*/
+string replace(string path, string from, string to) {
+	size_t index = 0;
+	while (true) {
+		index = path.find(from, index);
+		if (index == std::string::npos) break;
+
+		path.replace(index, from.length(), to);
+
+		index += to.length();
+	}
+	return path;
+}
+
+/* Ziskanie nazvu suboru z cesty */
+string getFileName(string path) {
+	path = replace(path, "%20", " ");
+	uint index = path.rfind("/");
+	if (index != 0 && (index+1) != path.length()) {
+		path.erase(0, index+1);
+		return path;
+	}
+
+	return "index.html";
 }
 
 /* Rozparsovanie vstupnej url adresy */
@@ -114,29 +154,43 @@ int parseURL(TUrlData *url_data, string tmp) {
 	}
 
 	/* Ulozenie path cesty */
-	if (tmp.length())
+	tmp = replace(tmp," ", "%20");
+
+	if (tmp.length() > 0)
 		url_data->path = tmp;
 	else
 		url_data->path = "/";
 
-//		cout << "hostname:: " << url_data->url << endl;
-//		cout << "path:: " << url_data->path << endl;
-//		cout << "port:: " << url_data->port << endl;
+	static bool filename = true;
+	if (filename) {
+		url_data->file = getFileName(url_data->path);
+		filename = false;
+	}
 	return 0;
 }
 
+/* Parsovanie argumentov */
 int parseArg(TUrlData *url_data, int argc, char *argv[]) {
+	int err = 0;
+
 	if (argc < 2 || argc >3)
 		return E_ARGV;
-	if (argc == 2 || argc == 3)
-		parseURL(url_data, argv[1]);
+
+	if (argc == 2 || argc == 3){
+
+		if (argc == 3)
+			url_data->file = argv[2];
+
+		err = parseURL(url_data, argv[1]);
+		return err;
+	}
 
 	if (argc == 3)
 		url_data->file = argv[2];
 
 	return 0;
 }
-\
+
 /* Pripojenie klienta k serveru */
 int connectClient(TUrlData url_data, int *client_socket) {
 	struct sockaddr_in sin;
@@ -172,13 +226,10 @@ int sendRequest(TUrlData url_data, int socket, string *s, int *chunked) {
 
 	/* Vytvorenie hlavicky poziadavky */
 	req.append(url_data.method_type + " " + url_data.path);
-	req.append(" " + url_data.http_ver + "\r\n");
+	req.append(" HTTP/1.1\r\n");
 	req.append("Host: " + url_data.url + "\r\n");
 	req.append("Connection: close\r\n");
 	req.append("Content-Encoding: gzip\r\n\r\n");
-	//req.append("User-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36 OPR/35.0.2066.92\r\n\r\n");
-
-	cout << endl << req << endl;
 
 	/* Odoslanie poziadavky */
 	if (write(socket, req.c_str(), req.size()) < 0)
@@ -196,6 +247,7 @@ int sendRequest(TUrlData url_data, int socket, string *s, int *chunked) {
 	return 0;
 }
 
+/* Spracovanie odpovede */
 int waitResponse(string msg) {
 	msg.erase(0, 9);
 	int i = msg.find("\n");
@@ -215,7 +267,7 @@ int waitResponse(string msg) {
 	else if (msg.find("505") != string::npos) //Version not supported
 		return E_NOT_SUPP;
 	else
-		return E_OTHER_ERR;
+		return E_UNKNOWN;
 
 	return 0;
 }
@@ -225,20 +277,24 @@ int redirect(string data, TUrlData *url_data) {
 	int index = data.find("Location:");
 	data.erase(0, index+10);
 
-	index = data.find("\n");
+	index = data.find("\r");
 	data.erase(index);
 
 	return parseURL(url_data, data);
 }
 
 /* Ulozenie dat do suboru */
-int saveData(string msg) {
+int saveData(string msg, string file_name) {
 	ofstream file;
-	const char *s = msg.substr(0,msg.find("\n")).c_str();
 	char *end = NULL;
+	const char *s = msg.substr(0,msg.find("\n")).c_str();
+	strtoul(msg.substr(0,msg.find("\n")).c_str(), &end, 16);
 
 	// Spracovanie chunk spravy ak sa podarilo nacitat cislo
-	if (s != end) {
+	// s - obsahuje retazec po \n
+	// end - obsahuje retazec, ktory sa nepodarilo nacitat ako cislo po /n
+	if (s != end && msg.find("\n") != 0) {
+
 		int chunk = 0, i;
 		string output = "";
 
@@ -253,7 +309,7 @@ int saveData(string msg) {
 		msg = output;
 	}
 
-	file.open("peto.html", ios::out | ios::binary);
+	file.open(file_name.c_str(), ios::out | ios::binary);
 	file << msg;
 	file.close();
 
@@ -289,7 +345,7 @@ int main(int argc, char *argv[]) {
 			if ((index = msg.find("\r\n\r\n")) != string::npos)
 				msg.erase(0, index+4);
 
-			saveData(msg);
+			saveData(msg, url_data.file);
 			break;
 		} else if (err == E_NOT_SUPP) {
 			if ((err = waitResponse(msg)) != OK)
