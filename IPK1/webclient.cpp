@@ -1,3 +1,8 @@
+/**
+ * @author Peter Tisovcik <xtisov00@fit.vutbr.cz
+ * @description Jednoduchy webclient
+ */
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -6,22 +11,12 @@
 #include <netdb.h>
 #include <string.h>
 #include <stdlib.h>
-
-#include <iostream>
-#include <sstream>
-#include <fstream>
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <map>
-#include <sstream>
-
-#include <cstring>
 #include <unistd.h>
 
-
+#include <iostream>
 #include <sstream>
+#include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -176,17 +171,10 @@ int parseArg(TUrlData *url_data, int argc, char *argv[]) {
 	if (argc < 2 || argc >3)
 		return E_ARGV;
 
-	if (argc == 2 || argc == 3){
-
-		if (argc == 3)
-			url_data->file = argv[2];
-
+	if (argc == 2){
 		err = parseURL(url_data, argv[1]);
 		return err;
 	}
-
-	if (argc == 3)
-		url_data->file = argv[2];
 
 	return 0;
 }
@@ -217,7 +205,7 @@ int connectClient(TUrlData url_data, int *client_socket) {
 }
 
 /* Odosle poziadavku na server */
-int sendRequest(TUrlData url_data, int socket, string *s, int *chunked) {
+int sendRequest(TUrlData url_data, int socket, string *s) {
 	char buffer[BUFFER_SIZE];
 	string req = "";
 	int i = 0;
@@ -302,7 +290,6 @@ int saveData(string msg, string file_name) {
 			i = msg.find("\n"); // Najdenie velkosti
 			chunk = strtoul(msg.substr(0,i).c_str(), NULL, 16); //hex->dec
 			msg.erase(0, i+1); // Odstranenie chunku + zarovnania
-
 			output += msg.substr(0, chunk); // Skopirovanie udajov
 			msg.erase(0, chunk+2); // Odstranenie skopironych udajov + \n\r
 		} while(chunk > 0);
@@ -317,7 +304,7 @@ int saveData(string msg, string file_name) {
 }
 
 int main(int argc, char *argv[]) {
-	int sock, chunked = 0;
+	int sock;
 	string msg = "";
 	TUrlData url_data = {80, "", "/", "index.html", "HTTP/1.1", "GET"};
 	int err = 0;
@@ -333,7 +320,7 @@ int main(int argc, char *argv[]) {
 			printErrMsg(err);
 
 		// Odoslanie poziadavky
-		if ((err = sendRequest(url_data, sock, &msg, &chunked)) != OK)
+		if ((err = sendRequest(url_data, sock, &msg)) != OK)
 			printErrMsg(err);
 
 		/* Defaultne odoslanie ako HTTP 1.1 v pripade chyby 505, pouzitie HTTP 1.0 */
@@ -348,15 +335,11 @@ int main(int argc, char *argv[]) {
 			saveData(msg, url_data.file);
 			break;
 		} else if (err == E_NOT_SUPP) {
-			if ((err = waitResponse(msg)) != OK)
-				printErrMsg(err);
-
 			/* Nastavenie hlavicky pre HTTP/1.0 */
 			url_data.http_ver = "HTTP/1.0";
 		} else if (err == REDIR) {
 			if ((err = redirect(msg, &url_data)) != OK)
 				printErrMsg(err);
-
 		} else
 			printErrMsg(E_UNKNOWN);
 
@@ -364,7 +347,3 @@ int main(int argc, char *argv[]) {
 		msg = "";
 	}
 }
-//TODO dopisat help
-//TODO dopisat chybove spravy
-//TODO dorobit ukladanie
-//TODO dorobit aby to bralo nazov suboru z url

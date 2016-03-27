@@ -68,37 +68,37 @@ check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-05/OK - test url - http://www.fit.vutbr.cz"
-./webclient http://www.fit.vutbr.cz $OUTPUT_FILE
+./webclient http://www.fit.vutbr.cz
 check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-06/OK - test url - http://www.fit.vutbr.cz/"
-./webclient http://www.fit.vutbr.cz/ $OUTPUT_FILE
+./webclient http://www.fit.vutbr.cz/
 check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-07/OK - test url - http://www.fit.vutbr.cz/news"
-./webclient http://www.fit.vutbr.cz/news $OUTPUT_FILE
+./webclient http://www.fit.vutbr.cz/news
 check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-08/OK - test url - http://www.fit.vutbr.cz:80"
-./webclient http://www.fit.vutbr.cz:80 $OUTPUT_FILE
+./webclient http://www.fit.vutbr.cz:80
 check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-09/OK - test url - http://www.fit.vutbr.cz:80/"
-./webclient http://www.fit.vutbr.cz:80/ $OUTPUT_FILE
+./webclient http://www.fit.vutbr.cz:80/
 check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-10/OK - test url - http://www.fit.vutbr.cz:80/news"
-./webclient http://www.fit.vutbr.cz:80/news $OUTPUT_FILE
+./webclient http://www.fit.vutbr.cz:80/news
 check "OK"
 echo $SEPARATOR
 
 echoTest "TEST-11/OK - test url - http://www.fit.vutbr.cz:80/news/"
-./webclient http://www.fit.vutbr.cz:80/news/ $OUTPUT_FILE
+./webclient http://www.fit.vutbr.cz:80/news/
 check "OK"
 echo $SEPARATOR
 
