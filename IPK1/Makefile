@@ -6,5 +6,6 @@ LOGIN=xtisov00
 all: webclient.cpp
 	$(CC) $(FLAGS) webclient.cpp -o webclient
 
-zip:
-	zip $(LOGIN).zip Makefile webclient.cpp
+tar: tar
+	tar -cf $(LOGIN).tar webclient.cpp Makefile
+	gzip $(LOGIN).tar
