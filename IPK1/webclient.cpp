@@ -47,7 +47,8 @@ enum code {
 	E_NOT_SUPP,
 	E_LINK,
 	E_ARGV,
-	E_UNKNOWN
+	E_UNKNOWN,
+	E_MAXREDIR
 };
 
 string errMsg[] = {
@@ -63,7 +64,8 @@ string errMsg[] = {
 	"not supported",
 	"bad link",
 	"bad argument",
-	"unknown err"
+	"unknown err",
+	"max redirect"
 };
 
 /* Vypis chybovej spravy na stderr */
@@ -346,4 +348,6 @@ int main(int argc, char *argv[]) {
 		redir++;
 		msg = "";
 	}
+	if (redir == 5)
+		printErrMsg(E_MAXREDIR);
 }
