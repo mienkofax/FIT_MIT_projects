@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<root>
 <row>
     <col1>
         zkouska csv,formatu,se tremi sloupci
@@ -14,3 +15,4 @@
         posledni radek neni ukoncen, odradkovanim, tedy neni tu znak \r\n
     </col1>
 </row>
+</root>

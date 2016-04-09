@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<root>
 <ra-dek>
     <col1>
         zkouska csv
@@ -12,7 +13,7 @@
 </ra-dek>
 <ra-dek>
     <col1>
-        znaky kolem carek 
+        znaky kolem carek
     </col1>
     <col2>
          se nevynechavaji
@@ -32,3 +33,4 @@
          tedy neni tu znak \r\n
     </col3>
 </ra-dek>
+</root>

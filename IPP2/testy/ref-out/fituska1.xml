@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
-<row index="5">
+<row>
     <col1>
-        aěščřřýžáhoj,svete
+        aaa
     </col1>
     <col2>
-        lomitko uvozovkyOK,konec
+        b
+bb
     </col2>
     <col3>
-        testu
+        ccc
     </col3>
 </row>
-<row index="6">
+<row>
     <col1>
-        aěščřřýžáhoj,svete
+        zzz
     </col1>
     <col2>
-        lomitko uvozovkyOK,konec
+        yyy
     </col2>
     <col3>
-        testu
+        xxx
     </col3>
 </row>
 </root>
