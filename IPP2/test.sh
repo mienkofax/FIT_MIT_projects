@@ -442,13 +442,14 @@ csvCheck "fituska3" 0 "-l=line -i"
 
 #chybove testy
 csvCheck "return1" 0 ""
-
 csvCheck "return2" 32 ""
 csvCheck "return1" 30 "-r=\&tralala"
 csvCheck "return1" 30 "-c=tral&l&"
 csvCheck "return1" 30 "-l=<row>"
 csvCheck "return1" 1 "--help"
 csvCheck "return1" 1 "-l"
+csvCheck "return1" 1 "-r"
+csvCheck "return1" 1 "-c"
 csvCheck "return1" 1 "-i"
 csvCheck "return1" 1 "-i --start=42"
 csvCheck "return1" 1 "-l=row --start=42"
@@ -461,7 +462,7 @@ csvCheck "return1" 1 "--all-columns"
 
 
 
-csvCheck "return1" 2 "--input=neexistujici_soubor" # pokud skript vraci chybu cislo 1, je to jeste lepsi chovani O:) (2x parametr input)
+csvCheck "return1" 1 "--input=neexistujici_soubor" # pokud skript vraci chybu cislo 1, je to jeste lepsi chovani O:) (2x parametr input)
 csvCheck "return3" 31 "-h=0"
 csvCheck "return3" 0 "-r=root -h=x"
 csvCheck "return3" 1 "-r=root -r=boot"

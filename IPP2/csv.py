@@ -102,7 +102,7 @@ class csv2xml:
 							xmlData[len(xmlData)-1].text = val
 						else:
 							xmlData.append(ET.SubElement(xmlData[lineElementIndex], col))
-							xmlData[len(xmlData)-1].text = self.convertData(row[i])
+							xmlData[len(xmlData)-1].text = row[i]
 
 				#osetrit situaciu, ked je hlavicka kratsia
 				if len(colName) < len(row):
@@ -132,7 +132,7 @@ class csv2xml:
 								col = colName[i]
 
 							xmlData.append(ET.SubElement(xmlData[lineElementIndex], col))
-							xmlData[len(xmlData)-1].text = self.convertData(row[i])
+							xmlData[len(xmlData)-1].text = row[i]
 
 			else:
 				if len(colName) != len(row):
@@ -145,7 +145,7 @@ class csv2xml:
 						col = colName[i]
 
 					xmlData.append(ET.SubElement(xmlData[lineElementIndex], col))
-					xmlData[len(xmlData)-1].text = self.convertData(row[i])
+					xmlData[len(xmlData)-1].text = row[i]
 		#except:
 		#	self.printErr("Neznaman chyba.", 222)
 
@@ -221,15 +221,6 @@ class csv2xml:
 			char in range(12272,12289) or char in range(55296, 63744) or
 			char in range(64976,65008) or char in range(65534,1114111)):
 				self.printErr("Nevalidny znak. ", exitCode)
-
-	#konvertuje problematicke znaky
-	def convertData(self, elem):
-		elem = elem.replace("&quot;", "\"")
-		elem = elem.replace("&amp;", "&")
-		elem = elem.replace("&apos;", "\'")
-		elem = elem.replace("&lt;", "<")
-		elem = elem.replace("&gt;", ">")
-		return elem
 
 	#konvertuje problematicke znaky
 	def convertElementMis(self, elem):
