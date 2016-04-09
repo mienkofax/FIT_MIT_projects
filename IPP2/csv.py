@@ -16,6 +16,7 @@ class customArgumentParser(argparse.ArgumentParser):
 		sys.stderr.write("Zly prepinac.\n")
 		sys.exit(1)
 
+
 #hlavna trieda
 class csv2xml:
 
@@ -25,6 +26,8 @@ class csv2xml:
 		argv = self.parseArg()
 
 		spamreader = csv_module.reader(argv.inputFile, delimiter = argv.separator,  quotechar='"')
+
+		#try:
 
 		#-r=root-element
 		xmlData = []
@@ -54,6 +57,12 @@ class csv2xml:
 					continue
 			#-h=subst -- nacita sahlavicka, -h --nacita sa hlavicka a nevypise sa
 			elif argv.subst != None and header:
+				col = "col"
+				#priradenie nazvu stlpca -- -c=column-element
+				if argv.colElem != None:
+					col = argv.colElem
+
+				argv.colElem = col
 				#prevod nepovolenych znakov
 				for item in row:
 					colName.append(self.replaceElement(item, argv.subst))
@@ -93,12 +102,12 @@ class csv2xml:
 							xmlData[len(xmlData)-1].text = val
 						else:
 							xmlData.append(ET.SubElement(xmlData[lineElementIndex], col))
-							xmlData[len(xmlData)-1].text = row[i]
+							xmlData[len(xmlData)-1].text = self.convertData(row[i])
 
 				#osetrit situaciu, ked je hlavicka kratsia
 				if len(colName) < len(row):
 					#if argv.allColumns:
-					#	printErr("Vasci pocet zaznamov ako je dany v hlavicke.", 32)
+						#self.printErr("Vasci pocet zaznamov ako je dany v hlavicke.", 32)
 
 					if argv.allColumns:
 						count = len(row)
@@ -123,7 +132,7 @@ class csv2xml:
 								col = colName[i]
 
 							xmlData.append(ET.SubElement(xmlData[lineElementIndex], col))
-							xmlData[len(xmlData)-1].text = row[i]
+							xmlData[len(xmlData)-1].text = self.convertData(row[i])
 
 			else:
 				if len(colName) != len(row):
@@ -136,8 +145,9 @@ class csv2xml:
 						col = colName[i]
 
 					xmlData.append(ET.SubElement(xmlData[lineElementIndex], col))
-					xmlData[len(xmlData)-1].text = row[i]
-
+					xmlData[len(xmlData)-1].text = self.convertData(row[i])
+		#except:
+		#	self.printErr("Neznaman chyba.", 222)
 
 
 		#data = ET.SubElement(xmlData[0], "data")
@@ -184,23 +194,49 @@ class csv2xml:
 		if None != valid.match(line):
 			self.printErr("Nepodporovany unicode znak. ", 111)
 
-	#validacia xml elementu
+	#validacia xml elementu row/col alebo root element
 	def validElement(self, elem, exitCode):
-		self.validData(elem)
-		if  None != re.match('[0-9]|[^\w]|[\s]', elem):
-			self.printErr("Nevalidny znak. ", exitCode)
+		firstChar = True
+		for char in elem:
+			char = ord(char)
+
+			#osetrenie pre prvy znak elementu
+			if firstChar:
+				if (char <= 64 or char in range(91,95) or char == 96 or
+				char in range(123,192) or char == 215  or char == 247 or
+				char in range (768, 880) or char == 894 or char in range(8192,8204) or
+				char in range(8206,8304) or char in range (8592, 11264) or
+				char in range(12272,12289) or char in range(55296, 63744) or
+				char in range(64976,65008) or char in range(65534,1114111)):
+					self.printErr("Nevalidny znak. ", exitCode)
+				firstChar = False
+				continue
+
+			#osetrenie pre druhy a dalsie znaky v elemente
+			if (char <= 44 or char == 47 or char in range(59,65) or
+			char in range(91,95) or char == 96 or char in range(123,183) or
+			char in range(184,192) or char == 215 or char == 247 or char == 894 or
+			char in range(8192,8204) or char in range(8206,8255) or
+			char in range(8257,8304) or char in range (8592, 11264) or
+			char in range(12272,12289) or char in range(55296, 63744) or
+			char in range(64976,65008) or char in range(65534,1114111)):
+				self.printErr("Nevalidny znak. ", exitCode)
 
 	#konvertuje problematicke znaky
-	def convertElement(self, elem):
-		elem = elem.replace("\"", "&quot;")
-		elem = elem.replace("&", "&amp;")
-		elem = elem.replace("\'", "&apos;")
-		elem = elem.replace("<", "&lt;")
-		elem = elem.replace(">", "&gt;")
+	def convertData(self, elem):
+		elem = elem.replace("&quot;", "\"")
+		elem = elem.replace("&amp;", "&")
+		elem = elem.replace("&apos;", "\'")
+		elem = elem.replace("&lt;", "<")
+		elem = elem.replace("&gt;", ">")
 		return elem
 
+	#konvertuje problematicke znaky
+	def convertElementMis(self, elem):
+		return elem
 
 	#nahradi problematicke znaky pri
+	#nahradenie pri row/col alebo root elemente
 	def replaceElement(self, elem, pattern):
 		elem = elem.replace(" ", pattern)
 		elem = elem.replace("\n", pattern)
@@ -220,10 +256,10 @@ class csv2xml:
 		parser.add_argument("--output", action = "store", dest = "outputFile", help = "Vystupny XML subor")
 		parser.add_argument("-n", action = "store_true", default = False, dest = "header", help = "Zakazanie vypisu hlavicky XML vystupu.")
 		parser.add_argument("-r", action = "store", dest = "root", help = "Element obalujuci vysledok XML vystupu.")
-		parser.add_argument("-s", action = "store", dest = "separator", nargs = "?", help = "Jeden znak/idetifikat TAB, na zaklade, ktoreho sa delia jednotlive stlpce v CSV.")
+		parser.add_argument("-s", action = "store", dest = "separator", help = "Jeden znak/idetifikat TAB, na zaklade, ktoreho sa delia jednotlive stlpce v CSV.")
 		parser.add_argument("-h", action = "store", dest = "subst", nargs = "?", const = "-",help = "Prvy riadok CSV suboru bude sluzit ako hlavicka pre elementy v XML. Nepovoleny znak sa nahradi zadanym retazcom.")
 		parser.add_argument("-c", action = "store", dest = "colElem", help = "Urcuje prefix mena elementu, ktory bude obalovat nepomenovane bunky.")
-		parser.add_argument("-l", action = "store", nargs = "?", const = "row", dest = "lineElem", help = "Meno elementu, ktory obaluje zvlast kazdy riadok.")
+		parser.add_argument("-l", action = "store", dest = "lineElem", help = "Meno elementu, ktory obaluje zvlast kazdy riadok.")
 		parser.add_argument("-i", action = "store_true", dest = "index", default = False, help = "Vlozi atribut index s ciselnou hodnotou do line-elementu.")
 		parser.add_argument("--start", action = "store", type = int, dest = "start", help = "Cislo pre pocitadlo v prepinaci -i.")
 		parser.add_argument("-e", "--error-recovery", action = "store_true", default = False, dest = "errRecovery", help = "Zotavenie z chyby.")
@@ -276,6 +312,7 @@ class csv2xml:
 		if argv.colElem != None:
 			self.validElement(argv.colElem, 30)
 
+
 		#kontrola: --start=n
 		if argv.start == None:
 			argv.start = 1
@@ -298,7 +335,7 @@ class csv2xml:
 		#kontrola: --missing-field=val
 		if argv.missingField != None:
 			if argv.errRecovery:
-				argv.missingField = self.convertElement(argv.missingField)
+				argv.missingField = self.convertElementMis(argv.missingField)
 			else:
 				self.printErr("Nie je zadany prepinac -e, --error-recovery.", 1);
 
@@ -330,8 +367,8 @@ class csv2xml:
 		else:
 			argv.outputFile = sys.stdout
 
+		#print(sys.argv)
 		#print(argv)
-		print(ET.iselement("  p"))
 		return argv
 
 if __name__ == "__main__":
