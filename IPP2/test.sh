@@ -1,7 +1,7 @@
 #!/bin/bash
 
 INTERPRET=python3
-FILE=csvPeto.py
+FILE=csv.py
 
 JEXAMXML_INTERPRET="java -jar jexamxml.jar"
 JEXAMXML_OPTIONS=csv_options
@@ -138,14 +138,14 @@ checkErrCode 0
 echo $SEPARATOR
 
 if [ $MERLIN_TEST -eq 0 ] ; then
-echoTest "TEST-ARG: 07/ERR - prepinac input s platnym suborom ale nedostatocnym opravnenim na citanie"
-sudo touch $TMP_FILE
-sudo chmod o-r $TMP_FILE
-$INTERPRET $FLAGS $FILE --input=$TMP_FILE
-check "ERR"
-checkErrCode 2
-echo $SEPARATOR
-sudo rm $TMP_FILE
+	echoTest "TEST-ARG: 07/ERR - prepinac input s platnym suborom ale nedostatocnym opravnenim na citanie"
+	sudo touch $TMP_FILE
+	sudo chmod o-r $TMP_FILE
+	$INTERPRET $FLAGS $FILE --input=$TMP_FILE
+	check "ERR"
+	checkErrCode 2
+	echo $SEPARATOR
+	sudo rm $TMP_FILE
 fi
 
 echoTest "TEST-ARG: 08/OK - podpora prepinaca: -n"
