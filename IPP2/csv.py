@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
+#CSV:xtisov00
 
 import argparse
 import sys, codecs
@@ -16,18 +17,13 @@ class customArgumentParser(argparse.ArgumentParser):
 		sys.stderr.write("Zly prepinac.\n")
 		sys.exit(1)
 
-
 #hlavna trieda
 class csv2xml:
-
 	_substVal = False
 
 	def __init__(self):
 		argv = self.parseArg()
-
 		spamreader = csv_module.reader(argv.inputFile, delimiter = argv.separator,  quotechar='"')
-
-		#try:
 
 		#-r=root-element
 		xmlData = []
@@ -106,9 +102,6 @@ class csv2xml:
 
 				#osetrit situaciu, ked je hlavicka kratsia
 				if len(colName) < len(row):
-					#if argv.allColumns:
-						#self.printErr("Vasci pocet zaznamov ako je dany v hlavicke.", 32)
-
 					if argv.allColumns:
 						count = len(row)
 					else:
@@ -146,9 +139,6 @@ class csv2xml:
 
 					xmlData.append(ET.SubElement(xmlData[lineElementIndex], col))
 					xmlData[len(xmlData)-1].text = row[i]
-		#except:
-		#	self.printErr("Neznaman chyba.", 222)
-
 
 		#data = ET.SubElement(xmlData[0], "data")
 		self.generateXML(xmlData[0], argv)
@@ -260,6 +250,13 @@ class csv2xml:
 		argv = parser.parse_args()
 		err = False
 
+		#osetrenie duplicitnych prepinacov
+		params = ["--help", "--output", "--input", "-n", "-r", "-s", "-h", "-c", "-l", "-i", "--start", "-e", "--error-recovery", "--missing-field", "--all-columns"]
+		tmp = [arg.split('=')[0] for arg in sys.argv]
+		for param in params:
+			if tmp.count(param) > 1:
+				self.printErr("Duplicitne prepinace.", 1)
+
 		#help nemoze byt s inym prepinacom
 		if (argv.help and len(sys.argv) != 2):
 			self.printErr("Prepinac help nemoze byt pouzity s inymi prepinacmi.", 1)
@@ -358,8 +355,6 @@ class csv2xml:
 		else:
 			argv.outputFile = sys.stdout
 
-		#print(sys.argv)
-		#print(argv)
 		return argv
 
 if __name__ == "__main__":

@@ -461,7 +461,6 @@ csvCheck "return1" 1 "--missing-field=5"
 csvCheck "return1" 1 "--all-columns"
 
 
-
 csvCheck "return1" 1 "--input=neexistujici_soubor" # pokud skript vraci chybu cislo 1, je to jeste lepsi chovani O:) (2x parametr input)
 csvCheck "return3" 31 "-h=0"
 csvCheck "return3" 0 "-r=root -h=x"
