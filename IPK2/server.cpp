@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
 			int tmp_sock = comm_socket;
 			int child_pid = getpid();
 			close(welcome_socket);
-			cout << ">>>New connection (maintained by" << child_pid << ")\n";
+			cout << ">>>New connection (maintained by " << child_pid << ")\n";
 
 			/* Cakanie na poziadavku*/
 			while(1) {
