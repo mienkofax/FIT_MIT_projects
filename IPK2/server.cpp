@@ -158,11 +158,6 @@ int receive_file(string msg, int sock) {
 	fwrite(buff, sizeof(char), size, f);
 	fclose(f);
 
-	//Potvrdenie nahratia suboru
-	data = data = create_msg_text("Msg", ACK);
-	if(send(sock, data.c_str(), strlen(data.c_str()), 0) < 0)
-		return E_SEND;
-
 	delete [] buff;
 	return 0;
 }
@@ -195,9 +190,6 @@ int main(int argc, char *argv[]) {
 		socklen_t len = sizeof(sa_client);
 		if ((comm_socket = accept(welcome_socket, (struct sockaddr *)&sa_client, &len)) < 0)
 			printErrMsg(E_ACCEPT);
-
-		if (comm_socket > 0)
-			cout << "con" << endl;
 
 		int pid = fork();
 		if (pid < 0)
@@ -233,7 +225,7 @@ int main(int argc, char *argv[]) {
 					break;
 			}
 
-			cout << ">>>Connection closed (maintained by" << child_pid << ")\n";
+			cout << ">>>Connection closed (maintained by " << child_pid << ")\n";
 			close(comm_socket);
 			exit(EXIT_FAILURE);
 		}

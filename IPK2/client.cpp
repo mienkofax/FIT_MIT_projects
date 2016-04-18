@@ -125,15 +125,6 @@ int send_file(int sock, TUrlData *args) {
 		return E_ACK;
 	}
 
-	//Potvrdenie ulozenia suboru
-	//Nacitanie odpovedi od clienta
-	data = read_msg(sock);
-	request = msg_type(data);
-	if (request != ACK) {
-		delete [] buff;
-		return request;
-	}
-
 	delete [] buff;
 	return 0;
 }

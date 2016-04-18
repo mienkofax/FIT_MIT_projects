@@ -2,7 +2,7 @@ CC=g++
 FLAGS= -Wall -pedantic -Wextra
 
 LOGIN=xtisov00
-FILES= Makefile server.cpp client.cpp common.cpp common.h test.sh
+FILES= Makefile server.cpp client.cpp common.cpp common.h test.sh READNE
 
 all: clean server client
 

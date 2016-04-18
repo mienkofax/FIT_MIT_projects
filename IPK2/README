@@ -1,0 +1,60 @@
+Počítačové komunikácie a siete - Projekt 2: Prenos súborov
+Autor: Peter Tisovčík <xtisov00@stud.fit.vutbr.cz>
+Dátum: 18.4.2016
+
+Projekt slúži pre vytvorenie konkurentného serveru a klienta,
+ktorý bude s ním komunikovať pomocou schránok(sockets API) a
+vytvoreného aplikačného protokolu. Server a klient si možu
+medzi sebou vymieňať súbory(upload, download). Po spustení
+serveru začne server čakať na klientov a vybabovať ich požiadavky
+na základe správ, ktoré obdrží.
+
+UPLOAD
+V prípade, že chce klient nahrať súbor musí najprv
+otvoriť požadovaný súbor načítať jeho obsah do pamäte a uzavrieť
+daný súbor, následne môže poslať
+požiadavku s nahranám súboru, veľkosťou súboru a názvom súboru,
+ktorý sa má nahrať. Server Tieto údaje spracuje a pošle potvrdenie
+o prijatí správy s danými údajmi, klient na to zareaguje poslaním
+súboru na server.
+
+DOWNLOAD
+V prípade, že chce klient stiahnuť súbor so serveru,
+musí odoslať správu s požadovanou požiadavkou a názvom súboru,
+ktorý chce klient stiahnuť. Server príjme správu načíta a uloží
+si súbor do pamäte, uzavrie súbor a pošle odpoveď s veľkosťou
+súboru, aby klient vedel, koľko údajov má prijať. Následne mu klient
+odpovie, že dostal požadované údaje o veľkosti a server začne posielať údaje.
+V prípade, že server neobsahuje daný súbor alebo nemá dostatočné
+oprávnenia na jeho čítanie, tak pošle server klientovi namiesto veľkosti
+súboru správu o chybe a klient vypíše túto chybu a ukončí sa.
+
+OŠETRENÉ A NEOŠETRENÉ STAVY
+Server a klient kontroluje zadanie nesprávnych argumentov, ich duplicitu,
+nevalidný port, chyby pri pripojení na daný host alebo na daný port,
+chyby pri posielaní údajov, otváraní súborov. Podporujú spustenie
+v rovnakom adresári a poslanie alebo nahranie súboru v danom adresári
+ale len pre jedného klienta, pre viacerých klientov, ktorý žiadajú
+o rovnaký súbor nie je zaručené, že bude požiadavka úspešná. Klient
+a server nepodporujú ukončenie spojenia počas komunikácie, procesy
+zostanú čakať na danú správu/dáta.
+
+SPUSTENIE
+./server -p port
+./client -p port -h hostname [-d|-u] file_name
+
+./server -p 8008
+./clinet -p port -h localhost -d file_name
+
+TEST SERVERA A KLIENTA
+Pre otestovanie funkčnosti komunikácie je priložený testovací súbor
+test.sh, ktorý spúšťa rôzne testy na argumenty a na kontrolu komunikácie
+medzi serverom a klientom. Testy sú formou volania funkcie, ktorá
+dostáva 3 parametre, čo sa má spusti, návratový kód a popis testu.
+
+SPUSTENIE TESTU
+./test.sh
+
+PRIDANIE TESTU DO test.sh
+test "server" $ERR "Program bez parametrov."
+test "client -p ${PORT} -h localhost -u Makefile" $OK "Stiahnutie suboru v rovnakom adresari."

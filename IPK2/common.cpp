@@ -28,9 +28,9 @@ int msg_type(string data) {
 	int i;
 	if (data.length() < 5)
 		return 5;
+
 	//Odstranenie retazca Msg: + medzera
 	data.erase(0, 5);
-
 	//Odstranenie vsetkeho okrem cisla poziadavky
 	i = data.find("\r");
 	data.erase(i);
