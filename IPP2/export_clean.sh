@@ -7,5 +7,5 @@ rm -f xtisov00-CSV.zip
 rm f testy2.zip
 
 rm -r testdir
-zip xtisov00-CSV.zip csv.py
+zip xtisov00-CSV.zip csv.py CSV-doc.pdf
 ./is_it_ok.sh xtisov00-CSV.zip testdir

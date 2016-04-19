@@ -1,6 +1,6 @@
 \documentclass[10pt,a4paper,final]{article}
 % cestina a fonty
-\usepackage[czech]{babel}
+
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -31,7 +31,7 @@ unicode,linkcolor=black]{hyperref}
   \setlength{\parskip}{0.5cm plus4mm minus3mm}
   
   \noindent
-  Dokumentace úlohy CSV: CSV2XML v Python3 do IPP 2015/2016 \\
+  Dokumentace úlohy CSV: CSV2XML v Python 3 do IPP 2015/2016 \\
   Jméno a příjmení: Peter Tisovčík \\
   Login: xtisov00 \\
   
@@ -41,35 +41,37 @@ unicode,linkcolor=black]{hyperref}
   \section{Úvod} \label{uvod}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Tato dokumentace popisuje implementaci skriptu v jazyce Python3. Úkolem vytvořeného skriptu je prevod CSV vstupu do jeho odpovedajúceho XML výstupu na základe zadaných parametrov. V dokumentaci se nachází popis implementace zpracování parametrů programu, ich prípustnej kombinácií a následného generování výstupního souboru v XML formátu, ktoré sa dá presne našpecifikovať na základe zadaných parametrov.
+Tato dokumentace popisuje implementaci skriptu v~jazyce Python 3. Úkolem vytvořeného skriptu je převod CSV souboru do odpovídajícího XML výstupu na základě zadaných parametrů. V dokumentaci se nachází popis implementace zpracování parametrů programu, jejich přípustné kombinace a následného generování výstupního souboru v XML formátu.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \section{Zpracování parametrů} \label{zpracovani-parametru}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Ke zpracování vstupních parametrů slouží trieda \texttt{ArgumentParser()}, která načte parametry na základě zadaných přepínačů. Samotná trieda však nestačí k ošetření všech možností, které ze zadání vyplývají. Tyto nedostatky řeší metóda \texttt{parseArg()}. Metóda ošetřuje situace, kdy jsou zadány nesprávné argumenty, duplicitné argumenty, nesprávné parametry argumentů jako například neexistující vstupní soubor a zadání nevalidnej hodnoty. Taktiež ošetruje rôzne prípustné a neprípustne kombinácie prepínačov podľa zadania. Menším nedostatkom triedy \texttt{ArgumentParser()} bolo automatické vytvorenie výnimky pri nesprávnych argumentoch alebo nesprávnych hodnotách argumentov. V mojom prípade som to vyriešil zdedením triedy a prepísaním metódy \texttt{error} aby vracala chybu podľa zadania. V tele tejto metódy sa taktiež generuje nápoveda programu.
+Ke zpracování vstupních parametrů slouží třída \texttt{ArgumentParser()}. Samotná třída však nestačí k ošetření všech možností, které ze zadání vyplývají. Tyto nedostatky řeší metoda \texttt{parseArg()}. Tato metoda ošetřuje situace, kdy jsou zadány nesprávné parametry, duplicitní parametry, nesprávné hodnoty parametrů jako například neexistující vstupní soubor a zadání nevalidní hodnoty. Také ošetřuje různé přípustné a nepřípustné kombinace parametrů dle zadání. Menším nedostatkem třídy \texttt{ArgumentParser()} bylo automatické vytvoření výjimky v případě zadání nesprávných parametrů. Tento problém by vyřešen zděděním dané třídy a~přepsáním metody \texttt{error()} tak, aby vracela chybový kód dle zadání. V těle této metody se také generuje nápověda k~programu. 
 	
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \section{Načtení CSV súboru} \label{nacitanie-suboru}
+  \section{Načtení CSV souboru} \label{nacitanie-suboru}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Pro usnadnění zpracování vstupního CSV souboru slouží metóda \texttt{reader()} z modulu csv, ktorá načíta súbor a vytvori z neho csv štruktúru, cez ktorú sa dá iterovať. Pri načítavaní CSV súboru je možné špecifikovať aký oddeľovač má byť použitý na rozdelenie stĺpcov a ako sa oznašuje reťazec, ktorý sa má vypísať, v našom prípade sú to úvodzovky. Pri načítaní tohto modulu bolo potrebné vyriešit problém s jej importovaním, pretože modul sa volal rovnako ako script, do ktorého sa imporoval.
 
+Pro usnadnění zpracování vstupního CSV souboru slouží metoda \texttt{reader()} z~modulu \texttt{csv}, která načítá soubor a~vytvoří z něj CSV strukturu, skrz kterou lze iterovat. Při načítání CSV souboru je možné pomocí přepínače \texttt{-s} specifikovat oddělovač CSV záznamů. 
+%\textit{TODO: a ako sa oznašuje reťazec, ktorý sa má vypísať, v našom prípade sú to úvodzovky.} 
+Také bylo nutné vyřešit problém s~importováním modulu \texttt{csv}, protože se jmenoval stejně jako skript, do kterého se importoval.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \section{Generování výstupního XML} \label{generovanie-xml}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Pro generování XML výstupu byl použitý modul \texttt{ElementTree}. Objekt z této třídy reprezentoval strukturu výstupného súboru. Pri prechode jednotlivými riadkami a stĺpcami sa spracovával vstup podľa zadaných parametrov. Ako hlavička sa môže použiť prvý riadok vstupného súboru alebo preddefinovaný reťazec, ktorý je uložený v liste a následne sa pomocou neho kontroluje počet stĺpcov. 
+Pro generování XML výstupu byl použit modul \texttt{ElementTree}. Objekt této třídy reprezentuje strukturu výstupního souboru. Při zpracování jednotlivých řádků a~sloupců se vstup zpracovává podle zadaných parametrů. Pokud je zadán přepínač \texttt{-h}, potom je první řádek vstupního CSV souboru použit pro odvození názvů sloupců výstupního XML souboru. V~opačném případě se využije předdefinovaný řetězec, které je uložený v~seznamu. Pomocí něj se kontroluje počet sloupců.  
 
-V prípade, že sa jedná o načítanie hlavičky z CSV súboru je potrebné ošetriť situácie, kedy môže obsahovať reťazec nepovolené znaky XML elementu ako rôzne biele znaky alebo čísla na prvom mieste a iné znaky znakovej sady UTF-8, túto kontrolu rieši metóda \texttt{validElement} a  \texttt{replaceElement}. Tieto metódy kontrolujú, či sa nachádza znak v povolenom rozsahu podľa štandardu. Rozlišné pravidlá platia pre prvý a pre ostatné znaky. Obsah jednotlivých elementov je potreba kontrolovať , či neobsahuje náhodou znaky, ktoré treba previesť na odpovedajúce XML entity. Ďalej je potrebné počítať počet údajov na riadok, či na danom riadku je dostatok stĺpcov alebo, či niektorý stĺpec nie je navyše a v prípade, že bol zadaný odpovedajúci prepínač sa nevypíše chyba ale dolpní sa chýbajúci stĺpec alebo prebytočný stĺpec bude ignorovaný. Údaje sa postupne pridávajú do XML objektu a po skončení načítavania vstupného súboru sa predá metóde \texttt{generateXML()}, ktorá uloží výstup do súboru. Pri ukladaní XML do súboru sa najpr vygeneruje XML ako reaťazec a uloží sa do premennej. Pri generovaní sa volí, či sa má vypísať aj hlavička XML a či sa majú odsadiť elementy. 
+V~případě načítání hlavičky z CSV souboru je nutné ošetřit případy, kdy načtený řetězec obsahuje znaky, které vedou na vznik neplatného XML elementu. Takovými znaky jako například bílé znaky, číslice vyskytující se na začátku řetězce a~další znaky znakové sady UTF-8. Kontrolu validity XML elementu provádějí metody \texttt{validElement()} a~\texttt{replaceElement()}. Tyto metody ošetřují, zda se znak daného řetězce nachází v~povoleném rozsahu dle standardu. Rozsahy se liší podle toho, zda se jedná o~ první znak či o~ostatní znaky v~řetězci. 
+
+Také je potřeba kontrolovat obsahy jednotlivých elementů a problematické znaky převést na odpovídající XML entity. Dále je potřeba udržovat informaci o~počtu údajů (sloupců) na řádek, zda je na daném řádku dostatek sloupců, zda některý sloupec nepřebývá. Pokud byl zadán odpovídající přepínač, nedojde k chybě, ale doplní se chybějící sloupec, v~opačném případě bude přebytečný sloupec ignorován. Údaje se postupně předávají do XML objektu a~po skončení načítání vstupního souboru se výsledek předá metodě \texttt{generateXML()}, která vytvoří výstupní XML soubor. Při ukládání XML souboru se nejprve vygeneruje XML jako řetězec a~uloží se do proměnné. V~procesu generování se volí, zda se má vypsat i~ XML hlavička a~zda se mají XML elementy odsazovat.     
    
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \section{Testovanie} \label{testovanie}
+  \section{Testování} \label{testovanie}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Dôležitou súčasťou celého projektu bolo testovanie. Na testovanie som si vytvoril vlastný bash script, ktorý využíval zo začiatku poskytnuté testy a neskôr som boli doplnené o vlastné testy. Testy porovnávali výstupné súbory a chybové kódy v prípade nesprávneho spracovania a porovnávali sa s predpokladaným výstupom. Testovanie prebiehalo automaticky a na porovnávanie výsledných xml súborov bol použitý odporúčaný nástroj JExamXML. Nástroj JExamXML nepodporuje XML štruktúru, ktorá neobsahuje root element, preto každý test musel obsahovať prepínač, ktorým sa nastavil root element.
-
+Důležitou součástí celého projektu bylo jeho testování. K tomuto účelu byl vytvořen bash skript, který nejdříve využíval poskytnuté testy a~následně byly doplněny i testy vlastní. Testy porovnávaly výstupní soubory a~chybové kódy v~případě nesprávného zpracování s~předpokládanými výstupy. Testování probíhalo automaticky, pro porovnání výsledných XML souborů byl využit doporučený nástroj JExamXML. Nástroj JExamXML nepodporuje XML strukturu, která neobsahuje kořenový element. Proto musel každý test obsahovat přepínač, pomocí kterého bylo možné chybějící kořenový element nastavit. 
     
 \end{document}
