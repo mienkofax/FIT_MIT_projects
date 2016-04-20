@@ -77,6 +77,9 @@ test() {
 	echo ""
 }
 
+#Odstranenie nepotrebnych suborov
+make clean
+
 #Kompilacia suborov
 echo "${CYAN}Kompilacia suborov:${RESET}"
 make

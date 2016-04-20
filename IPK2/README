@@ -58,3 +58,7 @@ SPUSTENIE TESTU
 PRIDANIE TESTU DO test.sh
 test "server" $ERR "Program bez parametrov."
 test "client -p ${PORT} -h localhost -u Makefile" $OK "Stiahnutie suboru v rovnakom adresari."
+
+Makefile:
+make          #vytvorenie binarnych suborov pre clienta a server
+make clien    #odstranenie nepotrebnych suborov, binariek a stiahnutych dat

@@ -12,7 +12,7 @@ server: clean
 client: clean
 	$(CC) client.cpp common.cpp -o client
 clean:
-	rm -f server xtisov00.tar.gz
+	rm -rf server xtisov00.tar.gz client testDir test.file 
 
 tar: tar
 		tar -cf $(LOGIN).tar $(FILES)
