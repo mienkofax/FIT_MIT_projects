@@ -37,7 +37,7 @@ OK=0
 #port na, ktorom sa spusta server
 PORT=15346
 
-#kontrola exit kodu, ci je je spravne alebo Najdenie
+#kontrola exit kodu, ci je je spravne alebo nie
 # $1 - navratovy kod
 check() {
 	if [ "$1" = "$OK" ] ; then

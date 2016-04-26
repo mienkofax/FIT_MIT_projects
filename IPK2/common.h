@@ -77,19 +77,19 @@ const string errMsg[] = {
 	"connect",
 	"bind",
 
-	"chyba servera",
+	"server error",
 	"bad link",
 	"bad argument",
 	"unknown err",
 	"can't listen",
 
-	"neakceptovane ",
+	"not accepter, ",
 	"fork failed",
-	"neuspesne poslanie",
-	"nie je mozne najst subor/neda sa citat",
-	"nastal problem s ACk",
-	
-	"problem s ulozenim suboru"
+	"failed to send",
+	"read file",
+	"problem with ACK",
+
+	"save file"
 };
 
 
