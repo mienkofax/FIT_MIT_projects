@@ -16,7 +16,9 @@ class OthelloGame
 {
 
 public:
+	OthelloBoard *board;
 	std::unique_ptr <OthelloBoard> board;
+	//OthelloBoard uniqptr::<board>;
 	std::vector <TGameMove> history;
 	Player *p1;
 	Player *p2;
