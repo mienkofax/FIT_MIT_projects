@@ -62,13 +62,10 @@ void GameManager::getBoard() {
 		for (int j = 0; j < deskSize; j++) {
 			if (games[this->activeGameIndex].board.getStone({i,j}) == 8)
 				games[this->activeGameIndex].board.setStone({i,j}, NON_DEFINE);
-			points = games[this->activeGameIndex].board.testStone({i,j}, color);
+			games[this->activeGameIndex].board.moveHint({i,j}, color);
 		}
 	}
 
-	for (int p : games[this->activeGameIndex].board.gameDesk) {
-		cout << p;
-	}
 
 }
 
