@@ -16,6 +16,8 @@ typedef struct {
 	int y;
 } TPoint;
 
+//const int white = 1;
+
 #define WHITE 1
 #define BLACK 0
 #define NON_DEFINE -1
@@ -27,12 +29,12 @@ protected:
 	int deskSize;
 	std::vector <int> gameDesk;
 
-	bool checkCoordinates(TPoint point);
 	/**
 	* Test ci sa jedna o validne suradnice
 	* @param	point		Suradnice, ktore sa maju overit
 	* @return 	True ak je suradnica platna inak false
 	*/
+	bool checkCoordinates(TPoint point);
 
 	/**
 	 * Test ci je na danej pozicie umiestneny uz nejaky kamen
@@ -108,7 +110,8 @@ public:
 	 * ak sa jedna o neplatny tah vrati naspat vykonane zmeny
 	 * @param	point		Suradnice, kde sa ma vykonat tah, prekreslenie
 	 * @param	color		Farba kamena, na ktoru sa maju prekreslit ostatne kamene
-	 * @return 	True v pripade, ze vykonal a obratil prazdne/superove kamene, inak false
+	 * @return 	Vekto bodov, ktore sa maju prekreslit, ak sa nema co prekreslit
+	 *			vrati sa prazdny vektor- tah je neplatny
 	 */
 	std::vector <TPoint> moveStone(TPoint point, int color);
 

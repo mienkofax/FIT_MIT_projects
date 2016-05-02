@@ -4,27 +4,40 @@
 #include "GameData.h"
 #include "Player.h"
 #include <fstream>
+#include <memory>
 
 using namespace std;
 
-GameManager::GameManager() : games(vector <TGame> ()), activeGameIndex(0),firstGame(true)
-{
+GameManager::GameManager() :
+	games(vector <TGame> ()),
+	activeGameIndex(0),
+	firstGame(true),
+	game(nullptr)
+{}
 
-}
-
-//vytvorenie novej hry
-void GameManager::newGame(int deskSize, int players)
+void GameManager::newGame(int deskSize, int players, int algorithm)
 {
-	Player *p1 = new Human();
-	Player *p2;
+	shared_ptr<Player> p1(new Human());
+	shared_ptr<Player> p2;
+
+	//ak ma byt druhy pc pocitac, tak sa mu nastavi algoritmus a hracia doska
 	if (players == 1) {
-		p2 = new PC(new Alg2());
-	} else
-		p2 = new Human();
+		shared_ptr<Strategy> alg;
+		shared_ptr<GameBoard> board(new GameBoard(deskSize));
 
+		//nastavenie vybraneho algoritmu
+		if (algorithm == 1)
+			alg = shared_ptr<Strategy>(new Alg1(board));
+		else if (algorithm == 2)
+			alg = shared_ptr<Strategy>(new Alg2(board));
+
+		p2 = shared_ptr<Player>(new PC(alg));
+	} else
+		p2 = shared_ptr<Player>(new Human());
 
 	p1->active = true;
-	p2->active = false;//kvoli prechodom medzi hrami
+	p2->active = false;
+
 	p1->setColor(WHITE);
 	p2->setColor(BLACK);
 
@@ -33,51 +46,125 @@ void GameManager::newGame(int deskSize, int players)
 	else
 		firstGame = false;
 
+	//vlozenie novej hry
 	this->games.push_back({GameBoard(deskSize), GameData(), p1, p2});
 	game = &games[this->activeGameIndex];
-	getBoard();
+
+	//vlozenie moznych tahov
+	getHint();
 }
 
-int GameManager::getStone(TPoint point)
+bool GameManager::loadGame(string filename)
 {
-	return games[this->activeGameIndex].board.getStone(point);
+	int deskSize, players;
+
+	ifstream gameFile;
+	gameFile.open(filename);
+
+	if (!gameFile.is_open())
+		return false;
+
+	//nacitanie velkosti hracej dosky a pocet hracov
+	gameFile >> deskSize;
+	gameFile >> players;
+	gameFile.close();
+
+	newGame(deskSize, players, 2); //TODO dorobit ukladanie cisla algoritmu
+
+	//nacitanie hernych dat
+	bool returnCode = games[this->activeGameIndex].data.loadGameData(filename);
+
+	//aplikovanie jednotlivych tahov na hraciu dosku
+	for (TGameMove move : games[this->activeGameIndex].data.getHistory())
+		games[this->activeGameIndex].board.updateBoard(move.points, move.color);
+
+	return returnCode;
 }
 
-void GameManager::getBoard() {
-	vector <TPoint> points;
+bool GameManager::saveGame(string filename)
+{
+	//predvolena hodnota - pocet hracov
+	int players = 2;
 
-	int color;
+	//v pripade, ze je druhy hrac pc tak zmenime hracov
+	if (games[this->activeGameIndex].p2->getType() == 1)
+		players = 1;
 
-	if(isActiveP1()) {
+	//ulozenie ernych dat
+	return games[this->activeGameIndex].data.saveGameData(filename, games[this->activeGameIndex].board.getDeskSize(), players);
+}
 
-		color = games[this->activeGameIndex].p1->getColor();
-	} else {
-		color = games[this->activeGameIndex].p2->getColor();
+bool GameManager::changeGame(int gameIndex)
+{
+	//kontrola ci je index hry v platnom rozsahu
+	if (gameIndex > games.size() || gameIndex < 0)
+		return false;
+
+	activeGameIndex = gameIndex;
+
+	//ukazatel na aktualnu hru
+	game = &games[this->activeGameIndex];
+	return true;
+}
+
+bool GameManager::undo()
+{
+	bool activePoints;
+	vector <TGameMove> moves;
+
+	//zistenie ci je este mozne nejake tahy vratit naspat
+	activePoints = games[this->activeGameIndex].data.checkUndo();
+
+	//vykonanie undo funkcie, navrat o jeden tah spat
+	moves = games[this->activeGameIndex].data.undo();
+
+	//ak sa jedna o hru PC - HUMAN, tak je potrebne vratit tah aj za pc
+	if (games[this->activeGameIndex].p2->getType() == 1) {
+		activePoints = games[this->activeGameIndex].data.checkUndo();
+		moves = games[this->activeGameIndex].data.undo();
 	}
 
-	cout << color;
+	//ak sa jedna o hru PC - HUMAN, musime posunut hru na dalsieho hraca
+	if (games[this->activeGameIndex].p2->getType() == 0 && activePoints)
+		nextPlayer();
 
-	int deskSize = 8;
-	for (int i = 0; i < deskSize; i++) {
-		for (int j = 0; j < deskSize; j++) {
-			if (games[this->activeGameIndex].board.getStone({i,j}) == 8)
-				games[this->activeGameIndex].board.setStone({i,j}, NON_DEFINE);
-			games[this->activeGameIndex].board.moveHint({i,j}, color);
-		}
-	}
+	//aktualizacia hracej dosky po aplkovani undo
+	updateBoard(moves);
 
-
+	return activePoints;
 }
 
-int GameManager::moveStone(TPoint point, bool isPass)
+bool GameManager::redo()
 {
+	bool activePoints;
+	vector <TGameMove> moves;
 
+	//zistenie ci je urobit tah vpred
+	activePoints = games[this->activeGameIndex].data.checkRedo();
 
-	int color;
+	//vykonanie tahu vpred
+	moves = games[this->activeGameIndex].data.redo();
+
+	if (games[this->activeGameIndex].p2->getType() == 1) {
+		activePoints = games[this->activeGameIndex].data.checkRedo();
+		moves = games[this->activeGameIndex].data.redo();
+	}
+
+	//ak sa jedna o hru PC - HUMAN, musime posunut hru na dalsieho hraca
+	if (games[this->activeGameIndex].p2->getType() == 0 && activePoints)
+		nextPlayer();
+
+	updateBoard(moves);
+	return activePoints;
+}
+
+bool GameManager::moveStone(TPoint point, bool isPass)
+{
+	int color, count;
 	vector <TPoint> points;
-	int count;
 	bool returnCode = false;
 
+	//zistenie tahu a zistenie aka farba sa ma pouzit
 	if(isActiveP1()) {
 		games[this->activeGameIndex].p1->getNextMove(&point);
 		color = games[this->activeGameIndex].p1->getColor();
@@ -86,18 +173,16 @@ int GameManager::moveStone(TPoint point, bool isPass)
 		color = games[this->activeGameIndex].p2->getColor();
 	}
 
-
-
+	//body, ktore sa maju prekreslit
 	points = games[this->activeGameIndex].board.moveStone(point, color);
 	count = points.size();
 
 	//ak bol tah dobry vrati sa aspon jedna suradnica, ktora sa prekreslila
+	//a pridaju sa prekreslene tahy do historie
 	if (count > 0) {
-		if (activeRedoUndo) {
-			games[this->activeGameIndex].data.removeInvalidData();
-			activeRedoUndo = false;
-		}
+		games[this->activeGameIndex].data.removeInvalidData();
 
+		//pridanie bodu, ktory sa vytvorit k bodovm, ktore sa prekreslia
 		points.push_back(point);
 		games[this->activeGameIndex].data.addMoveToHistory(points, color);
 		returnCode = true;
@@ -106,21 +191,114 @@ int GameManager::moveStone(TPoint point, bool isPass)
 	if (count > 0 && isPass)
 		returnCode = true;
 
-	if (returnCode) {
+	//ak je validn tah prepne sa na dalsieho hraca
+	if (returnCode)
 		nextPlayer();
 
-
-
-	}
-	getBoard();
-
+	getHint();
 	updateScore();
 
 	return returnCode;
 }
 
-void GameManager::nextPlayer() {
-	if (isActiveP1()) {
+void GameManager::endGame()
+{
+	return;
+}
+
+bool GameManager::isActiveP1()
+{
+	if (games.size() == 0)
+		return false;
+	return games[this->activeGameIndex].p1->active;
+}
+
+bool GameManager::isActiveP2()
+{
+	if (games.size() == 0)
+		return false;
+	return games[this->activeGameIndex].p2->active;
+}
+
+bool GameManager::livePlayer()
+{
+	if (isActiveP2() && games[this->activeGameIndex].p2->getType() == 1)
+		return false;
+	return true;
+}
+
+bool GameManager::isEmpty()
+{
+	if (games.size() == 0)
+		return true;
+	return false;
+}
+
+int GameManager::getGameID()
+{
+	if (isEmpty())
+		return -1;
+	return this->activeGameIndex;
+}
+
+int GameManager::getDeskSize()
+{
+	if (isEmpty())
+		return -1;
+	return games[this->activeGameIndex].board.getDeskSize();
+}
+
+int GameManager::getP1Score()
+{
+	if (isEmpty())
+		return -1;
+	return games[this->activeGameIndex].p1->getScore();
+}
+
+int GameManager::getP2Score()
+{
+	if (isEmpty())
+		return -1;
+	return games[this->activeGameIndex].p2->getScore();
+}
+
+int GameManager::getStone(TPoint point)
+{
+	return games[this->activeGameIndex].board.getStone(point);
+}
+
+void GameManager::getHint()
+{
+	vector <TPoint> points;
+	int color, deskSize;
+
+	//zistenie, pre ktoru farbu sa maju hladat pomocne body
+	if(isActiveP1())
+		color = games[this->activeGameIndex].p1->getColor();
+	else
+		color = games[this->activeGameIndex].p2->getColor();
+
+	deskSize = games[this->activeGameIndex].board.getDeskSize();
+
+	//prechod jednotlivymi suradnicami na hracej doske a zistenie
+	//mozneho tahu z danej suadnice
+	for (int i = 0; i < deskSize; i++) {
+		for (int j = 0; j < deskSize; j++) {
+
+			//odstranenie predchadzajucej napovedy
+			if (games[this->activeGameIndex].board.getStone({i,j}) == 8)
+				games[this->activeGameIndex].board.setStone({i,j}, NON_DEFINE);
+
+			//zistenie ci je mozne na dane suradnice vykonat tah
+			games[this->activeGameIndex].board.moveHint({i,j}, color);
+		}
+	}
+}
+
+void GameManager::nextPlayer()
+{
+	if (isActiveP1())
+	{
 		games[this->activeGameIndex].p1->active = false;
 		games[this->activeGameIndex].p2->active = true;
 	} else
@@ -130,7 +308,8 @@ void GameManager::nextPlayer() {
 	}
 }
 
-void GameManager::updateScore() {
+void GameManager::updateScore()
+{
 	int colorP1 = games[this->activeGameIndex].p1->getColor();
 	int colorP2 = games[this->activeGameIndex].p2->getColor();
 
@@ -138,153 +317,15 @@ void GameManager::updateScore() {
 	game->p2->setScore(games[this->activeGameIndex].board.getCountStone(colorP2));
 }
 
-bool GameManager::loadGame(string filename)
+void GameManager::updateBoard(vector<TGameMove> moves)
 {
-	ifstream gameFile;
-	gameFile.open(filename);
-
-	if (!gameFile.is_open())
-		return false;
-
-	int deskSize, players;
-	gameFile >> deskSize;
-	gameFile >> players;
-	gameFile.close();
-
-	newGame(deskSize, players);
-
-	bool returnCode = games[this->activeGameIndex].data.loadGameData(filename);
-
-	cout << endl;
-	for (TGameMove move : games[this->activeGameIndex].data.getHistory()) {
-			games[this->activeGameIndex].board.updateBoard(move.points, move.color);
-
-			for (TPoint p : move.points)
-				cout << p.x << "," << p.y << "," << move.color << endl;
-	}
-
-	return returnCode;
-}
-
-bool GameManager::saveGame(string filename)
-{
-	if (games.size() == false) return false;
-
-	int players = 2;
-
-	if (games[this->activeGameIndex].p2->getType() == 1)
-		players = 1;
-
-	return games[this->activeGameIndex].data.saveGameData(filename, games[this->activeGameIndex].board.getDeskSize(), players);
-}
-
-bool GameManager::isActiveP1()
-{
-	if (games.size() == 0) return false;
-	return games[this->activeGameIndex].p1->active;
-}
-
-bool GameManager::isActiveP2()
-{
-	if (games.size() == 0) return false;
-	return games[this->activeGameIndex].p2->active;
-}
-bool GameManager::livePlayer() {
-
-	if (isActiveP2() && games[this->activeGameIndex].p2->typ == 1)
-		return false;
-
-	return true;
-}
-bool GameManager::isEmpty()
-{
-	if (games.size() == 0)
-		return true;
-	return false;
-}
-int GameManager::getGameID() {
-	if (isEmpty())
-		return -1;
-	return this->activeGameIndex;
-}
-int GameManager::getDeskSize() {
-	return games[this->activeGameIndex].board.getDeskSize();
-}
-bool GameManager::changeGame(int gameIndex) {
-	if (gameIndex > games.size() || gameIndex < 0)
-		return false;
-
-	activeGameIndex = gameIndex;
-
-
-	game = &games[this->activeGameIndex];
-	return true;
-}
-
-int GameManager::getP1Score() {
-	return games[this->activeGameIndex].p1->getScore();
-}
-int GameManager::getP2Score() {
-	return games[this->activeGameIndex].p2->getScore();
-}
-bool GameManager::updateBoard(vector<TGameMove> moves) {
+	//inicializuje hraciu dosku na pociatocny stav
 	games[this->activeGameIndex].board.initDesk();
 
-
-	updateScore();
-
-	if (moves.size() == 0)
-		return false;
-
-
-	for (TGameMove move : moves) {
+	//vykreslenie jednotlivych bodov postupne ako idu v historii
+	for (TGameMove move : moves)
 		games[this->activeGameIndex].board.updateBoard(move.points, move.color);
-	}
 
-
-
-
-	return true;
-}
-
-bool GameManager::undo() {
-	bool activePoints = games[this->activeGameIndex].data.getHa();
-	vector <TGameMove> moves = games[this->activeGameIndex].data.undo();
-	cout <<"velkost::" << moves.size()<< endl;
-	if (games[this->activeGameIndex].p2->getType() == 1) {
-		activePoints = games[this->activeGameIndex].data.getHa();
-		cout <<"velkost:ssss:" <<games[this->activeGameIndex].p2->getType()<< endl;
-		moves = games[this->activeGameIndex].data.undo();
-		//nextPlayer();
-	}
-
-
-	if (games[this->activeGameIndex].p2->getType() == 0 && activePoints) {
-
-		nextPlayer();
-
-	}
-
-
-
-	updateBoard(moves);
-
-	return activePoints;
-}
-
-bool GameManager::redo() {
-	bool activePoints = games[this->activeGameIndex].data.getHa2();
-	vector <TGameMove> moves = games[this->activeGameIndex].data.redo();
-	if (games[this->activeGameIndex].p2->getType() == 1) {
-		activePoints = games[this->activeGameIndex].data.getHa2();
-		moves = games[this->activeGameIndex].data.redo();
-		//nextPlayer();
-	}
-
-	if (games[this->activeGameIndex].p2->getType() == 0 && activePoints) {
-		nextPlayer();
-	}
-
-updateBoard(moves);
-	return activePoints;
+	getHint();
+	updateScore();
 }

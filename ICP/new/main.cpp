@@ -89,7 +89,7 @@ bool getCoordinate(string s, TPoint *point) {
 	return true;
 }
 
-bool createNewGame(int *deskSize, int *countPlayers) {
+bool createNewGame(int *deskSize, int *countPlayers, int *alg) {
 	string enter;
 	int option;
 
@@ -103,11 +103,11 @@ bool createNewGame(int *deskSize, int *countPlayers) {
 	} else {
 		if (!strToInt(enter, &option)) {
 			cerr << "Zadana hodnota musi byt cislo." << endl;
-			return 1;
+			return false;
 		}
 		if ((option != 6 && option != 10 && option != 8 && option != 12))	{
 			cerr << "Velkost hracej dosky moze byt len 6,8,10,12." << endl;
-			return 1;
+			return false;
 		}
 		*deskSize = option;
 	}
@@ -117,9 +117,22 @@ bool createNewGame(int *deskSize, int *countPlayers) {
 	cin >> enter;
 	if (!strToInt(enter, &option)  || (option != 1 && option != 2)) {
 		cerr << "Zadana hodnota musi byt cislo 1 alebo 2." << endl;
-		return 1;
+		return false;
+	} else {
+		*countPlayers = option;
+
+		if (option == 1) {
+		cout << "Zadajte cislo algoritmu, ktory sa ma pouzit: ";
+		cin >> enter;
+			if (strToInt(enter, &option)) {
+				*alg = option;
+			} else {
+				cout << "Zadana neplatna volba." << endl;
+				return false;
+			}
+		}
 	}
-	*countPlayers = option;
+
 	return true;
 }
 
@@ -130,6 +143,8 @@ void help() {
 	cout << "\tpass - v pripade, ze nemate moznost posunu zadajte \"pass\"" << endl;
 	cout << "\tsave - v pripade, ze chcete ulozit rozohratu hru" << endl;
 	cout << "\tload - v pripade, ze chcete nacitat rozohratu hru" << endl;
+	cout << "\tundo - krok spat" << endl;
+	cout << "\tredo - krok vpred" << endl;
 	cout << "\tnew - pre vytvorenie novej hry" << endl;
 	cout << "\tchange - pre zmenu hry" << endl;
 	cout << "\tkonec - pre ukoncenie hry" << endl;
@@ -139,7 +154,7 @@ int main() {
 	GameManager manager;
 	GameManager& gameManager = manager;
 
-	int option, deskSize, countPlayers;
+	int option, deskSize, countPlayers, alg;
 	string enter;
 	TPoint point;
 	bool isNewGame = true;
@@ -185,8 +200,8 @@ int main() {
 				cout << "Hra bola ukoncena." << endl;
 				break;
 			} else if (enter == "new") {
-				createNewGame(&deskSize, &countPlayers);
-				manager.newGame(deskSize, countPlayers);
+				createNewGame(&deskSize, &countPlayers, &alg);
+				manager.newGame(deskSize, countPlayers, alg);
 				renderMap(gameManager);
 			} else if (enter == "change") {
 				cout << "Zadajte cislo hry: ";
