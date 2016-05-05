@@ -27,9 +27,9 @@ void GameManager::newGame(int deskSize, int players, int algorithm)
 
 		//nastavenie vybraneho algoritmu
 		if (algorithm == 1)
-			alg = shared_ptr<Strategy>(new Alg1(board));
+			alg = shared_ptr<Strategy>(new Alg1());
 		else if (algorithm == 2)
-			alg = shared_ptr<Strategy>(new Alg2(board));
+			alg = shared_ptr<Strategy>(new Alg2());
 
 		p2 = shared_ptr<Player>(new PC(alg));
 	} else
@@ -162,15 +162,29 @@ bool GameManager::moveStone(TPoint point, bool isPass)
 {
 	int color, count;
 	vector <TPoint> points;
-	bool returnCode = false;
 
 	//zistenie tahu a zistenie aka farba sa ma pouzit
 	if(isActiveP1()) {
-		games[this->activeGameIndex].p1->getNextMove(&point);
+		games[this->activeGameIndex].p1->getNextMove(&point, games[this->activeGameIndex].board);
 		color = games[this->activeGameIndex].p1->getColor();
 	} else {
-		games[this->activeGameIndex].p2->getNextMove(&point);
+		if (livePlayer())
+			games[this->activeGameIndex].p2->getNextMove(&point, games[this->activeGameIndex].board);
+		else
+			isPass = games[this->activeGameIndex].p2->getNextMove(&point, games[this->activeGameIndex].board);
+
 		color = games[this->activeGameIndex].p2->getColor();
+	}
+
+	if (isPass) {
+		if (getHint() > 0)
+			return false;
+		else {
+			nextPlayer();
+			getHint();
+			updateScore();
+			return true;
+		}
 	}
 
 	//body, ktore sa maju prekreslit
@@ -182,23 +196,17 @@ bool GameManager::moveStone(TPoint point, bool isPass)
 	if (count > 0) {
 		games[this->activeGameIndex].data.removeInvalidData();
 
-		//pridanie bodu, ktory sa vytvorit k bodovm, ktore sa prekreslia
+		//pridanie bodu, ktory sa vytvoril k bodovm, ktore sa prekreslia
 		points.push_back(point);
 		games[this->activeGameIndex].data.addMoveToHistory(points, color);
-		returnCode = true;
-	}
 
-	if (count > 0 && isPass)
-		returnCode = true;
-
-	//ak je validn tah prepne sa na dalsieho hraca
-	if (returnCode)
 		nextPlayer();
+		getHint();
+		updateScore();
 
-	getHint();
-	updateScore();
-
-	return returnCode;
+		return true;
+	}
+	return false;
 }
 
 void GameManager::endGame()
@@ -267,10 +275,10 @@ int GameManager::getStone(TPoint point)
 	return games[this->activeGameIndex].board.getStone(point);
 }
 
-void GameManager::getHint()
+int GameManager::getHint()
 {
 	vector <TPoint> points;
-	int color, deskSize;
+	int color, deskSize, count = 0;
 
 	//zistenie, pre ktoru farbu sa maju hladat pomocne body
 	if(isActiveP1())
@@ -286,13 +294,15 @@ void GameManager::getHint()
 		for (int j = 0; j < deskSize; j++) {
 
 			//odstranenie predchadzajucej napovedy
-			if (games[this->activeGameIndex].board.getStone({i,j}) == 8)
-				games[this->activeGameIndex].board.setStone({i,j}, NON_DEFINE);
+			if (games[this->activeGameIndex].board.getStone({j,i}) == 8)
+				games[this->activeGameIndex].board.setStone({j,i}, NON_DEFINE);
 
 			//zistenie ci je mozne na dane suradnice vykonat tah
-			games[this->activeGameIndex].board.moveHint({i,j}, color);
+			if (games[this->activeGameIndex].board.moveHint({j,i}, color) > 0)
+				count++;
 		}
 	}
+	return count;
 }
 
 void GameManager::nextPlayer()

@@ -39,13 +39,13 @@ int Player::getType()
 	return this->typ;
 }
 
-bool Human::getNextMove(TPoint *point) {
+bool Human::getNextMove(TPoint *point, GameBoard board) {
 	return true;
 }
 
-bool PC::getNextMove(TPoint *point) {
+bool PC::getNextMove(TPoint *point, GameBoard board) {
 	cout << "som PC a volam alg\n";
-	cout << algo->executeMove(point);
+	cout << algo->executeMove(point, board);
 	return true;
 }
 

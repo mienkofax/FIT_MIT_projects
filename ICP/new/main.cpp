@@ -40,29 +40,6 @@ cout << endl;
 	}
 }
 
-
-void renderMap2(vector <int> doska) {
-	int deskSize = 8;
-
-	for (int i = 0; i < deskSize; i++){
-		cout << i << ": ";
-		for (int j = 0; j < deskSize; j++) {
-			if (doska[deskSize*i+j] == WHITE)
-				//cout << "-";
-				cout << "●";
-			else if (doska[deskSize*i+j] == BLACK)
-				//cout << "+";
-				cout << "○";
-			else {
-				cout << " ";
-			}
-			cout << " ";
-		}
-		cout << endl;
-	}
-}
-
-
 bool strToInt(string s, int *value) {
 	char *endptr;
 	*value = strtol(s.c_str(), &endptr, 10);
@@ -164,12 +141,16 @@ int main() {
 	while(1) {
 		cout << "------------------------------------\n";
 
+
+
 		if (!gameManager.isEmpty()) {
 
 			if(manager.isActiveP1())
 			cout << "Na rade je hrac 1(Biele): ";
 			if (manager.isActiveP2())
 			cout << "Na rade je hrac 2(Cierne): ";
+
+
 		}
 		else
 			help();
@@ -179,9 +160,12 @@ int main() {
 
 
 		if (!getCoordinate(enter, &point)) {
-			if (enter == "pass")
-				cout << "pass" << endl;
-			else if (enter == "save") {
+			if (enter == "pass") {
+				if (manager.moveStone({0,0}, true))
+					cout << "Pass sa vykonal." << endl;
+				else
+					cout << "Pass je mozne zadat len ked nie je ziaden tah." << endl;
+			} else if (enter == "save") {
 				cout << "Zadajte subor, do ktore sa ulozi hra: ";
 				cin >> enter;
 				if (manager.saveGame(enter))

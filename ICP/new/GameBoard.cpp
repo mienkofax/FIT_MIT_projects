@@ -34,6 +34,7 @@ bool GameBoard::isFieldEmpty(TPoint point)
 
 int GameBoard::getPointIndex(TPoint point)
 {
+
 	return deskSize * point.y + point.x;
 }
 
@@ -161,12 +162,12 @@ vector <TPoint> GameBoard::moveStone(TPoint point, int color)
 	return points;
 }
 
-void GameBoard::moveHint(TPoint point, int color)
+int GameBoard::moveHint(TPoint point, int color)
 {
 	vector <TPoint> points;
 
 	if (!isFieldEmpty(point))
-		return;
+		return points.size();
 
 	//nastavenie bodu, po ktory chcem vykreslit
 	setStone(point, color);
@@ -179,4 +180,6 @@ void GameBoard::moveHint(TPoint point, int color)
 		setStone(point, HINT);
 	else
 		setStone(point, NON_DEFINE);
+
+	return points.size();
 }

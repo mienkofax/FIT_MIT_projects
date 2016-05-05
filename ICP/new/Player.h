@@ -17,7 +17,7 @@ protected:
 public:
 	Player();
 	bool active;
-	virtual bool getNextMove(TPoint*) {};
+	virtual bool getNextMove(TPoint*, GameBoard board) {};
 	int getColor();
 	void setColor(int);
 	int getScore();
@@ -29,7 +29,7 @@ class Human : public Player
 {
 public:
 	Human();
-	bool getNextMove(TPoint*) ;
+	bool getNextMove(TPoint*, GameBoard board) ;
 };
 
 class PC : public Player
@@ -38,7 +38,7 @@ class PC : public Player
 
 public:
 	PC(std::shared_ptr<Strategy>);
-	bool getNextMove(TPoint*);
+	bool getNextMove(TPoint*, GameBoard board);
 };
 
 #endif

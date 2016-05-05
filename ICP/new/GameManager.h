@@ -149,8 +149,9 @@ public:
 private:
 	/**
 	 * Vygeneruje pomocne body, ktore znacia mozne tahy daneho hraca
+	 * @return	Integer, pocet bodov, ktore sa daju prekreslit
 	 */
-	void getHint();
+	int getHint();
 
 	/**
 	 * Prepne na dalsieho hraca. Ak je aktivny hrac P1 prepne sa na

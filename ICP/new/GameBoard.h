@@ -27,6 +27,7 @@ class GameBoard
 {
 protected:
 	int deskSize;
+public:
 	std::vector <int> gameDesk;
 
 	/**
@@ -50,6 +51,7 @@ protected:
 	 */
 	int getPointIndex(TPoint point);
 
+public:
 	/**
 	 * Algoritmus, ktory prehlada okolie a zisti ci je dany tah validny,
 	 * ci je mozne otocit aspon jeden kamen a ci nie je volne policko medzi nimi
@@ -59,7 +61,6 @@ protected:
 	 */
 	std::vector <TPoint> findingMoves(TPoint point, int color);
 
-public:
 	/**
 	 * Inicializuje hraciu dosku na zaciatocne 4 kamene
 	 * @param	deskSize	Velkost hracej dosky
@@ -115,12 +116,14 @@ public:
 	 */
 	std::vector <TPoint> moveStone(TPoint point, int color);
 
+	std::vector <TPoint> checkStone(TPoint point, int color);
+
 	/**
 	 * Oznaci suradnice kamenov, ktore je mozne v nasledujucom tahu prevratit
 	 * @param	point		Suradnice kamena, ktore sa maju overit ci to je platny tah
 	 * @param	color		Farba zadaneho kamena, ktory sa bude overovat
 	 */
-	void moveHint(TPoint point, int color);
+	int moveHint(TPoint point, int color);
 };
 
 #endif
