@@ -1,3 +1,10 @@
+/**
+ * Game Manager
+ *
+ * @author			Klára Nečasová <xnecas24>
+ * @author			Peter Tisovčík <xtisov00>
+ */
+
 #include <iostream>
 #include "GameManager.h"
 #include "GameBoard.h"
@@ -94,10 +101,10 @@ bool GameManager::saveGame(string filename)
 	return games[this->activeGameIndex].data.saveGameData(filename, games[this->activeGameIndex].board.getDeskSize(), players);
 }
 
-bool GameManager::changeGame(int gameIndex)
+bool GameManager::changeGame(size_t gameIndex)
 {
 	//kontrola ci je index hry v platnom rozsahu
-	if (gameIndex > games.size() || gameIndex < 0)
+	if (gameIndex > games.size())
 		return false;
 
 	activeGameIndex = gameIndex;

@@ -1,3 +1,10 @@
+/**
+ * Game Manager
+ *
+ * @author			Klára Nečasová <xnecas24>
+ * @author			Peter Tisovčík <xtisov00>
+ */
+
 #ifndef GAME_MANAGER_H
 #define GAME_MANAGER_H
 
@@ -49,7 +56,7 @@ public:
 	 * @param	gameIndex	Index hry, na ktoru sa ma prepnut
 	 * @return	True ak dana hra existuje a spravne sa prepla inak false
 	 */
-	bool changeGame(int gameIndex);
+	bool changeGame(size_t gameIndex);
 
 	/**
 	 * Overi ci je mozne urobit krok spat, vykona krok spat

@@ -1,3 +1,10 @@
+/**
+ * Strategy
+ *
+ * @author			Klára Nečasová <xnecas24>
+ * @author			Peter Tisovčík <xtisov00>
+ */
+
 #include <iostream>
 #include "Strategy.h"
 #include <memory>
@@ -11,7 +18,7 @@ Strategy::Strategy()
 
 bool Alg1::executeMove(TPoint* point,  GameBoard bo)
 {
-	int max = 0;
+	size_t max = 0;
 	int deskSize = bo.getDeskSize();
 	vector <TPoint> points;
 
@@ -28,13 +35,12 @@ bool Alg1::executeMove(TPoint* point,  GameBoard bo)
 
 	//ak neexistuje tah vrati sa false
 	if (max == 0)
-		return false;
+		return true;
 
-	return true;
+	return false;
 }
 
 bool Alg2::executeMove(TPoint* point,  GameBoard bo) {
-	int max = 0;
 	int deskSize = bo.getDeskSize();
 	vector <TPoint> points;
 	vector <TPoint> pointsPossib;
@@ -48,8 +54,8 @@ bool Alg2::executeMove(TPoint* point,  GameBoard bo) {
 	}
 
 	if (pointsPossib.size() == 0)
-		return false;
+		return true;
 
 	*point = pointsPossib[rand() % pointsPossib.size()];
-	return true;
+	return false;
 }

@@ -1,3 +1,10 @@
+/**
+ * Player
+ *
+ * @author			Klára Nečasová <xnecas24>
+ * @author			Peter Tisovčík <xtisov00>
+ */
+
 #ifndef PLAYER_H
 #define PLAYER_H
 
@@ -17,7 +24,7 @@ protected:
 public:
 	Player();
 	bool active;
-	virtual bool getNextMove(TPoint*, GameBoard board) {};
+	virtual bool getNextMove(TPoint*, GameBoard board) = 0;
 	int getColor();
 	void setColor(int);
 	int getScore();

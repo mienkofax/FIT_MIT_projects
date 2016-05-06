@@ -1,3 +1,10 @@
+/**
+ * Player
+ *
+ * @author			Klára Nečasová <xnecas24>
+ * @author			Peter Tisovčík <xtisov00>
+ */
+
 #include <iostream>
 #include "Player.h"
 #include "Strategy.h"
@@ -40,13 +47,11 @@ int Player::getType()
 }
 
 bool Human::getNextMove(TPoint *point, GameBoard board) {
-	return true;
+	return false;
 }
 
 bool PC::getNextMove(TPoint *point, GameBoard board) {
-	cout << "som PC a volam alg\n";
-	cout << algo->executeMove(point, board);
-	return true;
+	return algo->executeMove(point, board);
 }
 
 Human::Human() {

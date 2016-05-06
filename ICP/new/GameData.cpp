@@ -130,7 +130,7 @@ vector <TGameMove> GameData::getHistory()
 }
 
 void GameData::removeInvalidData() {
-	int index = 0;
+	size_t index = 0;
 
 	//spocita sa kolko je mozne spravit krookov vpred
 	for (TGameMove move : history) {
@@ -159,7 +159,7 @@ bool GameData::checkUndo() {
 }
 
 bool GameData::checkRedo() {
-	int count = 0;
+	size_t count = 0;
 	for (TGameMove move: history) {
 		if (move.isActive)
 		 	count++;
