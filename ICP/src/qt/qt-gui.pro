@@ -19,11 +19,7 @@ SOURCES += main.cpp\
     gui.cpp \
     square.cpp \
     game.cpp \
-    ../core/GameBoard.cpp \
-    ../core/GameData.cpp \
-    ../core/GameManager.cpp \
-    ../core/Player.cpp \
-    ../core/Strategy.cpp
+
 
 HEADERS  += gui.h \
     ui_gui.h \

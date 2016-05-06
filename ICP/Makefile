@@ -29,6 +29,7 @@ pack:
 	zip xnecas24-xtisov00.zip -r Makefile src/cli src/core src/qt doxygen.conf
 
 doxygen:
+	rm -rf doc
 	mkdir doc
 	doxygen src/doxygen.conf
 

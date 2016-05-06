@@ -5,11 +5,15 @@
 #include <vector>
 #include "GameBoard.h"
 
+/**
+ * Struktura popisujuca jeden herny tah.
+ */
 typedef struct {
-	int moveNumber;		//cislo tahu
-	std::vector <TPoint> points;
-	int color; 			//farba na ktoru sa to ma prekreslit
-	bool isActive;
+	int moveNumber;				 /**< Cislo tahu */
+	std::vector <TPoint> points; /**< Body, ktore sa prekreslili */
+	int color;					 /**< Farba, na ktoru sa prekreslia body */
+	bool isActive;				 /**< Pouziva sa pri prechode undo/redo funkcii
+									  pre oznacenie ci je tah viditelny */
 } TGameMove;
 
 class GameData
@@ -20,14 +24,14 @@ public:
 	GameData();
 
 	/**
-	 * Prida tah hry so historie
+	 * Prida tah hry do historie
 	 * @param	points		Vector bodov, ktore sa maju pridat do historie
-	 * @param 	color 		Farba bodov, na ktoru sa prekreslili
+	 * @param 	color 		Farba bodov, na ktoru sa kamene prekreslili
 	 */
 	void addMoveToHistory(std::vector <TPoint> points, int color);
 
 	/**
-	 * Ulozi historiu hry
+	 * Ulozi historiu hry do zadaneho suboru
 	 * @param	filename	Nazov suboru, do ktoreho sa maju ulozit herne data
 	 * @param	deskSize	Velkost hracej dosky
 	 * @param 	players		Pocet realnych hracov v hre
@@ -36,9 +40,9 @@ public:
 	bool saveGameData(std::string filename, int deskSize, int players);
 
 	/**
-	 * Nacitanie rozohranej hry
+	 * Nacitanie rozohranej hry zo zadaneho suboru
 	 * @param	filename	Nazov suboru, s ktoreho sa maju nacitat herne data
-	 * @return True v pripade, ze sa podarilo nacitat subor spravne inak false.
+	 * @return True v pripade, ze sa podarilo nacitat subor spravne inak false
 	 */
 	bool loadGameData(std::string filename);
 
@@ -69,16 +73,16 @@ public:
 
 	/**
 	 * Vrati pocet platnych bodov pri pouzivani undo,
-	 * kontrola, ci sa nezadalo undo aj ked nie je co vratit,
-	 * uz nie je mozne ist viacej dozadu
+	 * kontrola, ci sa nezadalo undo aj ked nie je co vratit
+	 * alebo uz nie je mozne ist viacej dozadu
 	 * @return	True v pripade, ze je undo platne inak false
 	 */
 	bool checkUndo();
 
 	/**
 	* Vrati pocet platnych bodov pri pouzivani redo,
-	* kontrola, ci sa nezadalo redo aj ked nie je co vratit,
-	* uz nie je mozne ist viacej dopredu
+	* kontrola, ci sa nezadalo redo aj ked nie je co vratit
+	* alebo uz nie je mozne ist viacej dopredu
 	* @return	True v pripade, ze je undo platne inak false
 	 */
 	bool checkRedo();

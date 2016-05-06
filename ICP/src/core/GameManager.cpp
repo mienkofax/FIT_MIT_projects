@@ -6,12 +6,12 @@
  */
 
 #include <iostream>
+#include <fstream>
+#include <memory>
 #include "GameManager.h"
 #include "GameBoard.h"
 #include "GameData.h"
 #include "Player.h"
-#include <fstream>
-#include <memory>
 
 using namespace std;
 
@@ -30,7 +30,6 @@ void GameManager::newGame(int deskSize, int players, int algorithm)
 	//ak ma byt druhy pc pocitac, tak sa mu nastavi algoritmus a hracia doska
 	if (players == 1) {
 		shared_ptr<Strategy> alg;
-		shared_ptr<GameBoard> board(new GameBoard(deskSize));
 
 		//nastavenie vybraneho algoritmu
 		if (algorithm == 1)
@@ -302,7 +301,7 @@ int GameManager::getHint()
 		for (int j = 0; j < deskSize; j++) {
 
 			//odstranenie predchadzajucej napovedy
-			if (games[this->activeGameIndex].board.getStone({j,i}) == 8)
+			if (games[this->activeGameIndex].board.getStone({j,i}) == HINT)
 				games[this->activeGameIndex].board.setStone({j,i}, NON_DEFINE);
 
 			//zistenie ci je mozne na dane suradnice vykonat tah

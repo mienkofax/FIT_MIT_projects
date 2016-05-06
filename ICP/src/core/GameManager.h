@@ -10,20 +10,23 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
 #include "GameBoard.h"
 #include "GameData.h"
 #include "Player.h"
-#include <memory>
 
+/**
+ * Struktura uchovavajuca jednu hru, hra pozostava
+ * z hernej dosky, z hernych dat(jednotlvie tahy) a hracov
+ */
 typedef struct {
-	GameBoard board;
-	GameData data;
-	std::shared_ptr<Player> p1;
-	std::shared_ptr<Player> p2;
+	GameBoard board;			/**< Hracia doska */
+	GameData data;				/**< Herne data (jednotlive tahy) */
+	std::shared_ptr<Player> p1;	/**< Informacie o hraci cislo 1 */
+	std::shared_ptr<Player> p2;	/**< Informacie o hraci cislo 2 */
 } TGame;
 
-class GameManager
-{
+class GameManager {
 	std::vector <TGame> games;
 	int activeGameIndex;
 	bool firstGame;
@@ -36,6 +39,7 @@ public:
 	 * Vytvori novu hru a priradi jej hraciu dosku, historiu tahov a hracov
 	 * @param	deskSize	Velkost hracej dosky
 	 * @param	players		Pocet realnych hracov v danej hre
+	 * @param	algorithm	Cislo Algoritmu, ktory sa ma pouzit pre PC
 	 */
 	void newGame(int deskSize, int players, int algorithm);
 
@@ -61,7 +65,7 @@ public:
 	/**
 	 * Overi ci je mozne urobit krok spat, vykona krok spat
 	 * a prekresli hraciu dosku predchadzajucim tahom
-	 * @return	True ak je mozne urobit tah vpred, inak false
+	 * @return	True ak je mozne urobit tah spat, inak false
 	 */
 	bool undo();
 
@@ -73,10 +77,11 @@ public:
 	bool redo();
 
 	/**
-	 * Dostane bod, kde by sa mal vykonat tak, overi ci je mozne uskutocnit tah
-	 * ak ano prekreslene body sa zapisu do historie, prepne sa na dalsieho hraca
-	 * vykresli sa nove pomocne body, kde sa da vykonat tah a aktualizuje sa hracia
-	 * doska
+	 * Dostane bod, kde by sa mal vykonat tak, overi ci je mozne
+	 * uskutocnit tah, ak ano prekreslia sa body a zapisu sa
+	 * do historie, prepne sa na dalsieho hraca vykreslia
+	 * sa nove pomocne body, kde sa da vykonat tah a aktualizuje
+	 * sa hracia doska
 	 * @param	point		Bod, kde sa ma vykonat tah
 	 * @param	isPass		V pripade ze hrac nemoze tahat
 	 * @return True ak je to platny, false ak je to neplatny tah
@@ -107,8 +112,9 @@ public:
 	bool livePlayer();
 
 	/**
-	 * Zistuje sa ci existuje aspon jedna vytvorena hracej
-	 * @return	True ak existuje aspon jedna hra, false ak neexistuje ani jedna hra
+	 * Zisti ci existuje aspon jedna hra
+	 * @return	True ak existuje aspon jedna hra, false ak neexistuje
+	 * ani jedna hra
 	 */
 	bool isEmpty();
 
@@ -148,11 +154,6 @@ public:
 	 */
 	int getStone(TPoint point);
 
-	/**
-	 *
-	 */
-	bool setAlg(int);
-
 private:
 	/**
 	 * Vygeneruje pomocne body, ktore znacia mozne tahy daneho hraca
@@ -162,7 +163,7 @@ private:
 
 	/**
 	 * Prepne na dalsieho hraca. Ak je aktivny hrac P1 prepne sa na
-	 * hraca P2, a ak je aktivny hrac P2 prepe sa na hraca P1
+	 * hraca P2 a ak je aktivny hrac P2 prepe sa na hraca P1
 	 */
 	void nextPlayer();
 
@@ -175,7 +176,7 @@ private:
 
 	/**
 	 * Aktualizuje hraciu dosku, najprv ju inicialuzuje na pociatocny stav a
-	 * nasledne vykresli jednotlive tahy ktore dostane.
+	 * nasledne vykresli jednotlive tahy ktore dostane
 	 * @param	moves		Tahy, ktore sa maju vykreslit
 	 */
 	void updateBoard(std::vector<TGameMove> moves);

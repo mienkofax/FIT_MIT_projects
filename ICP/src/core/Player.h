@@ -13,8 +13,7 @@
 #include "Strategy.h"
 #include <memory>
 
-class Player
-{
+class Player {
 protected:
 	int color;
 	int score;
@@ -22,13 +21,49 @@ protected:
 	void setType(int);
 
 public:
-	Player();
 	bool active;
-	virtual bool getNextMove(TPoint*, GameBoard board) = 0;
+	Player();
+
+	/**
+	 * Rozhranie pre dalsi tah, pre cloveka to je len vratenie
+	 * rovnakych suradnic ale pre PC to je vygenerovanie suradnic
+	 * na zaklade algoritmus
+	 * @param	point		Ukazatel na suradnice, ktore sa maju zmenit
+	 * @param	board		Hracia doska, z ktorej sa pocitaju tahy
+	 *						v jednotlivych algoritmoch
+	 * @return	True v pripade, ze je tah validny, false v pripade,
+	 *			ze nie je kam potiahnut
+	 */
+	virtual bool getNextMove(TPoint* point, GameBoard board) = 0;
+
+	/**
+	 * Vrati farbu daneho hraca
+	 * @return	Integer, farba hraca
+	 */
 	int getColor();
-	void setColor(int);
+
+	/**
+	 * Nastavenie farby
+	 * @param	color		Farba, ktoru bude mat dany hrac
+	 */
+	void setColor(int color);
+
+	/**
+	 * Zistenie score hraca
+	 * @retunr Integer, score hraca
+	 */
 	int getScore();
-	void setScore(int);
+
+	/**
+	 * Nastavenie score hraca
+	 * @param	score		Score hraca
+	 */
+	void setScore(int score);
+
+	/**
+	 * Zistenie ci sa jedna o PC alebo HUMAN hraca
+	 * @return Integer, typ hraca
+	 */
 	int getType();
 };
 

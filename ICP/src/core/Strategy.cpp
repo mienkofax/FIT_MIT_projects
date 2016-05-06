@@ -22,6 +22,7 @@ bool Alg1::executeMove(TPoint* point,  GameBoard bo)
 	vector <TPoint> points;
 	bool move = false;
 
+	//prechod bodmi a najdenie prvych validnych suradnic
 	for(int i = 0; i < deskSize && !move; i++) {
 		for(int j = 0; j < deskSize; j++) {
 			points = bo.moveStone({j,i}, BLACK);
@@ -44,6 +45,7 @@ bool Alg2::executeMove(TPoint* point,  GameBoard bo) {
 	vector <TPoint> points;
 	vector <TPoint> pointsPossib;
 
+	//prechod bodmi, ulozenie validnych suradnic do vektoru
 	for(int i = 0; i < deskSize; i++) {
 		for(int j = 0; j < deskSize; j++) {
 			points = bo.moveStone({j,i}, BLACK);
@@ -55,6 +57,7 @@ bool Alg2::executeMove(TPoint* point,  GameBoard bo) {
 	if (pointsPossib.size() == 0)
 		return true;
 
+	//nahodny vyber suradnic, ktore su validne
 	*point = pointsPossib[rand() % pointsPossib.size()];
 	return false;
 }

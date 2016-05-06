@@ -11,9 +11,12 @@
 #include <iostream>
 #include <vector>
 
+/**
+ * Struktura, ktora popisuje bod suradnicami x, y
+ */
 typedef struct {
-	int x;
-	int y;
+	int x;	/**< Suradnica bodu x */
+	int y;	/**< Suradnica body y */
 } TPoint;
 
 //const int white = 1;
