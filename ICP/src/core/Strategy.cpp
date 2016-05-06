@@ -18,23 +18,22 @@ Strategy::Strategy()
 
 bool Alg1::executeMove(TPoint* point,  GameBoard bo)
 {
-	size_t max = 0;
 	int deskSize = bo.getDeskSize();
 	vector <TPoint> points;
+	bool move = false;
 
-	for(int i = 0; i < deskSize; i++) {
+	for(int i = 0; i < deskSize && !move; i++) {
 		for(int j = 0; j < deskSize; j++) {
 			points = bo.moveStone({j,i}, BLACK);
-			if(points.size() > max) {
+			if(points.size() > 0) {
 				point->x = j;
 				point->y = i;
-				max = points.size();
+				move = true;
 			}
 		}
 	}
 
-	//ak neexistuje tah vrati sa false
-	if (max == 0)
+	if (!move)
 		return true;
 
 	return false;

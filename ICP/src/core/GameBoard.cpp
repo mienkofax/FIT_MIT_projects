@@ -72,10 +72,10 @@ vector <TPoint> GameBoard::findingMoves(TPoint point, int color)
 			{
 				if (startPoint.x == point.x-x && startPoint.y == point.y-y)
 					break;
-
 				//spetne dohladanie vsetkych bodov na vykreslenie
 				for (int k = 0; k < deskSize; k++)
 				{
+
 					point.x -= x; point.y -= y;
 					if (point.x == startPoint.x && point.y == startPoint.y)
 						break;

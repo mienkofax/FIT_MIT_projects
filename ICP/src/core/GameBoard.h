@@ -53,8 +53,9 @@ public:
 
 public:
 	/**
-	 * Algoritmus, ktory prehlada okolie a zisti ci je dany tah validny,
+	 * Algoritmus, ktory prehladava okolie a zistuje ci je dany tah validny,
 	 * ci je mozne otocit aspon jeden kamen a ci nie je volne policko medzi nimi
+	 * otacanymi kamenmi
 	 * @param	point		Suradnice, kde sa ma umiestnit novy kamen
 	 * @param 	color		Farba kamena, ktory sa ma umiestnit
 	 * @return 	Vektor bodov, ktore je mozne prekreslit danym tahom
@@ -62,7 +63,7 @@ public:
 	std::vector <TPoint> findingMoves(TPoint point, int color);
 
 	/**
-	 * Inicializuje hraciu dosku na zaciatocne 4 kamene
+	 * Iniclializacia hracej dosky na zaciatocne 4 kamene
 	 * @param	deskSize	Velkost hracej dosky
 	 */
 	GameBoard(int deskSize);
@@ -73,31 +74,31 @@ public:
 	void initDesk();
 
 	/**
-	 * Nastavenie farby kamaena na zaklade zadanuych suradnic a farby
+	 * Nastavenie farby kamena na zaklade zadanych suradnic a farby
 	 * @param	point		Bod, na ktorom sa ma dana farba zmenit
 	 * @param	color		Farba kamena, na ktoru sa ma otocit
 	 */
 	void setStone(TPoint points, int color);
 
 	/**
-	* Zistenie farby kamena na danych suradnicciach
+	* Zistenie farby kamena na danych suradniciach
 	* @param	point		Suradnice, pozadovaneho bodu
-	* @return	Farba daneho kamena na zadanych suradnicciach
+	* @return	Farba daneho kamena na zadanych suradniciach
 	*/
-	int getStone(TPoint);
+	int getStone(TPoint point);
 
 	/**
 	* Velkost hracej dosky
-	* @param	Velkost hracej dosky ako cele cislo
+	* @return	Velkost hracej dosky ako cele cislo
 	*/
 	int getDeskSize();
 
 	/**
-	 * Aktualizuje hracie kamene na danu farbu, vyuzite pri nacitani
+	 * Aktualizuje hracie kamene na danu farbu
 	 * @param	points		Body, na ktorych sa ma dana farba zmenit
 	 * @param	color		Farba kamena, na ktoru sa ma otocit
 	 */
-	void updateBoard(std::vector <TPoint>, int);
+	void updateBoard(std::vector <TPoint> points, int color);
 
 	/**
 	 * Pocet kamenov danej farby
@@ -112,11 +113,9 @@ public:
 	 * @param	point		Suradnice, kde sa ma vykonat tah, prekreslenie
 	 * @param	color		Farba kamena, na ktoru sa maju prekreslit ostatne kamene
 	 * @return 	Vekto bodov, ktore sa maju prekreslit, ak sa nema co prekreslit
-	 *			vrati sa prazdny vektor- tah je neplatny
+	 *			vrati sa prazdny vektor - tah je neplatny
 	 */
 	std::vector <TPoint> moveStone(TPoint point, int color);
-
-	std::vector <TPoint> checkStone(TPoint point, int color);
 
 	/**
 	 * Oznaci suradnice kamenov, ktore je mozne v nasledujucom tahu prevratit

@@ -85,6 +85,7 @@ bool GameManager::loadGame(string filename)
 	for (TGameMove move : games[this->activeGameIndex].data.getHistory())
 		games[this->activeGameIndex].board.updateBoard(move.points, move.color);
 
+	getHint();
 	return returnCode;
 }
 

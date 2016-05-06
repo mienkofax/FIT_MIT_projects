@@ -1,0 +1,11 @@
+- dorobit koniec hry
+- okomentovat zvysok kodu
+- dorobit READMI - tam bude ako to prelozit co tam je implementovane co nie, ako sa to pouziva
+- vyriesit aby sa v cli zobrazovali pismenka v stlpcoch - OPRAVENE
+- nepodporovana velkost dosky - OPRAVENE
+- velikost 10, 1 hráč, algoritmus 1, tahy 5,7 a 7,7 - OPRAVENE
+
+
+SPRAVENE KOMENTARE
+- GameBoard.cpp
+- GameBoard.h

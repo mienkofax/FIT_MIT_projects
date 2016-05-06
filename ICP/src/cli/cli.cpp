@@ -10,6 +10,7 @@
 #include "GameData.h"
 #include "GameManager.h"
 #include <vector>
+#include <iomanip>
 #include "Player.h"
 #include "Strategy.h"
 #include "cli.h"
@@ -20,15 +21,16 @@ void CLI::renderMap(GameManager &board) {
 	int deskSize = board.getDeskSize();
 
 	//vykreslenie pismeniek
-	cout << endl << "   ";
+	cout << endl << "    ";
 	for (int i = 0; i < deskSize; i++)
-		cout << i + 1 << " ";
+		cout << char(i + 'a') << " ";
 
 	cout << endl;
 
 	//Vykreslenie hracej dosky
 	for (int i = 0; i < deskSize; i++){
-		cout << i + 1 << ": ";
+		cout << setfill(' ') << setw(2) << i + 1  <<": ";
+
 		for (int j = 0; j < deskSize; j++) {
 			if (board.getStone({j,i}) == WHITE)
 				cout << "●";
@@ -59,15 +61,14 @@ bool CLI::getCoordinate(string s, TPoint *point) {
 	if (index < 0)
 		return false;
 
-	if (!strToInt(s.substr(0,index), &point->x))
-		return false;
+	//prevod znaku na cislo
+	point->x = unsigned(char(s.substr(0, index)[0]-'a'));
 
 	s.erase(0,index+1); //odstranenie ciarky a xsovej suradnice
 
-	if (!strToInt(s.substr(0,index), &point->y))
+	if (!strToInt(s, &point->y))
 		return false;
 
-	point->x -= 1;
 	point->y -= 1;
 	return true;
 }
@@ -181,9 +182,12 @@ void CLI::show() {
 				cout << "Hra bola ukoncena." << endl;
 				break;
 			} else if (enter == "new") {
-				createNewGame(&deskSize, &countPlayers, &alg);
-				manager.newGame(deskSize, countPlayers, alg);
-				renderMap(gameManager);
+				if (!createNewGame(&deskSize, &countPlayers, &alg))
+					cout << "Nebolo mozne vytvorit hru." << endl;
+				else {
+					manager.newGame(deskSize, countPlayers, alg);
+					renderMap(gameManager);
+				}
 			} else if (enter == "change") {
 				cout << "Zadajte cislo hry: ";
 				cin >> enter;

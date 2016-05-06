@@ -15,7 +15,7 @@ run: library hra2016-cli hra2016 doxygen
 library:
 	make -C $(CORE_DIR) library
 
-hra2016-cli:
+hra2016-cli: library
 	g++ $(CLI_DIR)/main.cpp $(CLI_DIR)/cli.cpp $(LIBRARY_OTHELLO) -o $(NAME_CLI) $(CXXFLAGS) -I$(CLI_DIR) -I$(CORE_DIR) -L$(CORE_DIR)
 
 hra2016: library
