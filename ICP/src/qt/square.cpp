@@ -24,6 +24,8 @@ Square::Square(QGraphicsItem *parent, int size)
 	brush.setStyle(Qt::SolidPattern);
 	brush.setColor(Qt::green);
 	setBrush(brush);
+
+	this->size = size;
 }
 
 void Square::mousePressEvent(QGraphicsSceneMouseEvent *event)

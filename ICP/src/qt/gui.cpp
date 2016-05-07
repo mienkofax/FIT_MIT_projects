@@ -146,8 +146,6 @@ void gui::moveToPosition(int x, int y)
 	else
 		status("Neúspešný ťah.", false);
 
-	qDebug() << x << "," << y;
-
 	//tah pocitaca a pockanie 0.5s
 	if (!manager->livePlayer()) {
 		QThread::msleep(500);
@@ -333,9 +331,9 @@ void gui::on_buttonChangeGame_clicked()
 void gui::on_buttonDemoGame_clicked()
 {
 	QMessageBox msgBox;
-    msgBox.setWindowTitle("Autori");
-    msgBox.setText("Othello Game\n\n" "Autor: Peter Tisovčík    <xtisov00@stud.fit.vutbr.cz>\n"
-                   "Autor: Klára Nečasová <xnecas24@stud.fit.vutbr.cz>");
+	msgBox.setWindowTitle("Autori");
+	msgBox.setText("Othello Game\n\n" "Autor: Peter Tisovčík    <xtisov00@stud.fit.vutbr.cz>\n"
+					"Autor: Klára Nečasová <xnecas24@stud.fit.vutbr.cz>");
 	msgBox.exec();
 }
 
