@@ -31,7 +31,7 @@ void CLI::renderMap(GameManager &board) {
 				cout << "●";
 			else if (board.getStone({j,i}) == BLACK)
 				cout << "○";
-			else if (board.getStone({j,i}) == 8)
+			else if (board.getStone({j,i}) == HINT)
 				cout << ".";
 			else
 				cout << " ";
@@ -72,41 +72,41 @@ bool CLI::createNewGame(int *deskSize, int *countPlayers, int *alg) {
 	string enter;
 	int option;
 
-	cout << "Zadajte Velkost hracej dosky[8 - predvolene znak *]: ";
+	cout << "Zadajte veľkosť hracej dosky[8 - predvolená veľkosť znak: *]: ";
 
 	//nacitanie velkosti
 	cin >> enter;
 	if (enter == "*") {
-		cout << "Doska sa vytvori s default hodnotou 8." << endl;
+		cout << "Hracia doska sa vytvori s predvolenou veľkosťou 8." << endl;
 		*deskSize = 8;
 	} else {
 		if (!strToInt(enter, &option)) {
-			cout << "Zadana hodnota musi byt cislo." << endl;
+			cout << "Zadaná hodnota musí byt číslo." << endl;
 			return false;
 		}
 		if ((option != 6 && option != 10 && option != 8 && option != 12))	{
-			cout << "Velkost hracej dosky moze byt len 6,8,10,12." << endl;
+			cout << "Veľkosť hracej dosky môže byť len 6,8,10,12." << endl;
 			return false;
 		}
 		*deskSize = option;
 	}
 
 	//pocet hracov a ich typ PC - clovek
-	cout << "Zadajte pocet realnych hracov, musi byt aspon jeden: ";
+	cout << "Zadajte počet reálnych hráčov, musí byť aspoň jeden: ";
 	cin >> enter;
 	if (!strToInt(enter, &option)  || (option != 1 && option != 2)) {
-		cout << "Zadana hodnota musi byt cislo 1 alebo 2." << endl;
+		cout << "Zadaná hodnota musí byť číslo 1 alebo 2." << endl;
 		return false;
 	} else {
 		*countPlayers = option;
 
 		if (option == 1) {
-		cout << "Zadajte cislo algoritmu, ktory sa ma pouzit: ";
+		cout << "Zadajte číslo algoritmu, ktorý sa ma použiť: ";
 		cin >> enter;
 			if (strToInt(enter, &option)) {
 				*alg = option;
 			} else {
-				cout << "Zadana neplatna volba." << endl;
+				cout << "Bola zadaná neplatná voľba." << endl;
 				return false;
 			}
 		}
@@ -116,17 +116,17 @@ bool CLI::createNewGame(int *deskSize, int *countPlayers, int *alg) {
 }
 
 void CLI::help() {
-	cout << "NAPOVEDA:" << endl;
-	cout << "\tx,y - zadajte suradnice oddelene ciarkou bez medzier[stlpec,riadok], napriklad:a,2";
+	cout << "NÁPOVEDA:" << endl;
+	cout << "\tx,y - zadajte súradnice oddelené čiarkou, bez medzier[stlpec,riadok], napríklad:a,2";
 	cout << endl;
-	cout << "\tpass - v pripade, ze nemate moznost posunu zadajte \"pass\"" << endl;
-	cout << "\tsave - v pripade, ze chcete ulozit rozohratu hru" << endl;
-	cout << "\tload - v pripade, ze chcete nacitat rozohratu hru" << endl;
-	cout << "\tundo - krok spat" << endl;
-	cout << "\tredo - krok vpred" << endl;
-	cout << "\tnew - pre vytvorenie novej hry" << endl;
-	cout << "\tchange - pre zmenu hry" << endl;
-	cout << "\tkonec - pre ukoncenie hry" << endl;
+	cout << "\tpass   - v prípade, že nemáte možnosť urobiť ťah, zadajte pass" << endl;
+	cout << "\tsave   - v prípade, že chcete uložiť rozohranú hru" << endl;
+	cout << "\tload   - v prípade, že chcete načítať rozohranú hru" << endl;
+	cout << "\tundo   - krok späť" << endl;
+	cout << "\tredo   - krok vpred" << endl;
+	cout << "\tnew    - vytvorenie novej hry" << endl;
+	cout << "\tchange - zmena hry" << endl;
+	cout << "\tend    - ukončenie hry" << endl;
 }
 
 void CLI::show() {
@@ -137,14 +137,16 @@ void CLI::show() {
 	string enter;
 	TPoint point;
 
+	cout << "Hra: Othello \nAutori: xnecas24, xtisov00" << endl;
+
 	while(1) {
 		cout << "------------------------------------\n";
 
 		if (!gameManager.isEmpty()) {
 			if(manager.isActiveP1())
-			cout << "Na rade je hrac 1(Biele): ";
+			cout << "Na rade je hráč 1(Biele kamene): ";
 			if (manager.isActiveP2())
-			cout << "Na rade je hrac 2(Cierne): ";
+			cout << "Na rade je hráč 2(Čierne kamene): ";
 		}
 		else
 			help();
@@ -157,66 +159,67 @@ void CLI::show() {
 				if (manager.moveStone({0,0}, true))
 					cout << "Pass sa vykonal." << endl;
 				else
-					cout << "Pass je mozne zadat len ked nie je ziaden tah." << endl;
+					cout << "Pass je možné zadať len, keď nie je možné spraviť iný ťah." << endl;
 			} else if (enter == "save") {
-				cout << "Zadajte subor, do ktore sa ulozi hra: ";
+				cout << "Zadajte súbor, do ktorého sa uloží hra: ";
 				cin >> enter;
 				if (manager.saveGame(enter))
-					cout << "Herne data boli ulozene v subore: " << enter << endl;
+					cout << "Herne dáta boli uložene v súbore: " << enter << endl;
 				else
-					cout << "Problem pri ukladani hernych dat, opakujte ulozenie." << endl;
+					cout << "Problém pri ukladaní herných dát, opakujte uloženie." << endl;
 			} else if (enter == "load") {
-				cout << "Zadajte nazov suboru, s ktoreho sa maju nacitat data: ";
+				cout << "Zadajte názov súboru, s ktorého sa majú načítať dáta: ";
 				cin >> enter;
 				if (manager.loadGame(enter))
-					cout << "Data boli nacitane." << endl;
+					cout << "Dáta boli načítané." << endl;
 				else
-					cout << "Problem pri nacitani dat" << endl;
+					cout << "Problém pri načítaní dát." << endl;
 				renderMap(gameManager);
-			} else if (enter == "konec") {
-				cout << "Hra bola ukoncena." << endl;
+			} else if (enter == "end") {
+				cout << "Hra bola ukončená." << endl;
 				break;
 			} else if (enter == "new") {
+				help();
 				if (!createNewGame(&deskSize, &countPlayers, &alg))
-					cout << "Nebolo mozne vytvorit hru." << endl;
+					cout << "Nebolo možné vytvoriť hru." << endl;
 				else {
 					manager.newGame(deskSize, countPlayers, alg);
 					renderMap(gameManager);
 				}
 			} else if (enter == "change") {
-				cout << "Zadajte cislo hry: ";
+				cout << "Zadajte číslo hry: ";
 				cin >> enter;
 				if (strToInt(enter, &option) && option >=0 ) {
 					if (manager.changeGame(option))
-						cout << "Hra uspesne zmenena." << endl;
+						cout << "Hra úspešne zmenená." << endl;
 					else
-						cout << "Bola zadana nespravna hodnota. " << endl;
+						cout << "Bola zadaná nesprávna hodnota. " << endl;
 					renderMap(gameManager);
 				} else
-					cout << "Bola zadaza zla hodnota hry." << endl;
+					cout << "Bola zadaná zlá hodnota hry." << endl;
 
 			} else if (enter == "undo") {
 				if (!gameManager.undo())
-					cout << "Nie je mozne ist spat." << endl;
+					cout << "Nie je možné ísť späť." << endl;
 				renderMap(gameManager);
 			} else if (enter == "redo") {
 				if (!gameManager.redo())
-					cout << "Nie je mozne sa vratit vpred." << endl;
+					cout << "Nie je možné sa vrátiť vpred." << endl;
 				renderMap(gameManager);
 			} else {
-				cout << "Nepodporovany string, opakujte volbu." << endl;
+				cout << "Nepodporovaný reťazec, opakujte voľbu." << endl;
 			}
 		} else {
 			if (!gameManager.moveStone(point, false) )
-				cout << "Nemozno presunut kamen, opakujte pokus." << endl;
+				cout << "Nemožno presunúť kameň, opakujte pokus." << endl;
 
 			renderMap(gameManager);
 		}
 
 		//vypis skore, ked je aspon jedna aktivna hra
 		if (!gameManager.isEmpty()) {
-			cout << "SCORE::" << gameManager.getP1Score() << endl;
-			cout << "SCORE::" << gameManager.getP2Score() << endl;
+			cout << "Skóre Hráč 1::" << gameManager.getP1Score() << endl;
+			cout << "Skúre hráč 2::" << gameManager.getP2Score() << endl;
 			cout << "ID hry: " << gameManager.getGameID() << endl;
 		}
 	}

@@ -23,6 +23,7 @@ typedef struct {
 	GameData data;				/**< Herne data (jednotlive tahy) */
 	std::shared_ptr<Player> p1;	/**< Informacie o hraci cislo 1 */
 	std::shared_ptr<Player> p2;	/**< Informacie o hraci cislo 2 */
+	int algorithm;				/**< Cislo algoritmu ak sa pouzil */
 } TGame;
 
 /**

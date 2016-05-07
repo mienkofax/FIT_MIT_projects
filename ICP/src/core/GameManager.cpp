@@ -61,7 +61,7 @@ void GameManager::newGame(int deskSize, int players, int algorithm)
 
 bool GameManager::loadGame(string filename)
 {
-	int deskSize, players;
+	int deskSize, players, alg;
 
 	ifstream gameFile;
 	gameFile.open(filename);
@@ -72,9 +72,10 @@ bool GameManager::loadGame(string filename)
 	//nacitanie velkosti hracej dosky a pocet hracov
 	gameFile >> deskSize;
 	gameFile >> players;
+	gameFile >> alg;
 	gameFile.close();
 
-	newGame(deskSize, players, 2); //TODO dorobit ukladanie cisla algoritmu
+	newGame(deskSize, players, alg);
 
 	//nacitanie hernych dat
 	bool returnCode = games[this->activeGameIndex].data.loadGameData(filename);
@@ -97,7 +98,9 @@ bool GameManager::saveGame(string filename)
 		players = 1;
 
 	//ulozenie ernych dat
-	return games[this->activeGameIndex].data.saveGameData(filename, games[this->activeGameIndex].board.getDeskSize(), players);
+	return games[this->activeGameIndex].data.saveGameData(filename,
+		games[this->activeGameIndex].board.getDeskSize(), players,
+		games[this->activeGameIndex].algorithm);
 }
 
 bool GameManager::changeGame(size_t gameIndex)

@@ -102,7 +102,7 @@ void Game::drawStone(std::shared_ptr <GameManager> board)
 				createStone(i,j, Qt::white, deskSize);
 			else if(board->getStone({i, j}) == BLACK)
 				createStone(i,j, Qt::black, deskSize);
-			else if (board->getStone({i, j}) == 8)
+			else if (board->getStone({i, j}) == HINT)
 				createStone(i,j, Qt::darkCyan, deskSize);
 		}
 	}

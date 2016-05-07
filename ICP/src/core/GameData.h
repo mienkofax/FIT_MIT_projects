@@ -46,9 +46,10 @@ public:
 	 * @param	filename	Nazov suboru, do ktoreho sa maju ulozit herne data
 	 * @param	deskSize	Velkost hracej dosky
 	 * @param 	players		Pocet realnych hracov v hre
+	 * @param	algorithm	Cislo algoritmu, ktory sa pouzil
 	 * @return	True v pripade, ze sa ulozili data spravne inak false
 	 */
-	bool saveGameData(std::string filename, int deskSize, int players);
+	bool saveGameData(std::string filename, int deskSize, int players, int algorithm);
 
 	/**
 	 * Nacitanie rozohranej hry zo zadaneho suboru

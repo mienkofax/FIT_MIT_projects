@@ -29,7 +29,7 @@ void GameData::addMoveToHistory(vector <TPoint> points, int color)
 	this->history.push_back({moveNumber, points, color, true});
 }
 
-bool GameData::saveGameData(string filename, int deskSize, int players)
+bool GameData::saveGameData(string filename, int deskSize, int players, int algorithm)
 {
 	ofstream gameFile;
 	gameFile.open(filename);
@@ -40,6 +40,7 @@ bool GameData::saveGameData(string filename, int deskSize, int players)
 	//prechod jednotlivymi polozkami v historii
 	gameFile << deskSize << endl;
 	gameFile << players << endl;
+	gameFile << algorithm << endl;
 	for (TGameMove record : this->history)
 	{
 		gameFile << record.moveNumber << endl;
