@@ -35,7 +35,7 @@ hra2016: library
 
 #vytvorenie archivu
 pack:
-	zip xnecas24-xtisov00.zip -r Makefile READMI.txt src/cli src/core src/qt doxygen.conf examples
+	zip xtisov00-xnecas24.zip -r Makefile READMI.txt src/cli src/core src/qt src/doxygen.conf examples
 
 #vytvorenie dokumentacie
 doxygen:
