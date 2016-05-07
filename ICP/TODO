@@ -7,18 +7,18 @@
 - ulozenie a nacitanie cislo algoritmu, ktory sa pouzil pri hre
 
 SPRAVENE KOMENTARE
-- GameBoard.cpp
-- GameBoard.h
+- src/core/GameBoard.cpp
+- src/core/GameBoard.h
 
-- GameData.cpp
-- GameData.h
+- src/core/GameData.cpp
+- src/core/GameData.h
 
-- GameManager.cpp
-- GameManager.h
+- src/core/GameManager.cpp
+- src/core/GameManager.h
 
-- Player.cpp
-- Player.h
+- src/core/Player.cpp
+- src/core/Player.h
 
-- Strategy.cpp
-- Strategy.h
+- src/core/Strategy.cpp
+- src/core/Strategy.h
 
