@@ -60,6 +60,8 @@ private:
     void updateGameData();
     void status(QString text, bool isOk);
     void createComboBoxString(QString deskSize);
+    void initNewGame();
+    void setGameTitle();
      Game *game;
 
 };

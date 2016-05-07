@@ -4,7 +4,7 @@
 #include <QString>
 #include "game.h"
 #include <QThread>
-
+#include <QDebug>
 #include <QListView>
 
 
@@ -21,14 +21,7 @@ gui::gui(QWidget *parent) :
     setComboBoxNewGameData();
 
     manager = std::shared_ptr <GameManager>(new GameManager());
-    game = new Game(480);
-
-    //vytvorenie kamenov pre aktualne skore
-    game->createStone(500, 245,Qt::white);
-    game->createStone(500, 300,Qt::black);
-
-    //zaciatocny kamen, kto je na tahu
-    game->createStone(540, 140,Qt::white);
+    initNewGame();
 }
 
 void gui::setComboBoxNewGameData()
@@ -121,6 +114,30 @@ void gui::createComboBoxString(QString deskSize)
     ui->comboBoxGame->setCurrentIndex(ui->comboBoxGame->count()-1);
 }
 
+void gui::initNewGame()
+{
+    delete game;
+    game = new Game(480);
+
+    //vytvorenie kamenov pre aktualne skore
+    game->createStone(500, 245,Qt::white);
+    game->createStone(500, 300,Qt::black);
+
+    //zaciatocny kamen, kto je na tahu
+    game->createStone(540, 140,Qt::white);
+
+    setGameTitle();
+}
+
+void gui::setGameTitle()
+{
+    QString title;
+    if (ui->comboBoxGame->count() > 0 && ui->stackedWidget->currentIndex() == 2)
+        title = " - Game ID:" + ui->comboBoxGame->currentText().replace(": Game:", " ~");
+
+    this->setWindowTitle("Othello Game" + title);
+}
+
 void gui::moveToPosition(int x, int y)
 {
     //spracovanie tahu
@@ -128,6 +145,8 @@ void gui::moveToPosition(int x, int y)
        status("Uspesny tah.", true);
     else
        status("Nesuspesny tah.", false);
+
+    qDebug() << x << "," << y;
 
     //tah pocitaca a pockanie 0.5s
     if (!manager->livePlayer()) {
@@ -138,12 +157,14 @@ void gui::moveToPosition(int x, int y)
     //prekreslenie kamenov a aktualizacia skore
     game->drawStone(manager);
     updateGameData();
+    ui->graphicsView->setScene(game->scene);
 }
 
 void gui::widgetCreateNewGame()
 {
     //okno pre vytvorenie novej hry
     ui->stackedWidget->setCurrentIndex(1);
+    setGameTitle();
 
     //nastavenie predvolenych hodnot
     initComboBoxNewGameData();
@@ -157,6 +178,7 @@ void gui::widgetLoadNewGame()
 
     //ak sa nacitali udaje spravne vytvori sa hra
     if(manager->loadGame(filename.toStdString())) {
+        initNewGame();
 
         //vytvorenie hracej dosky, vykreslenie kamenov
         game->placeSquare(manager->getDeskSize());
@@ -174,6 +196,7 @@ void gui::widgetLoadNewGame()
 
         connect(game, &Game::moveToPosition, this, &gui::moveToPosition);
         status("Hra uspesne nacitana.", true);
+        setGameTitle();
    } else
         status("Hru sa nepodarilo nacitat.", false);
 }
@@ -218,6 +241,8 @@ void gui::on_comboBoxPlayer2_currentIndexChanged(int index)
 
 void gui::on_pushButton_12_clicked()
 {
+    initNewGame();
+
     int players = 1;
 
     if (ui->comboBoxPlayer2->currentIndex() == 0)
@@ -240,6 +265,7 @@ void gui::on_pushButton_12_clicked()
     ui->graphicsView->setScene(game->scene);
     connect(game, &Game::moveToPosition, this, &gui::moveToPosition);
     status("Hra bola uspesne vytvorena.", true);
+    setGameTitle();
 }
 
 void gui::on_buttonSave_clicked()
@@ -290,6 +316,7 @@ void gui::on_buttonBackToGame_clicked()
 void gui::on_buttonChangeGame_clicked()
 {
     if (manager->changeGame(ui->comboBoxGame->currentIndex())) {
+        initNewGame();
 
         //vykresenie hracej plochy a nasledne kamenov
         game->placeSquare(manager->getDeskSize());
@@ -298,6 +325,8 @@ void gui::on_buttonChangeGame_clicked()
 
         ui->graphicsView->setScene(game->scene);
         status("Hra bola uspesne zmenena.", true);
+        connect(game, &Game::moveToPosition, this, &gui::moveToPosition);
+        setGameTitle();
     } else
         status("Hru sa nepodarilo zmenit", false);
 }

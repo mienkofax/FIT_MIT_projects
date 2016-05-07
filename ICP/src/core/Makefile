@@ -2,18 +2,14 @@ CXX=g++
 CXXFLAGS=-Wall -pedantic -std=c++11
 LIBRARY_NAME=othello-lib.a
 
-
+all: library
 
 library:
 	g++ -c $(CXXFLAGS) GameManager.cpp GameBoard.cpp GameData.cpp Strategy.cpp Player.cpp
-	ar -rv $(LIBRARY_NAME) GameManager.o
-	ar -rv $(LIBRARY_NAME) GameData.o
-	ar -rv $(LIBRARY_NAME) GameBoard.o
-	ar -rv $(LIBRARY_NAME) Player.o
-	ar -rv $(LIBRARY_NAME) Strategy.o
+	ar rcs $(LIBRARY_NAME) GameManager.o GameData.o GameBoard.o Player.o Strategy.o
 
 clean:
-	rm -f GameManager.o GameBoard.o GameData.o Strategy.o Player.o
+	rm -f *.o
 
 cleanall: clean
 	rm -f $(LIBRARY_NAME)
