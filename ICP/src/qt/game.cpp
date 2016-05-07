@@ -27,7 +27,6 @@ void Game::placeSquare(int deskSize)
             square->setPos(size*j,size*i);
             squares.append(square);
             scene->addItem(square);
-            square->setOwner();
             connect(square, &Square::getClickPosition, this, &Game::getPosition);
         }
     }
@@ -111,6 +110,3 @@ void Game::setActivePlayer(int x, int y, Qt::GlobalColor color)
     delete lastElipseItem;
     createStone(x, y, color);
 }
-
-
-

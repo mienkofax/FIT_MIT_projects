@@ -6,21 +6,33 @@
 #include <QMessageBox>
 #include <QObject>
 
+
 class Square: public QObject, public QGraphicsPolygonItem {
-    Q_OBJECT
+	Q_OBJECT
+	QString owner;
+	int size;
+
 public:
-    Square(QGraphicsItem* parent=NULL, int size=50);
+	/**
+	 * Constructor stvorca, ktory predstavuje jedno hracie policko
+	 * @param	param		Rodic objektu
+	 * @param	size		Velkost stvorca
+	 */
+	Square(QGraphicsItem* parent=NULL, int size = 50);
 
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-
-    void setOwner();
+	/**
+	 * Event pri stlaceni na dany stvorec
+	 * @param	event		Pointer na event, ktory vyvolal stlacenie
+	 */
+	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 signals:
-    void getClickPosition(int x, int y);
-private:
-    QString owner;
-    int size;
+	/**
+	 * Signal pre poslanie suradnic stvorca, kde sa kliklo
+	 * @param	x			X suradnica stvorca, kde sa kliklo
+	 * @param	y			Y suradnica stvorca, kde sa kliklo
+	 */
+	void getClickPosition(int x, int y);
 };
 
 #endif // SQUARE
-
