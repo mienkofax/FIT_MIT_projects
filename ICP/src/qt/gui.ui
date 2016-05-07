@@ -40,7 +40,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Help</string>
+       <string>Autori</string>
       </property>
      </widget>
      <widget class="QPushButton" name="buttonNewGame">
@@ -53,7 +53,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>New Game</string>
+       <string>Nová Hra</string>
       </property>
       <property name="default">
        <bool>false</bool>
@@ -72,7 +72,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Load Game</string>
+       <string>Načítať Hru</string>
       </property>
      </widget>
     </widget>
@@ -107,7 +107,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Create game</string>
+       <string>Vytvoriť hru</string>
       </property>
      </widget>
      <widget class="QComboBox" name="comboBoxAlgorithm">
@@ -130,7 +130,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Back to menu</string>
+       <string>Späť do menu</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_2">
@@ -143,7 +143,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Velkost hracej dosky</string>
+       <string>Veľkosť hracej dosky</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_3">
@@ -156,7 +156,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Hrac 2:</string>
+       <string>Hráč 2:</string>
       </property>
      </widget>
      <widget class="QComboBox" name="comboBoxPlayer2">
@@ -195,7 +195,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Hrac 1:</string>
+       <string>Hráč 1:</string>
       </property>
      </widget>
      <widget class="QPushButton" name="buttonBackToGame">
@@ -208,7 +208,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Back to game</string>
+       <string>Späť na hru</string>
       </property>
      </widget>
     </widget>
@@ -239,7 +239,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>New Game</string>
+       <string>Nová hra</string>
       </property>
      </widget>
      <widget class="QLabel" name="labelMove">
@@ -275,7 +275,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Load</string>
+       <string>Načítať</string>
       </property>
      </widget>
      <widget class="QPushButton" name="buttonSave">
@@ -288,7 +288,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Save</string>
+       <string>Uložiť</string>
       </property>
      </widget>
      <widget class="QPushButton" name="buttonChangeGame">
@@ -301,7 +301,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Change Game</string>
+       <string>Zmeniť hru</string>
       </property>
      </widget>
      <widget class="QLabel" name="labelPlayer1Score">
@@ -459,7 +459,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Score:</string>
+       <string>Skóre</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>

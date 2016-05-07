@@ -20,6 +20,7 @@ gui::gui(QWidget *parent) :
 	setComboBoxNewGameData();
 
 	manager = std::shared_ptr <GameManager>(new GameManager());
+	game = new Game(480);
 	initNewGame();
 }
 
@@ -34,20 +35,20 @@ void gui::setComboBoxNewGameData()
 	list.clear();
 
 	//1. hrac
-	list = (QStringList() << "Clovek");
+	list = (QStringList() << "Človek");
 	ui->comboBoxPlayer1->addItems(list);
 
 
 	list.clear();
 
 	//2.hrac
-	list = (QStringList() << "Clovek" << "PC");
+	list = (QStringList() << "Človek" << "PC");
 	ui->comboBoxPlayer2->addItems(list);
 
 	list.clear();
 
 	//algoritmy
-	list = (QStringList() << "Alg1" << "Alg2");
+	list = (QStringList() << "Algoritmus 1" << "Algoritmus 2");
 	ui->comboBoxAlgorithm->addItems(list);
 }
 
@@ -105,7 +106,7 @@ void gui::status(QString text, bool isOk)
 void gui::createComboBoxString(QString deskSize)
 {
 	//vytvorenie stringu, ktory identifikuje hru a zobrazi sa v comboBoxe
-	QString gameString = QString::number(ui->comboBoxGame->count()) + ": Game: " +
+	QString gameString = QString::number(ui->comboBoxGame->count()) + ": Hra: " +
 		deskSize + "x" + deskSize;
 	ui->comboBoxGame->addItem(gameString);
 
@@ -115,7 +116,7 @@ void gui::createComboBoxString(QString deskSize)
 
 void gui::initNewGame()
 {
-	delete game;
+    //delete game;
 	game = new Game(480);
 
 	//vytvorenie kamenov pre aktualne skore
@@ -132,7 +133,7 @@ void gui::setGameTitle()
 {
 	QString title;
 	if (ui->comboBoxGame->count() > 0 && ui->stackedWidget->currentIndex() == 2)
-		title = " - Game ID:" + ui->comboBoxGame->currentText().replace(": Game:", " ~");
+		title = " - Hra ID:" + ui->comboBoxGame->currentText().replace(": Hra:", " ~");
 
 	this->setWindowTitle("Othello Game" + title);
 }
@@ -141,9 +142,9 @@ void gui::moveToPosition(int x, int y)
 {
 	//spracovanie tahu
 	if (manager->moveStone({x, y}, false))
-		status("Uspesny tah.", true);
+		status("Úspešný ťah.", true);
 	else
-		status("Nesuspesny tah.", false);
+		status("Neúspešný ťah.", false);
 
 	qDebug() << x << "," << y;
 
@@ -173,7 +174,7 @@ void gui::widgetCreateNewGame()
 void gui::widgetLoadNewGame()
 {
 	QString filename = QFileDialog::getOpenFileName(
-		this, tr("Open game data file"), "", "All files(*)");
+		this, tr("Otvorenie súboru s hernými dátami"), "", "Všetky súbory(*)");
 
 	//ak sa nacitali udaje spravne vytvori sa hra
 	if(manager->loadGame(filename.toStdString())) {
@@ -194,10 +195,10 @@ void gui::widgetLoadNewGame()
 		createComboBoxString(QString::number(manager->getDeskSize()));
 
 		connect(game, &Game::moveToPosition, this, &gui::moveToPosition);
-		status("Hra uspesne nacitana.", true);
+		status("Hra bola úspešne načítaná.", true);
 		setGameTitle();
    } else
-		status("Hru sa nepodarilo nacitat.", false);
+		status("Hru sa nepodarilo načítať.", false);
 }
 
 gui::~gui()
@@ -263,19 +264,19 @@ void gui::on_pushButton_12_clicked()
 
 	ui->graphicsView->setScene(game->scene);
 	connect(game, &Game::moveToPosition, this, &gui::moveToPosition);
-	status("Hra bola uspesne vytvorena.", true);
+	status("Hra bola úspešne vytvorená.", true);
 	setGameTitle();
 }
 
 void gui::on_buttonSave_clicked()
 {
 	QString filename = QFileDialog::getSaveFileName(
-		this, tr("Save game data file"), "", "All files (*.*)");
+		this, tr("Uloženie herných dát do súboru"), "", "Všetky súbory(*.*)");
 
 	if (manager->saveGame(filename.toStdString()))
-		status("Hra bola uspesne ulozena.", true);
+		status("Hra bola úspešme uložená.", true);
 	else
-		status("Hru sa nepodarilo ulozit.", false);
+		status("Hru sa nepodarilo uložiť.", false);
 }
 
 void gui::on_buttonLoad2_clicked()
@@ -286,9 +287,9 @@ void gui::on_buttonLoad2_clicked()
 void gui::on_buttonUndo_clicked()
 {
 	if (manager->undo())
-		status("Krok spat uspesny.", true);
+		status("Krok spät bol úspešný.", true);
 	else
-		status("Krok spat neuspesny, nie je kam sa vratit.", false);
+		status("Krok spät bol neúspešný, nie je kam ísť.", false);
 
 	game->drawStone(manager);
 	updateGameData();
@@ -297,9 +298,9 @@ void gui::on_buttonUndo_clicked()
 void gui::on_buttonRedo_clicked()
 {
 	if (manager->redo())
-		status("Krok vpred uspesny.", true);
+		status("Krok vpred úspešný.", true);
 	else
-		status("Krok vpred neuspesny, nie je kam ist.", false);
+		status("Krok vpred neúspešný, nie je kam ist.", false);
 
 	game->drawStone(manager);
 	updateGameData();
@@ -322,17 +323,19 @@ void gui::on_buttonChangeGame_clicked()
 		updateGameData();
 
 		ui->graphicsView->setScene(game->scene);
-		status("Hra bola uspesne zmenena.", true);
+		status("Hra bola úspešne zmenená.", true);
 		connect(game, &Game::moveToPosition, this, &gui::moveToPosition);
 		setGameTitle();
 	} else
-		status("Hru sa nepodarilo zmenit", false);
+		status("Hru sa nepodarilo zmeniť.", false);
 }
 
 void gui::on_buttonDemoGame_clicked()
 {
 	QMessageBox msgBox;
-	msgBox.setText("Help");
+    msgBox.setWindowTitle("Autori");
+    msgBox.setText("Othello Game\n\n" "Autor: Peter Tisovčík    <xtisov00@stud.fit.vutbr.cz>\n"
+                   "Autor: Klára Nečasová <xnecas24@stud.fit.vutbr.cz>");
 	msgBox.exec();
 }
 
@@ -341,5 +344,5 @@ void gui::on_buttonPass_clicked()
 	if (manager->moveStone({-1,-1}, true))
 		status("Pass.", true);
 	else
-		status("Nie je mozne urobit pass", false);
+		status("Nie je možné urobiť pass.", false);
 }
