@@ -1,3 +1,9 @@
+/**
+ * @file			square.h
+ * @author			Klára Nečasová <xnecas24>
+ * @author			Peter Tisovčík <xtisov00>
+ */
+
 #ifndef SQUARE
 #define SQUARE
 
@@ -6,7 +12,9 @@
 #include <QMessageBox>
 #include <QObject>
 
-
+/**
+ * Trieda reprezentujuca jeden stvorec hracej dosky.
+ */
 class Square: public QObject, public QGraphicsPolygonItem {
 	Q_OBJECT
 	QString owner;

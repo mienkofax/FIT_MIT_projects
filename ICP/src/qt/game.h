@@ -1,3 +1,9 @@
+/**
+ * @file			game.h
+ * @author			Klára Nečasová <xnecas24>
+ * @author			Peter Tisovčík <xtisov00>
+ */
+
 #ifndef GAME
 #define GAME
 
@@ -7,6 +13,9 @@
 #include "square.h"
 #include "GameManager.h"
 
+/**
+ * Trieda obsahujuca objekty hernej sceny.
+ */
 class Game : public QObject {
 	Q_OBJECT
 

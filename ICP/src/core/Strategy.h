@@ -8,9 +8,9 @@
 #define STRATEGY_H
 
 #include <iostream>
-#include "GameBoard.h"
 #include <vector>
 #include <memory>
+#include "GameBoard.h"
 
 /**
  * Herne strategie pocitaca, metoda executeMove implementuje

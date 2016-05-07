@@ -5,10 +5,10 @@
  */
 
 #include <iostream>
-#include "GameData.h"
 #include <string>
 #include <fstream>
 #include <memory>
+#include "GameData.h"
 
 using namespace std;
 

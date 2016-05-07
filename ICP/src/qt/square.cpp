@@ -1,3 +1,9 @@
+/**
+ * @file			square.cpp
+ * @author			Klára Nečasová <xnecas24>
+ * @author			Peter Tisovčík <xtisov00>
+ */
+
 #include <square.h>
 #include <QBrush>
 

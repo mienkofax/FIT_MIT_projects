@@ -1,3 +1,9 @@
+/**
+ * @file			game.cpp
+ * @author			Klára Nečasová <xnecas24>
+ * @author			Peter Tisovčík <xtisov00>
+ */
+
 #include <QGraphicsDropShadowEffect>
 #include <QMessageBox>
 #include <QObject>

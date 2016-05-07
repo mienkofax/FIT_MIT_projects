@@ -5,13 +5,9 @@
  */
 
 #include <iostream>
-#include "GameBoard.h"
-#include "GameData.h"
-#include "GameManager.h"
 #include <vector>
 #include <iomanip>
-#include "Player.h"
-#include "Strategy.h"
+#include "GameManager.h"
 #include "cli.h"
 
 using namespace std;
