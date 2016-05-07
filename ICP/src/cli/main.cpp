@@ -1,6 +1,5 @@
 /**
- * Othello Game - CLI Main file
- *
+ * @file			main.cpp
  * @author			Klára Nečasová <xnecas24>
  * @author			Peter Tisovčík <xtisov00>
  */

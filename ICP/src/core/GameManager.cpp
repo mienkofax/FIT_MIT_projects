@@ -1,6 +1,5 @@
 /**
- * Game Manager
- *
+ * @file			GameManager.cpp
  * @author			Klára Nečasová <xnecas24>
  * @author			Peter Tisovčík <xtisov00>
  */

@@ -1,6 +1,5 @@
 /**
- * Game Data
- *
+ * @file			GameData.cpp
  * @author			Klára Nečasová <xnecas24>
  * @author			Peter Tisovčík <xtisov00>
  */

@@ -1,6 +1,5 @@
 /**
- * Player
- *
+ * @file			Player.h
  * @author			Klára Nečasová <xnecas24>
  * @author			Peter Tisovčík <xtisov00>
  */
@@ -9,10 +8,14 @@
 #define PLAYER_H
 
 #include <iostream>
+#include <memory>
 #include "GameBoard.h"
 #include "Strategy.h"
-#include <memory>
 
+/**
+ * Trieda popisuje jednotlivych hracov, jednotlivy hraci
+ * si uchovavaju informacie o farbe, type a score.
+ */
 class Player {
 protected:
 	int color;

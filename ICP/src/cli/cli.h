@@ -1,6 +1,5 @@
 /**
- * Othello Game - CLI
- *
+ * @file			cli.h
  * @author			Klára Nečasová <xnecas24>
  * @author			Peter Tisovčík <xtisov00>
  */
@@ -10,6 +9,11 @@
 #include "GameData.h"
 #include "GameManager.h"
 
+/**
+ * Trieda vytvara CLI rozhranie pre uzivatela,
+ * vypisuje informacie uzivatelovi, co moze spravit,
+ * co ma zadat, popripadne osetruje zle vstupy
+ */
 class CLI {
 
 	/**
@@ -49,7 +53,7 @@ class CLI {
 	 * Vypis zakladnych prikazov hry.
 	 */
 	void help();
-	
+
 public:
 	void show();
 };

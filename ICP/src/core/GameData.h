@@ -1,3 +1,9 @@
+/**
+ * @file			GameData.h
+ * @author			Klára Nečasová <xnecas24>
+ * @author			Peter Tisovčík <xtisov00>
+ */
+
 #ifndef GAME_DATA_H
 #define GAME_DATA_H
 
@@ -16,6 +22,11 @@ typedef struct {
 									  pre oznacenie ci je tah viditelny */
 } TGameMove;
 
+/**
+ * Trieda spracuvava informacie o hre, jednotlive tahy a
+ * umoznuje ukladat informacie o hre do suboru, nacitat
+ * informacie o hre zo suboru
+ */
 class GameData
 {
 	std::vector <TGameMove> history;

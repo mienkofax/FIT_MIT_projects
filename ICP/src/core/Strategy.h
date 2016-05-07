@@ -1,3 +1,9 @@
+/**
+ * @file			Strategy.cpp
+ * @author			Klára Nečasová <xnecas24>
+ * @author			Peter Tisovčík <xtisov00>
+ */
+
 #ifndef STRATEGY_H
 #define STRATEGY_H
 
@@ -6,6 +12,10 @@
 #include <vector>
 #include <memory>
 
+/**
+ * Herne strategie pocitaca, metoda executeMove implementuje
+ * herny algoritmus.
+ */
 class Strategy
 {
 public:
@@ -22,6 +32,9 @@ public:
 	virtual bool executeMove(TPoint* point,  GameBoard board) = 0;
 };
 
+/**
+ * Algoritmus pre vyber prveho mozneho tahu.
+ */
 class Alg1 : public Strategy
 {
 public:
@@ -35,6 +48,9 @@ public:
 	bool executeMove(TPoint*, GameBoard board);
 };
 
+/**
+ * Algoritmus pre nahodny vyber mozneho tahu.
+ */
 class Alg2 : public Strategy
 {
 public:

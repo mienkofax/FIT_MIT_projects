@@ -1,6 +1,5 @@
 /**
- * Game Manager
- *
+ * @file			GameManager.h
  * @author			Klára Nečasová <xnecas24>
  * @author			Peter Tisovčík <xtisov00>
  */
@@ -26,6 +25,11 @@ typedef struct {
 	std::shared_ptr<Player> p2;	/**< Informacie o hraci cislo 2 */
 } TGame;
 
+/**
+ * Trieda spaja hraciu dosku, informacie o hre a hracov
+ * do jednej struktury a ponuka metody, ktorymi je mozne
+ * vytvarat upravovat dosku.
+ */
 class GameManager {
 	std::vector <TGame> games;
 	int activeGameIndex;

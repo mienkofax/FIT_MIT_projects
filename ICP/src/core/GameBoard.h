@@ -1,6 +1,5 @@
 /**
- * Game Board
- *
+ * @file			GameBoard.h
  * @author			Klára Nečasová <xnecas24>
  * @author			Peter Tisovčík <xtisov00>
  */
@@ -19,13 +18,18 @@ typedef struct {
 	int y;	/**< Suradnica body y */
 } TPoint;
 
-//const int white = 1;
-
 #define WHITE 1
 #define BLACK 0
 #define NON_DEFINE -1
 #define HINT 8
 
+/**
+ * Trieda vytvara hraciu dosku hry a ponuka metody
+ * na pracu z doskou, jednotlive body su reprezentovane
+ * strukturou, ktora uchovava X,Y suradnice. Ponuka
+ * niekolko definovanych konstant, ktore je mozne
+ * dalej v programe pouzit.
+ */
 class GameBoard
 {
 protected:
