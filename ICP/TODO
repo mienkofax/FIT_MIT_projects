@@ -22,3 +22,7 @@ SPRAVENE KOMENTARE
 - src/core/Strategy.cpp
 - src/core/Strategy.h
 
+- src/cli/cli.cpp
+- src/cli/cli.hi
+
+- src/cli/main.cpp

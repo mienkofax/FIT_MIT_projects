@@ -1,5 +1,5 @@
 /**
- * Othello Game - CLI
+ * Othello Game - CLI Main file
  *
  * @author			Klára Nečasová <xnecas24>
  * @author			Peter Tisovčík <xtisov00>

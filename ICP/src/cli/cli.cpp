@@ -46,9 +46,9 @@ void CLI::renderMap(GameManager &board) {
 	}
 }
 
-bool CLI::strToInt(string s, int *value) {
+bool CLI::strToInt(string str, int *value) {
 	char *endptr;
-	*value = strtol(s.c_str(), &endptr, 10);
+	*value = strtol(str.c_str(), &endptr, 10);
 
 	if ((*endptr) != '\0')
 		return false;
@@ -56,17 +56,17 @@ bool CLI::strToInt(string s, int *value) {
 	return true;
 }
 
-bool CLI::getCoordinate(string s, TPoint *point) {
-	int index = s.find(",");
-	if (index < 0)
+bool CLI::getCoordinate(string str, TPoint *point) {
+	int index = str.find(",");
+	if (index < 1)
 		return false;
 
 	//prevod znaku na cislo
-	point->x = unsigned(char(s.substr(0, index)[0]-'a'));
+	point->x = unsigned(char(str.substr(0, index)[0]-'a'));
 
-	s.erase(0,index+1); //odstranenie ciarky a xsovej suradnice
+	str.erase(0,index+1); //odstranenie ciarky a xsovej suradnice
 
-	if (!strToInt(s, &point->y))
+	if (!strToInt(str, &point->y))
 		return false;
 
 	point->y -= 1;
@@ -122,7 +122,7 @@ bool CLI::createNewGame(int *deskSize, int *countPlayers, int *alg) {
 
 void CLI::help() {
 	cout << "NAPOVEDA:" << endl;
-	cout << "\tx,y - zadajte suradnice oddelene ciarkou bez medzier[stlpec,riadok], napriklad[a,2].";
+	cout << "\tx,y - zadajte suradnice oddelene ciarkou bez medzier[stlpec,riadok], napriklad:a,2";
 	cout << endl;
 	cout << "\tpass - v pripade, ze nemate moznost posunu zadajte \"pass\"" << endl;
 	cout << "\tsave - v pripade, ze chcete ulozit rozohratu hru" << endl;
