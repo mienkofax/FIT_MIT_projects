@@ -31,7 +31,7 @@ hra2016-cli: library
 hra2016: library
 	qmake $(GUI_LIB)/qt-gui.pro -o $(GUI_LIB)/Makefile
 	make -C $(GUI_LIB)
-	cp $(GUI_LIB)/$(NAME_GUI) $(NAME_GUI)
+	mv $(GUI_LIB)/$(NAME_GUI) $(NAME_GUI)
 
 #vytvorenie archivu
 pack:
@@ -47,8 +47,6 @@ doxygen:
 clean:
 	make -C $(CORE_DIR) cleanall
 	rm -f $(GUI_LIB)/*.o $(GUI_LIB)/qt-gui.pro.user $(GUI_LIB)/ui_gui.h $(GUI_LIB)/Makefile
-	rm -f $(GUI_LIB)/qt-gui.pro.user $(GUI_LIB)/$(NAME_GUI) $(GUI_LIB)/moc_*.cpp
-	rm -f $(NAME_CLI)
-	rm -f $(NAME_GUI)
+	rm -f $(GUI_LIB)/qt-gui.pro.user $(GUI_LIB)/moc_*.cpp
+	rm -f $(NAME_CLI) $(NAME_GUI) xtisov00-xnecas24.zip
 	rm -rf doc
-	rm -f xtisov00-xnecas24.zip
