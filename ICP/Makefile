@@ -21,7 +21,7 @@ NAME_GUI=hra2016
 
 all: library hra2016-cli hra2016
 
-#vytvorenie vsetkeho
+#spustenie hier
 run: library hra2016-cli hra2016
 	./$(NAME_GUI)
 	./$(NAME_CLI)
