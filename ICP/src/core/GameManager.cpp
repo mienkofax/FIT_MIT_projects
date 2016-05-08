@@ -23,7 +23,6 @@ GameManager::GameManager() :
 
 void GameManager::newGame(int deskSize, int players, int algorithm)
 {
-	cout << "ALG ALG" << algorithm;
 	shared_ptr<Player> p1(new Human());
 	shared_ptr<Player> p2;
 
@@ -36,6 +35,8 @@ void GameManager::newGame(int deskSize, int players, int algorithm)
 			alg = shared_ptr<Strategy>(new Alg1());
 		else if (algorithm == 1)
 			alg = shared_ptr<Strategy>(new Alg2());
+		else
+			alg = shared_ptr<Strategy>(new Alg1());
 
 		p2 = shared_ptr<Player>(new PC(alg));
 	} else
@@ -222,13 +223,15 @@ bool GameManager::moveStone(TPoint point, bool isPass)
 
 bool GameManager::endGame()
 {
-	if (getHint() == 0) {
-		nextPlayer();
+	if (games.size() > 0) {
 		if (getHint() == 0) {
 			nextPlayer();
-			return true;
+			if (getHint() == 0) {
+				nextPlayer();
+				return true;
+			}
+			nextPlayer();
 		}
-		nextPlayer();
 	}
 	return false;
 }

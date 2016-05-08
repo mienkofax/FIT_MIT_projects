@@ -1,19 +1,55 @@
-./src/*       - zdrojové texty
-./examples/*  - příklady (pro testování)
-./doc/        - dokumentace (bude později generován: "make doxygen")
-./README.txt  - základní přehled o co jde, Autoři, poznámky, ...
-./Makefile    - zavolá rekurzivně make na src/Makefile, případně
-				na generování dokumentace atd
+==============================================================
+ZÁKLADNÉ INFORMÁCIE
 
+PROJEKT:	OTHELLO GAME
+AUTOR:		Klára Nečasová <xnecas24@stud.fit.vutbr.cz>
+AUTOR:		Peter Tisovčík <xtisov00@stud.fit.vutbr.cz>
 
-Kompilacia
+==============================================================
+POPIS
 
-make vytvori programy
-make run - spousti hry
-make doxygen - vytvorenie dokumentacie
-make clean	 - vsechny produkty prekladu zmaze
-make pack	 vytvorenie archivu
+Zadanie bolo vytvoriť Othello hru, ktorá mala nezávislú logiku
+od grafického rozhrania, či už sa jednalo o CLI ale o Qt. Ďalej
+bolo potrebné vytvoriť CLI a Qt rozhranie, ktoré demonštrovalo,
+že je logika oddelená. Podmienkou bolo implementovanie herných
+stratégií a ich jednoduché pridávanie. Ďalej bolo potrebné
+vytvoriť Makefile súbor, ktorý umožnil preložiť hru, vygenerovať
+dokumentáciu, vytvoriť archív a tak isto upratať po sebe.
 
-make hra2016-cli
-make hra2016
-make library
+==============================================================
+PRAVIDLÁ HRY
+
+https://cs.wikipedia.org/wiki/Othello_%28desková_hra%29#Pravidla_hry
+
+==============================================================
+ADRESÁROVÁ ŠTRUKÚRA
+
+./src/*				- zdrojové súbory
+./src/cli			- zdrojové súbory pre CLI
+./src/core			- zdrojové súbory logiky hry
+./src/qt			- zdrojové súbory pre Qt
+./examples/*		- testovacie hry
+./doc/				- vygenerovaná dokumentácia
+./src/doxygen.conf	- konfiguračný súbor pre doxygen
+./src/core/Makefile - súbor pre preklad knižnice
+./README.txt  		- informácie o programe
+./Makefile   		- súbor pre preklad hry
+
+==============================================================
+POTREBNÉ BALÍČKY PRE PREKLAD
+
+QT (v. 5.5)
+g++ s podporou c++11
+
+==============================================================
+PREKLAD
+
+make 			 - preloženie hry, CLI a Qt
+make run 		 - spoustenie CLI a Qt hier
+make doxygen 	 - vygenerovanie dokumentácie
+make pack	 	 - vytvorenie archívu, ktorý zabaľuje potrebné
+				   súbory pre preklad
+make clean	 	 - zmaže všetky súbory, ktoré vznikli prekladom
+make hra2016-cli - preklad hry pre CLI
+make hra2016	 - preklad hry v Qt
+make library	 - vytvorenie knižnice

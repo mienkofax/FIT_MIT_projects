@@ -7,7 +7,7 @@
 #cesty pre merlin
 export PATH:=/usr/local/share/Qt-5.5.1/5.5/gcc_64/bin:${PATH}
 export LD_LIBRARY_PATH=/usr/local/share/Qt-5.5.1/5.5/gcc_64/lib
-export QT_PLUGIN_PATH=/usr/local/share/Qt-5.5.1/5.5/gcc_64
+export QT_PLUGIN_PATH:=/usr/local/share/Qt-5.5.1/5.5/gcc_64/plugins:${QT_PLUGIN_PATH}
 
 CXX=g++
 CXXFLAGS=-Wall -pedantic -std=c++11 -lm
@@ -23,7 +23,7 @@ all: library hra2016-cli hra2016
 
 #spustenie hier
 run: library hra2016-cli hra2016
-	./$(NAME_GUI)
+	./$(NAME_GUI) &
 	./$(NAME_CLI)
 
 #vytvorenie knizcnice

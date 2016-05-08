@@ -2,7 +2,6 @@
 #include <QListView>
 #include <QString>
 #include <QThread>
-#include <QDebug>
 #include "gui.h"
 #include "ui_gui.h"
 #include "game.h"
@@ -70,7 +69,10 @@ void gui::initComboBoxNewGameData()
 	//nastavenoie algoritmu
 	ui->comboBoxAlgorithm->setCurrentIndex(1);
 
-    ui->buttonBackToGame->setDisabled(true);
+	if (ui->comboBoxGame->count() > 0)
+		ui->buttonBackToGame->setDisabled(false);
+	else
+		ui->buttonBackToGame->setDisabled(true);
 }
 
 void gui::resizeToGame()
@@ -141,7 +143,7 @@ void gui::setGameTitle()
 			title += " Hráč vs Hráč";
 		else
 			title += " Hráč vs PC";
-		}
+	}
 
 	this->setWindowTitle("Othello Game" + title);
 }
@@ -259,7 +261,7 @@ void gui::on_pushButton_12_clicked()
 
 	//create new game
 	manager->newGame(ui->comboBoxDeskSize->currentText().toInt(),
-					 players, ui->comboBoxAlgorithm->currentIndex()+1);
+					players, ui->comboBoxAlgorithm->currentIndex());
 
 	ui->stackedWidget->setCurrentIndex(2);
 
@@ -280,7 +282,7 @@ void gui::on_pushButton_12_clicked()
 void gui::on_buttonSave_clicked()
 {
 	QString filename = QFileDialog::getSaveFileName(
-		this, tr("Uloženie herných dát do súboru"), "", "Všetky súbory(*.*)");
+		this, tr("Uloženie herných dát do súboru"), this->windowTitle(), "Všetky súbory(*)");
 
 	if (manager->saveGame(filename.toStdString()))
 		status("Hra bola úspešme uložená.", true);
@@ -317,11 +319,8 @@ void gui::on_buttonRedo_clicked()
 
 void gui::on_buttonBackToGame_clicked()
 {
-    if (ui->comboBoxGame->count() > 0) {
-        ui->stackedWidget->setCurrentIndex(2);
-        resizeToGame();
-    } else
-        ui->buttonBackToGame->setDisabled("true");
+	ui->stackedWidget->setCurrentIndex(2);
+	resizeToGame();
 }
 
 void gui::on_buttonChangeGame_clicked()
@@ -353,8 +352,12 @@ void gui::on_buttonDemoGame_clicked()
 
 void gui::on_buttonPass_clicked()
 {
-	if (manager->moveStone({-1,-1}, true))
+	if (manager->moveStone({-1,-1}, true)) {
+		//prekreslenie kamenov a aktualizacia skore
+		game->drawStone(manager);
+		updateGameData();
+		ui->graphicsView->setScene(game->scene);
 		status("Pass.", true);
-	else
+	} else
 		status("Nie je možné urobiť pass.", false);
 }

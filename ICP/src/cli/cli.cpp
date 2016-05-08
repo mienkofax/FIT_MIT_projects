@@ -117,7 +117,7 @@ bool CLI::createNewGame(int *deskSize, int *countPlayers, int *alg) {
 
 void CLI::help() {
 	cout << "NÁPOVEDA:" << endl;
-	cout << "\tx,y - zadajte súradnice oddelené čiarkou, bez medzier[stlpec,riadok], napríklad:a,2";
+	cout << "\tx,y    - zadajte súradnice oddelené čiarkou, bez medzier[stlpec,riadok], napríklad:a,2";
 	cout << endl;
 	cout << "\tpass   - v prípade, že nemáte možnosť urobiť ťah, zadajte pass" << endl;
 	cout << "\tsave   - v prípade, že chcete uložiť rozohranú hru" << endl;
@@ -156,9 +156,10 @@ void CLI::show() {
 
 		if (!getCoordinate(enter, &point)) {
 			if (enter == "pass") {
-				if (manager.moveStone({0,0}, true))
+				if (manager.moveStone({0,0}, true)) {
 					cout << "Pass sa vykonal." << endl;
-				else
+					renderMap(gameManager);
+				} else
 					cout << "Pass je možné zadať len, keď nie je možné spraviť iný ťah." << endl;
 			} else if (enter == "save") {
 				cout << "Zadajte súbor, do ktorého sa uloží hra: ";
@@ -183,7 +184,7 @@ void CLI::show() {
 				if (!createNewGame(&deskSize, &countPlayers, &alg))
 					cout << "Nebolo možné vytvoriť hru." << endl;
 				else {
-					manager.newGame(deskSize, countPlayers, alg);
+					manager.newGame(deskSize, countPlayers, alg-1);
 					renderMap(gameManager);
 				}
 			} else if (enter == "change") {
@@ -222,5 +223,8 @@ void CLI::show() {
 			cout << "Skúre hráč 2::" << gameManager.getP2Score() << endl;
 			cout << "ID hry: " << gameManager.getGameID() << endl;
 		}
+
+		if (manager.endGame())
+			cout << "\t\t!!!Koniec hry.!!!" << endl;
 	}
 }
