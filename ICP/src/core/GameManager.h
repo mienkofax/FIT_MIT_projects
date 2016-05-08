@@ -94,9 +94,10 @@ public:
 	bool moveStone(TPoint point, bool isPass);
 
 	/**
-	 * Ukonci aktualne rozohranu hru
+	 * Zistenie ci nie je koniec hry.
+	 * @return	True v pripade, ze je koniec hry, inak false
 	 */
-	void endGame();
+	bool endGame();
 
 	/**
 	 * Zisti ci je aktivny hrac jedna
@@ -158,6 +159,11 @@ public:
 	 * @return	Integer, hodnota kamena, ktory sa nachadza na danych suradniciach
 	 */
 	int getStone(TPoint point);
+
+	/**
+	 * Zistenie ci sa v hre nachadza hrac alebo pc
+	 */
+	bool isLivePlayer();
 
 private:
 	/**

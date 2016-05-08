@@ -23,6 +23,7 @@ GameManager::GameManager() :
 
 void GameManager::newGame(int deskSize, int players, int algorithm)
 {
+	cout << "ALG ALG" << algorithm;
 	shared_ptr<Player> p1(new Human());
 	shared_ptr<Player> p2;
 
@@ -31,9 +32,9 @@ void GameManager::newGame(int deskSize, int players, int algorithm)
 		shared_ptr<Strategy> alg;
 
 		//nastavenie vybraneho algoritmu
-		if (algorithm == 1)
+		if (algorithm == 0)
 			alg = shared_ptr<Strategy>(new Alg1());
-		else if (algorithm == 2)
+		else if (algorithm == 1)
 			alg = shared_ptr<Strategy>(new Alg2());
 
 		p2 = shared_ptr<Player>(new PC(alg));
@@ -85,6 +86,7 @@ bool GameManager::loadGame(string filename)
 		games[this->activeGameIndex].board.updateBoard(move.points, move.color);
 
 	getHint();
+
 	return returnCode;
 }
 
@@ -185,7 +187,7 @@ bool GameManager::moveStone(TPoint point, bool isPass)
 		color = games[this->activeGameIndex].p2->getColor();
 	}
 
-	if (isPass) {
+	if (isPass && !endGame()) {
 		if (getHint() > 0)
 			return false;
 		else {
@@ -218,9 +220,17 @@ bool GameManager::moveStone(TPoint point, bool isPass)
 	return false;
 }
 
-void GameManager::endGame()
+bool GameManager::endGame()
 {
-	return;
+	if (getHint() == 0) {
+		nextPlayer();
+		if (getHint() == 0) {
+			nextPlayer();
+			return true;
+		}
+		nextPlayer();
+	}
+	return false;
 }
 
 bool GameManager::isActiveP1()
@@ -282,6 +292,13 @@ int GameManager::getP2Score()
 int GameManager::getStone(TPoint point)
 {
 	return games[this->activeGameIndex].board.getStone(point);
+}
+
+bool GameManager::isLivePlayer()
+{
+	if (games[this->activeGameIndex].p2->getType() == 1)
+		return false;
+	return true;
 }
 
 int GameManager::getHint()

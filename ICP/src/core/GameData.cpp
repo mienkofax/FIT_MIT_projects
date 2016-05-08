@@ -67,7 +67,7 @@ bool GameData::loadGameData(string filename)
 
 	TGameMove record;
 	record.isActive = true;
-	gameFile >> countMove >> countMove;
+	gameFile >> countMove >> countMove >> countMove;
 
 	while (gameFile >> record.moveNumber >> record.color >> countMove) {
 		record.points.clear();

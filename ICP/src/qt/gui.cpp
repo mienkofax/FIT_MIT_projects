@@ -69,6 +69,8 @@ void gui::initComboBoxNewGameData()
 
 	//nastavenoie algoritmu
 	ui->comboBoxAlgorithm->setCurrentIndex(1);
+
+    ui->buttonBackToGame->setDisabled(true);
 }
 
 void gui::resizeToGame()
@@ -116,7 +118,7 @@ void gui::createComboBoxString(QString deskSize)
 
 void gui::initNewGame()
 {
-    //delete game;
+	delete game;
 	game = new Game(480);
 
 	//vytvorenie kamenov pre aktualne skore
@@ -132,8 +134,14 @@ void gui::initNewGame()
 void gui::setGameTitle()
 {
 	QString title;
-	if (ui->comboBoxGame->count() > 0 && ui->stackedWidget->currentIndex() == 2)
+	if (ui->comboBoxGame->count() > 0 && ui->stackedWidget->currentIndex() == 2) {
 		title = " - Hra ID:" + ui->comboBoxGame->currentText().replace(": Hra:", " ~");
+
+		if (manager->isLivePlayer())
+			title += " Hráč vs Hráč";
+		else
+			title += " Hráč vs PC";
+		}
 
 	this->setWindowTitle("Othello Game" + title);
 }
@@ -156,6 +164,9 @@ void gui::moveToPosition(int x, int y)
 	game->drawStone(manager);
 	updateGameData();
 	ui->graphicsView->setScene(game->scene);
+
+	if (manager->endGame())
+		status("Koniec hry.", false);
 }
 
 void gui::widgetCreateNewGame()
@@ -306,8 +317,11 @@ void gui::on_buttonRedo_clicked()
 
 void gui::on_buttonBackToGame_clicked()
 {
-	ui->stackedWidget->setCurrentIndex(2);
-	resizeToGame();
+    if (ui->comboBoxGame->count() > 0) {
+        ui->stackedWidget->setCurrentIndex(2);
+        resizeToGame();
+    } else
+        ui->buttonBackToGame->setDisabled("true");
 }
 
 void gui::on_buttonChangeGame_clicked()
