@@ -4,6 +4,11 @@
 # @author		Peter Tisovčík <xtisov00>
 #
 
+#cesty pre merlin
+export PATH:=/usr/local/share/Qt-5.5.1/5.5/gcc_64/bin:${PATH}
+export LD_LIBRARY_PATH=/usr/local/share/Qt-5.5.1/5.5/gcc_64/lib
+export QT_PLUGIN_PATH=/usr/local/share/Qt-5.5.1/5.5/gcc_64
+
 CXX=g++
 CXXFLAGS=-Wall -pedantic -std=c++11 -lm
 CLI_DIR=src/cli
@@ -17,7 +22,9 @@ NAME_GUI=hra2016
 all: library hra2016-cli hra2016
 
 #vytvorenie vsetkeho
-run: library hra2016-cli hra2016 doxygen
+run: library hra2016-cli hra2016
+	./$(NAME_GUI)
+	./$(NAME_CLI)
 
 #vytvorenie knizcnice
 library:

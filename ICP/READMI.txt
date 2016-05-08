@@ -3,15 +3,17 @@
 ./doc/        - dokumentace (bude později generován: "make doxygen")
 ./README.txt  - základní přehled o co jde, Autoři, poznámky, ...
 ./Makefile    - zavolá rekurzivně make na src/Makefile, případně
-                na generování dokumentace atd
+				na generování dokumentace atd
 
 
 Kompilacia
 
-make run - vytvori vsetko
+make vytvori programy
+make run - spousti hry
 make doxygen - vytvorenie dokumentacie
 make clean	 - vsechny produkty prekladu zmaze
 make pack	 vytvorenie archivu
+
 make hra2016-cli
 make hra2016
 make library
