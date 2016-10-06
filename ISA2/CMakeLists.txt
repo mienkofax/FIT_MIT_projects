@@ -8,6 +8,8 @@ set (CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -g -pedantic -Wall -Wextra")
 add_definitions(-std=c++11)
 
 set (SOURCE
+	ArgumentParser.cpp
+	ArgumentValidator.cpp
 	main.cpp
 	)
 
