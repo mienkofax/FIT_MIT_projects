@@ -10,6 +10,8 @@ add_definitions(-std=c++11)
 set (SOURCE
 	ArgumentParser.cpp
 	ArgumentValidator.cpp
+	PcapReader.cpp
+	LayerMessage.cpp
 	main.cpp
 	)
 

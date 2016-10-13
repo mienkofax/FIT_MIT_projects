@@ -9,7 +9,10 @@
 #include <exception>
 #include "ArgumentParser.h"
 #include "ArgumentValidator.h"
-
+#include "LayerMessage.h"
+#include "PcapReader.h"
+#include <iomanip>
+#include "PcapReader.h"
 using namespace std;
 
 int main(int argc, char * argv[])
@@ -44,4 +47,27 @@ int main(int argc, char * argv[])
 		cerr << ex.what() << endl;
 		return 10;
 	}
+
+	GenericLayerMessageFactory factory;
+	factory.registerLayer(LINK_LAYER);
+	factory.registerLayer(NETWORK_LAYER);
+
+	//ifstream file("binfile", ios::in|ios::binary|ios::ate);
+	ifstream file("ipv6test2.pcap", ios::in|ios::binary);
+
+	Input input({file, std::vector<uint8_t>()});
+	
+	PcapReaderFromFile reader(input.file);
+
+	reader.skip(24);
+	factory.create(input, NETWORK_LAYER);
+	cout << endl;
+//	factory.create(file, MAC, SOURCE);
+	
+/*	char *buffer = reader.read(2000);
+	for (int i = 0; i < 2000; i++) {
+		cout << setfill('0') << setw(2) << hex <<(uint32_t)(uint8_t) buffer[i] << " ";
+	}
+
+*/	return 0;
 }
