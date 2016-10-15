@@ -13,6 +13,8 @@
 #include "PcapReader.h"
 #include <iomanip>
 #include "PcapReader.h"
+#include "Statistics.h"
+
 using namespace std;
 
 int main(int argc, char * argv[])
@@ -48,12 +50,31 @@ int main(int argc, char * argv[])
 		return 10;
 	}
 
+	Top10 stat;
+	stat.insertMessage("peto", 10, 30);
+	stat.insertMessage("peto98", 5, 30);
+	stat.insertMessage("peto1", 11, 30);
+	stat.insertMessage("peto0", 11, 30);
+	stat.insertMessage("peto2", 11, 30);
+	stat.insertMessage("peto3", 11, 30);
+	stat.insertMessage("peto4", 11, 30);
+	stat.insertMessage("peto5", 11, 30);
+	stat.insertMessage("peto6", 11, 30);
+	stat.insertMessage("peto7", 11, 30);
+	stat.insertMessage("peto8", 11, 30);
+	stat.insertMessage("peto9", 11, 30);
+
+	stat.showStatistics();
+	
+
+
+return 5;
 	GenericLayerMessageFactory factory;
 	factory.registerLayer(LINK_LAYER);
 	factory.registerLayer(NETWORK_LAYER);
 
 	//ifstream file("binfile", ios::in|ios::binary|ios::ate);
-	ifstream file("ipv6test2.pcap", ios::in|ios::binary);
+	ifstream file("pcap/ipv6test2.pcap", ios::in|ios::binary);
 
 	Input input({file, std::vector<uint8_t>()});
 	

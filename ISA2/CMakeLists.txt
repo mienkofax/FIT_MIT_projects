@@ -12,6 +12,7 @@ set (SOURCE
 	ArgumentValidator.cpp
 	PcapReader.cpp
 	LayerMessage.cpp
+	Statistics.cpp
 	main.cpp
 	)
 
