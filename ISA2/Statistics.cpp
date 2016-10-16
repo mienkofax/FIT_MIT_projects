@@ -10,13 +10,13 @@
 
 using namespace std;
 
-bool Top10::compare(const mytuple &lhs, const mytuple &rhs)
+bool Statistics::compare(const mytuple &lhs, const mytuple &rhs)
 {
 	return get<1>(lhs) > get<1>(rhs);
 }
 
 
-void Top10::insertMessage(const std::string &key, const int &value1, const int &value2)
+void Statistics::insert(const std::string &key, const int &value1, const int &value2)
 {
 	for (vector<mytuple>::iterator it = m_data.begin(); it != m_data.end();
 		++it) {
@@ -30,7 +30,7 @@ void Top10::insertMessage(const std::string &key, const int &value1, const int &
 	m_data.push_back(make_tuple(key, value1, value2));
 }
 
-void Top10::showStatistics()
+void Statistics::showTop10()
 {
 	short a = 0;
 
@@ -38,4 +38,12 @@ void Top10::showStatistics()
 	for (vector<mytuple>::iterator it = m_data.begin();
 		it != m_data.end() && a < 10; it++, a++)
 		cout << get<0>(*it) << " " << get<1>(*it) << " "<< get<2>(*it) << endl;
+}
+
+void Statistics::showFilterStatistics()
+{
+	sort(m_data.begin(), m_data.end(), compare);
+	for (vector<mytuple>::iterator it = m_data.begin();
+		it != m_data.end(); it++)
+		cout << get<1>(*it) << " "<< get<2>(*it) << endl;
 }

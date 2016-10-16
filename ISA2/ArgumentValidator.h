@@ -11,3 +11,10 @@ public:
 	static bool ipv6Address(const std::string &value);
 	static bool port(const std::string &value);
 };
+
+class Normalization {
+public:
+	static std::string getIPv4(const std::string &ip);
+	static std::string getIPv6(const std::string &ip);
+	static std::string getMac(std::string mac);
+};

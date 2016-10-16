@@ -14,8 +14,35 @@
 #include <iomanip>
 #include "PcapReader.h"
 #include "Statistics.h"
-
+#include <cstdlib>
 using namespace std;
+
+
+Layer getLayer(string protocol)
+{
+	if (protocol == "mac")
+        return LINK_LAYER;
+    else if (protocol == "ipv4" || protocol == "ipv6")
+        return NETWORK_LAYER;
+    else if (protocol == "tcp" || protocol == "udp")
+        return TRANSPORT_LAYER;
+
+	return LINK_LAYER;
+}
+
+Layer getHighestLayer(const std::vector<string> &filter)
+{
+	Layer layer = LINK_LAYER;
+
+	for (const auto &item : filter) {
+		Layer currentLayer = getLayer(item);
+
+		if (layer < currentLayer)
+			layer = currentLayer;
+	}
+
+	return layer;
+}
 
 int main(int argc, char * argv[])
 {
@@ -41,54 +68,117 @@ int main(int argc, char * argv[])
 		"",
 		false);
 
+
+	//kontrola ci sa spracovali argumenty uspesne
 	try {
 		if (!args.validateArguments(argc, argv))
-			return 1;
+			return EXIT_FAILURE;
 	}
 	catch (exception &ex) {
 		cerr << ex.what() << endl;
-		return 10;
+		return EXIT_FAILURE;
 	}
 
-	Top10 stat;
-	stat.insertMessage("peto", 10, 30);
-	stat.insertMessage("peto98", 5, 30);
-	stat.insertMessage("peto1", 11, 30);
-	stat.insertMessage("peto0", 11, 30);
-	stat.insertMessage("peto2", 11, 30);
-	stat.insertMessage("peto3", 11, 30);
-	stat.insertMessage("peto4", 11, 30);
-	stat.insertMessage("peto5", 11, 30);
-	stat.insertMessage("peto6", 11, 30);
-	stat.insertMessage("peto7", 11, 30);
-	stat.insertMessage("peto8", 11, 30);
-	stat.insertMessage("peto9", 11, 30);
-
-	stat.showStatistics();
-	
-
-
-return 5;
+	Statistics statistics;
 	GenericLayerMessageFactory factory;
+	LayerMessage *layerMessage;
+
 	factory.registerLayer(LINK_LAYER);
 	factory.registerLayer(NETWORK_LAYER);
+	factory.registerLayer(TRANSPORT_LAYER);
 
-	//ifstream file("binfile", ios::in|ios::binary|ios::ate);
-	ifstream file("pcap/ipv6test2.pcap", ios::in|ios::binary);
+	ifstream file(args.getArgument("i"), ios::in|ios::binary);
+	file.seekg(0, ios::end);
+	int end = file.tellg();
+	file.seekg(0, ios::beg);
 
+	//test ci sa subor otvoril spravne
+	if (!file.is_open())
+		return EXIT_FAILURE;
+
+	//struktura popisujuca vstup, pre triedu PcapReader
 	Input input({file, std::vector<uint8_t>()});
-	
-	PcapReaderFromFile reader(input.file);
 
+	//preskocenie hlavicky pocap suboru
+	PcapReaderFromFile reader(input.file);
 	reader.skip(24);
-	factory.create(input, NETWORK_LAYER);
-	cout << endl;
-//	factory.create(file, MAC, SOURCE);
-	
-/*	char *buffer = reader.read(2000);
-	for (int i = 0; i < 2000; i++) {
-		cout << setfill('0') << setw(2) << hex <<(uint32_t)(uint8_t) buffer[i] << " ";
+
+	//ziskanie filtrov a ip adries z argumentov
+	LayerMessage optionMessage = args.getLayersMessage();
+
+	vector<string> filterType = {"mac", "ipv4", "ipv6", "tcp", "udp"};
+
+	//vrstva po ktoru sa ma parsovat sprava
+	vector<string> enteredFilter = args.getFilter();
+	Layer layer = getHighestLayer(enteredFilter);
+
+	string keyS, keyD;
+	while(file.tellg() < end) {
+		try {
+			layerMessage = factory.create(input, layer);
+		}
+		catch (exception &ex) {
+			continue;
+		}
+
+		//prechod dostupnymi filtrami
+		for (const auto &item : filterType) {
+			//kontrola si sa prehladavany typ filtra zadal
+			if (find(enteredFilter.begin(), enteredFilter.end(), item) == enteredFilter.end())
+				continue;
+
+			auto search = optionMessage.address.find(getLayer(item));
+			auto search2 = layerMessage->address.find(getLayer(item));
+
+			if (args.isTop10()) {
+
+				if (search2 == layerMessage->address.end())
+					continue;
+
+				//vytvorenie kluca podla ktoreho sa bude ukladat
+					keyS = search2->second.sourceAddress[0];
+					keyD = search2->second.destinationAddress[0];
+
+				if (optionMessage.source)
+					statistics.insert(keyS, 0, 0);
+
+				if (optionMessage.destination)
+					statistics.insert(keyD, 0, 0);
+			}
+			else {
+				if (search == optionMessage.address.end()
+					|| search2 == layerMessage->address.end())
+					continue;
+
+				if (item == "mac") {
+					keyS = search2->second.sourceAddress[0];
+					keyD = search2->second.destinationAddress[0];
+				}
+
+				if (optionMessage.destination) {
+					for (const auto &add : search->second.sourceAddress) {
+						if (add == search2->second.sourceAddress[0])
+							statistics.insert(add, 0, 0);
+					}
+				}
+
+				if (optionMessage.source) {
+					for (const auto &add : search->second.sourceAddress) {
+						if (add == search2->second.sourceAddress[0])
+							statistics.insert(add, 0, 0);
+					}
+				}
+			}
+		} //koniec prechodu medzi filtrami
+
+		break;
 	}
 
-*/	return 0;
+	cout << "--------Statistika----------\n";
+	statistics.showTop10();
+	cout << "--------Statistika2---------\n";
+	statistics.showFilterStatistics();
+	cout << "----------------------------\n";
+
+	return 0;
 }

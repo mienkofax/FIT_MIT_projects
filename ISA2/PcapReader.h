@@ -19,6 +19,7 @@ class PcapReader {
 public:
 	virtual long readIntBigEndian(size_t size) = 0;
 	virtual long readIntLittleEndian(size_t size) = 0;
+	virtual std::string readString(size_t size, std::string separator = "") = 0;
 	virtual std::vector <uint8_t> readUint8Vector(size_t size) = 0;
 	virtual void skip(size_t size) = 0;
 };
@@ -29,6 +30,7 @@ public:
 
 	long readIntBigEndian(size_t size);
 	long readIntLittleEndian(size_t size);
+	std::string readString(size_t size, std::string separator = "");
 	std::vector<uint8_t> readUint8Vector(size_t size);
 	void skip(size_t size);
 	char *read(size_t size);
@@ -43,6 +45,7 @@ public:
 
 	long readIntBigEndian(size_t size);
 	long readIntLittleEndian(size_t size);
+	std::string readString(size_t size, std::string separator = "");
 	std::vector<uint8_t> readUint8Vector(size_t size);
 	void skip(size_t size);
 

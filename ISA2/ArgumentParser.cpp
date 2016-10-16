@@ -11,6 +11,7 @@
 
 #include "ArgumentParser.h"
 #include "ArgumentValidator.h"
+#include "LayerMessage.h"
 
 using namespace std;
 
@@ -45,6 +46,9 @@ bool ArgumentParser::validateArguments(const int &argc, char *argv[])
 	if (!getOption("s").m_entered && !getOption("d").m_entered)
 		return false;
 
+	m_layerMessage.source = getOption("s").m_entered;
+	m_layerMessage.destination = getOption("d").m_entered;
+
 	//najpr kontrola ci sa nejedna o top10, povolena len jedna hodnota filtra,
 	//jednoducha kontrola, hladanie vo vektore filtrov
 	if (getArgument("v") == "top10") {
@@ -56,23 +60,55 @@ bool ArgumentParser::validateArguments(const int &argc, char *argv[])
 		return false;
 	}
 
-	//validacia zadanych hodnot
 	vector<string> filterValue = split(getArgument("v"), ';');
 
 	if (filterValue.size() != filterArgumets.size())
 		return false;
 
+	//validacia zadanych hodnot
 	for (auto item : filterArgumets) {
 		if (filterValue.size() == i)
 			continue;
 
 		str = filterValue[i];
-		getFilterValue(str, item);
+		LayerData address;
+	
+		address.sourceAddress = getFilterValue(str, item);
+		address.destinationAddress = address.sourceAddress;
+
+		m_layerMessage.address[getLayerFromProtocol(item)] = address;
 
 		i++;
 	}
 
 	return true;
+}
+
+string ArgumentParser::getNormalizeString(string data, string protocol)
+{
+	if (protocol == "mac")
+		return Normalization::getMac(data);
+	else if (protocol == "ipv4")
+		return Normalization::getIPv4(data);
+	else if (protocol == "ipv6")
+		return Normalization::getIPv6(data);
+	else
+		return data;
+}
+
+Layer ArgumentParser::getLayerFromProtocol(string protocol)
+{
+	if (protocol == "mac")
+		return LINK_LAYER;
+	else if (protocol == "ipv4" || protocol == "ipv6")
+		return NETWORK_LAYER;
+	else if (protocol == "tcp" || protocol == "udp")
+		return TRANSPORT_LAYER;
+}
+
+LayerMessage ArgumentParser::getLayersMessage()
+{
+	return m_layerMessage;		
 }
 
 vector<std::string> ArgumentParser::getFilterValue(const std::string &str, const string &filter)
@@ -87,7 +123,7 @@ vector<std::string> ArgumentParser::getFilterValue(const std::string &str, const
 			|| ((filter == "tcp" || filter == "udp") && !ArgumentValidator::port(item)))
 			throw std::invalid_argument("Bad filter value: " + item + " " + filter);
 
-		values.push_back(item);
+		values.push_back(getNormalizeString(item, filter));
 	}
 
 	return values;

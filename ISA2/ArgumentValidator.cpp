@@ -7,6 +7,7 @@
 #include <sstream>
 #include <cctype>
 #include <iostream>
+#include <algorithm>
 
 #include <arpa/inet.h>
 
@@ -31,7 +32,7 @@ bool ArgumentValidator::ipv4Address(const std::string &value)
 
 bool ArgumentValidator::ipv6Address(const std::string &value)
 {
-	struct in_addr result;
+	struct in6_addr result;
 
 	if (inet_pton(AF_INET6, value.c_str(), &result) == 1)
 		return true;
@@ -63,9 +64,33 @@ bool ArgumentValidator::port(const std::string &value)
 
 	if (*p)
 		return false;
-		cout << "num" << number;
+
 	if (number >= 0 && number <= 65535)
 		return true;
 
 	return false;
+}
+
+std::string Normalization::getIPv4(const std::string &ip)
+{
+	struct in_addr addr;
+	inet_aton(ip.c_str(), &addr);
+	return string(inet_ntoa(addr));
+}
+
+std::string Normalization::getIPv6(const std::string &ip)
+{
+	struct sockaddr_in sa;
+	char str[INET6_ADDRSTRLEN];
+
+	inet_pton(AF_INET6, ip.c_str(), &(sa.sin_addr));
+
+	inet_ntop(AF_INET6, &(sa.sin_addr), str, INET_ADDRSTRLEN);
+	return string(str);
+}
+
+std::string Normalization::getMac(std::string mac)
+{
+	for (auto & c: mac) c = toupper(c);
+	return mac;
 }

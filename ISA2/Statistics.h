@@ -14,10 +14,11 @@
 
 typedef std::tuple<std::string, int, int> mytuple;
 
-class Top10 {
+class Statistics {
 public:
-	void insertMessage(const std::string &key, const int &value1, const int &value2);
-	void showStatistics();
+	void insert(const std::string &key, const int &value1, const int &value2 = 0);
+	void showTop10();
+	void showFilterStatistics();
 
 private:
 	std::vector<mytuple> m_data;

@@ -37,43 +37,52 @@ enum POSITION_IN_COMMUNICATION {
 	SOURCE_AND_DESTINATION,
 };
 
+struct LayerData {
+	std::vector<std::string> sourceAddress;
+	std::vector<std::string> destinationAddress;
+};
+
 class LayerMessage {
 public:
-	std::vector<uint8_t> macDestination;
-	std::vector<uint8_t> macSource;
-	std::vector<uint8_t> ipDestination;
-	std::vector<uint8_t> ipSource;
-	long portSource;
-	long portDestination;
 	std::vector<uint8_t> data;
-	long port;
-	long ipVersion;
-	long protocol;
+	long nextProtocol;
+	bool destination;
+	bool source;
 
-	void showItem(std::string itemName, std::vector<uint8_t> items)
-	{
-		cout << itemName << ": ";
-		for (auto item : items)
-			cout << setfill('0') << setw(2) << hex << (uint32_t) item << " ";
-		cout << endl;
-	}
-	
-	void showItem(std::string itemName, int number)
-	{
-		cout << itemName << ": ";
-			cout << setfill('0') << setw(2) << hex << number << " ";
-		cout << endl;
-	}
+	std::map<const Layer, LayerData> address;
+
+	void showItem(std::string itemName, std::vector<std::string> items)
+    {
+        cout << itemName << ": ";
+        for (auto item : items)
+            cout << item << ", ";
+        cout << endl;
+    }
+
+	void showItem(std::string itemName, std::vector<std::uint8_t> items)
+    {
+        cout << itemName << ": ";
+        for (auto item : items)
+            cout << setfill('0') << setw(2) << hex << (uint32_t) item << " ";
+        cout << endl;
+    }   
+ 
+    void showItem(std::string itemName, int number)
+    {
+        cout << itemName << ": ";
+            cout << setfill('0') << setw(2) << hex << number << " ";
+        cout << endl;
+    }
 
 	void show() {
-		showItem("mac destination", macDestination);
-		showItem("mac Source", macSource);
-		showItem("ip destination", ipDestination);
-		showItem("ip source", ipSource);
+		cout << "\n------------------layer_data----------------\n";
+		for (auto item : address) {
+			showItem("source address", item.second.sourceAddress);
+			showItem("destiation address", item.second.destinationAddress);
+		}
+
+		showItem("next protocol", nextProtocol);
 		showItem("data", data);
-		showItem("port", port);
-		showItem("ip version", ipVersion);
-		showItem("next heaer", protocol);
 	}
 };
 
@@ -81,6 +90,22 @@ class LayerMessageFactory {
 public:
 	virtual LayerMessage *create(Input &input, const Layer &layer) = 0;
 	virtual ~LayerMessageFactory() {}
+
+	void setLayerMessage(LayerMessage *message)
+	{
+		m_message = message;
+	}
+
+protected:
+	LayerMessage *m_message;
+
+	LayerMessage *getLayerMessage()
+	{
+		if (m_message == NULL)
+			m_message = new LayerMessage();
+
+		return m_message;
+	}
 };
 
 class GenericLayerMessageFactory : public LayerMessageFactory {

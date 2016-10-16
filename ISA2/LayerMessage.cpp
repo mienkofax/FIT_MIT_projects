@@ -8,6 +8,8 @@
 #include "LayerMessage.h"
 #include "PcapReader.h"
 #include <iostream>
+#include "ArgumentValidator.h"
+
 using namespace std;
 
 LayerMessageFactory *GenericLayerMessageFactory::findFactory(const Layer &layer)
@@ -29,11 +31,13 @@ LayerMessage *GenericLayerMessageFactory::create(Input &input, const Layer &laye
 		return msg;
 
 	input.data = msg->data;
+	findFactory(NETWORK_LAYER)->setLayerMessage(msg);
 	msg = findFactory(NETWORK_LAYER)->create(input, layer);
 	if (layer == NETWORK_LAYER)
 		return msg;
 
 	input.data = msg->data;
+	findFactory(TRANSPORT_LAYER)->setLayerMessage(msg);
 	msg = findFactory(TRANSPORT_LAYER)->create(input, layer);
 	if (layer == TRANSPORT_LAYER)
 		return msg;
@@ -83,7 +87,8 @@ GenericLayerMessageFactory::~GenericLayerMessageFactory()
 LayerMessage *LinkLayerMessage::create(Input &input, const Layer&)
 {
 	PcapReaderFromFile reader(input.file);
-	LayerMessage *message = new LayerMessage();
+	LayerMessage *message = getLayerMessage();
+	LayerData address;
 	int readSize = 0;
 	int frameType = 0;
 	bool trailer = false;
@@ -95,8 +100,9 @@ LayerMessage *LinkLayerMessage::create(Input &input, const Layer&)
 	readSize = reader.readIntBigEndian(PCAP_HEADER_CAPTURE_LENGTH);
 
 	readSize -= 2 * ETHERNET_ADDRESS;
-	message->macDestination = reader.readUint8Vector(ETHERNET_ADDRESS);
-	message->macSource= reader.readUint8Vector(ETHERNET_ADDRESS);
+	address.destinationAddress.push_back(Normalization::getMac(reader.readString(ETHERNET_ADDRESS, ":")));
+	address.sourceAddress.push_back(Normalization::getMac(reader.readString(ETHERNET_ADDRESS, ":")));
+	message->address[LINK_LAYER] = address;
 
 	readSize -= ETHERNET_TYPE;
 	frameType = reader.readIntLittleEndian(ETHERNET_TYPE);
@@ -122,7 +128,11 @@ LayerMessage *LinkLayerMessage::create(Input &input, const Layer&)
 		readSize -= ETHERNET_8021Q_TRAILER;
 
 	message->data = reader.readUint8Vector(readSize);
-	message->ipVersion = frameType;
+	message->nextProtocol = frameType;
+
+	if (frameType != 0x800 && frameType != 0x86dd)
+		throw runtime_error("nepodporovany linkovy protokol");
+
 	message->show();
 
 	return message;
@@ -155,16 +165,15 @@ LayerMessage *LinkLayerMessage::create(Input &input, const Layer&)
 LayerMessage *NetworkLayerMessage::create(Input &input, const Layer&)
 {
 	PcapReaderFromVector reader(input.data);
-	LayerMessage *message = new LayerMessage();
+	LayerMessage *message = getLayerMessage();
+	LayerData address;
 	int ipVersion = 0;
 	int tmpData = 0;
 	int readSize = 0;
 
 	tmpData = reader.readIntLittleEndian(N_IP4_VERSION_AND_IHL);
-	message->ipVersion = (tmpData & N_IP4_VERSION_MASK) >> 4;
+	ipVersion = (tmpData & N_IP4_VERSION_MASK) >> 4;
 	readSize -= N_IP4_VERSION_AND_IHL;
-
-	cout << "TMP DATA:" << tmpData;
 
 	if (ipVersion == N_IP4_VERSION) {
 		reader.skip(N_IP4_TYPE_OF_SEVICE);
@@ -175,34 +184,35 @@ LayerMessage *NetworkLayerMessage::create(Input &input, const Layer&)
 		readSize -= N_IP4_IDENTIFICATION + N_IP4_OFFSET + N_IP4_TTL;
 
 		readSize -= N_IP4_PROTOCOL;
-		message->protocol = reader.readIntLittleEndian(N_IP4_PROTOCOL);
+		message->nextProtocol = reader.readIntLittleEndian(N_IP4_PROTOCOL);
 
 		reader.skip(N_IP4_CRC);
-		message->ipDestination = reader.readUint8Vector(N_IP4_ADDRESS);
-		message->ipSource = reader.readUint8Vector(N_IP4_ADDRESS);
+		address.destinationAddress.push_back(Normalization::getIPv4(reader.readString(N_IP4_ADDRESS, ".")));
+		address.sourceAddress.push_back(Normalization::getIPv4(reader.readString(N_IP4_ADDRESS, ".")));
+		message->address[NETWORK_LAYER] = address;
 		readSize -= N_IP4_CRC + 2 * N_IP4_ADDRESS;
 
 		message->data = reader.readUint8Vector(readSize);
 
 		message->show();
-	} else if (message->ipVersion == N_IP6_VERSION) {
+	} else if (ipVersion == N_IP6_VERSION) {
 		reader.skip(N_IP6_TRAFFIC_CLASS + N_IP6_FLOW_LABEL);
 		readSize = reader.readIntLittleEndian(N_IP6_PAYLOAD_LENGTH);
 
-		message->protocol = reader.readIntLittleEndian(N_IP6_NEXT_HEADER);
+		message->nextProtocol = reader.readIntLittleEndian(N_IP6_NEXT_HEADER);
 		reader.skip(N_IP6_HOP_LIMIT);
 
-		message->ipSource = reader.readUint8Vector(N_IP6_ADDRESS_LENGTH);
-		message->ipDestination = reader.readUint8Vector(N_IP6_ADDRESS_LENGTH);
-
-		//https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers
-		cout << "message protocol: " << message->protocol;
-		if (message->protocol != 0x06 && message->protocol != 0x11)
-			return message;
+		address.destinationAddress.push_back(Normalization::getIPv6(reader.readString(N_IP6_ADDRESS_LENGTH, ".")));
+		address.sourceAddress.push_back(Normalization::getIPv6(reader.readString(N_IP6_ADDRESS_LENGTH, ".")));
+		message->address[NETWORK_LAYER] = address;
 
 		message->data = reader.readUint8Vector(readSize);
 		message->show();
 	}
+
+	//https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers
+	if (message->nextProtocol != 0x06 && message->nextProtocol != 0x11)
+		throw runtime_error("nepodporovany sietovy protokol");;
 
 	return message;
 }

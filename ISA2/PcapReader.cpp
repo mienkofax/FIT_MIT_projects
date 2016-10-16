@@ -4,6 +4,8 @@
  * @date October, 2016
  */
 
+#include <sstream>
+
 #include "PcapReader.h"
 
 using namespace std;
@@ -11,6 +13,19 @@ using namespace std;
 PcapReaderFromFile::PcapReaderFromFile(ifstream &file):
 	m_file(file)
 {
+}
+
+string PcapReaderFromFile::readString(size_t size, string separator)
+{
+	char *buffer = read(size);
+	stringstream stream;
+
+	for (size_t i = 0; i < size; i++) {
+		stream << setfill('0') << setw(2) << hex << (uint32_t) (uint8_t)buffer[i];
+		stream << (i+1 == size ? "" : separator);
+	}
+
+	return stream.str();
 }
 
 char *PcapReaderFromFile::read(size_t size)
@@ -77,14 +92,22 @@ long PcapReaderFromVector::readIntLittleEndian(size_t size)
 {
 	long number = 0;
 
-//	cout << "num: ";
- //       cout << setfill('0') << setw(2) << hex << (uint8_t)m_data[4] << endl;
-
 	for (size_t i = 0; i < size; i++)
 		number = number << 8 | m_data[currentPosition + i];
 
 	currentPosition += size;
 	return number;
+}
+
+string PcapReaderFromVector::readString(size_t size, string separator)
+{
+	stringstream stream;
+
+	for (size_t i = 0; i < size; i++)
+		stream << setfill('0') << setw(2) << hex << (uint32_t) (uint8_t)m_data[currentPosition +i] << separator;
+
+	currentPosition += size;
+	return stream.str();
 }
 
 std::vector<uint8_t> PcapReaderFromVector::readUint8Vector(size_t size)
