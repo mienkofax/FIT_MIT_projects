@@ -15,13 +15,17 @@ PcapReaderFromFile::PcapReaderFromFile(ifstream &file):
 {
 }
 
-string PcapReaderFromFile::readString(size_t size, string separator)
+string PcapReaderFromFile::readString(size_t size, string separator, bool stringFormat)
 {
 	char *buffer = read(size);
 	stringstream stream;
 
 	for (size_t i = 0; i < size; i++) {
-		stream << setfill('0') << setw(2) << hex << (uint32_t) (uint8_t)buffer[i];
+		if (stringFormat)
+			stream << (uint32_t) (uint8_t)buffer[i];
+		else
+			stream << setfill('0') << setw(2) << hex << (uint32_t) (uint8_t)buffer[i];
+
 		stream << (i+1 == size ? "" : separator);
 	}
 
@@ -99,13 +103,18 @@ long PcapReaderFromVector::readIntLittleEndian(size_t size)
 	return number;
 }
 
-string PcapReaderFromVector::readString(size_t size, string separator)
+string PcapReaderFromVector::readString(size_t size, string separator, bool stringFormat)
 {
 	stringstream stream;
 
-	for (size_t i = 0; i < size; i++)
-		stream << setfill('0') << setw(2) << hex << (uint32_t) (uint8_t)m_data[currentPosition +i] << separator;
+	for (size_t i = 0; i < size; i++) {
+		if (stringFormat)
+			stream << (uint32_t) (uint8_t)m_data[currentPosition +i];
+		else
+			stream << setfill('0') << setw(2) << hex << (uint32_t) (uint8_t)m_data[currentPosition +i];
 
+		stream << ((i+1 == size) ? "" : separator);
+	}
 	currentPosition += size;
 	return stream.str();
 }

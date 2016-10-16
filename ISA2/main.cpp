@@ -30,6 +30,20 @@ Layer getLayer(string protocol)
 	return LINK_LAYER;
 }
 
+Protocols getProtocol(string protocol)
+{
+	if (protocol == "mac")
+        return MAC;
+    else if (protocol == "ipv4")
+        return IPV4;
+    else if (protocol == "ipv6")
+        return IPV6;
+    else if (protocol == "tcp")
+        return TCP;
+    else if (protocol == "udp")
+        return UDP;
+}
+
 Layer getHighestLayer(const std::vector<string> &filter)
 {
 	Layer layer = LINK_LAYER;
@@ -112,6 +126,8 @@ int main(int argc, char * argv[])
 	vector<string> enteredFilter = args.getFilter();
 	Layer layer = getHighestLayer(enteredFilter);
 
+	optionMessage.show();
+
 	string keyS, keyD;
 	while(file.tellg() < end) {
 		try {
@@ -127,9 +143,8 @@ int main(int argc, char * argv[])
 			if (find(enteredFilter.begin(), enteredFilter.end(), item) == enteredFilter.end())
 				continue;
 
-			auto search = optionMessage.address.find(getLayer(item));
-			auto search2 = layerMessage->address.find(getLayer(item));
-
+			auto search = optionMessage.address.find(getProtocol(item));
+			auto search2 = layerMessage->address.find(getProtocol(item));
 			if (args.isTop10()) {
 
 				if (search2 == layerMessage->address.end())
@@ -163,8 +178,8 @@ int main(int argc, char * argv[])
 				}
 
 				if (optionMessage.source) {
-					for (const auto &add : search->second.sourceAddress) {
-						if (add == search2->second.sourceAddress[0])
+					for (const auto &add : search->second.destinationAddress) {
+						if (add == search2->second.destinationAddress[0])
 							statistics.insert(add, 0, 0);
 					}
 				}

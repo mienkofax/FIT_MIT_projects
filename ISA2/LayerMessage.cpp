@@ -100,9 +100,9 @@ LayerMessage *LinkLayerMessage::create(Input &input, const Layer&)
 	readSize = reader.readIntBigEndian(PCAP_HEADER_CAPTURE_LENGTH);
 
 	readSize -= 2 * ETHERNET_ADDRESS;
-	address.destinationAddress.push_back(Normalization::getMac(reader.readString(ETHERNET_ADDRESS, ":")));
-	address.sourceAddress.push_back(Normalization::getMac(reader.readString(ETHERNET_ADDRESS, ":")));
-	message->address[LINK_LAYER] = address;
+	address.destinationAddress.push_back(Normalization::getMac(reader.readString(ETHERNET_ADDRESS, ":", false)));
+	address.sourceAddress.push_back(Normalization::getMac(reader.readString(ETHERNET_ADDRESS, ":", false)));
+	message->address[MAC] = address;
 
 	readSize -= ETHERNET_TYPE;
 	frameType = reader.readIntLittleEndian(ETHERNET_TYPE);
@@ -189,7 +189,7 @@ LayerMessage *NetworkLayerMessage::create(Input &input, const Layer&)
 		reader.skip(N_IP4_CRC);
 		address.destinationAddress.push_back(Normalization::getIPv4(reader.readString(N_IP4_ADDRESS, ".")));
 		address.sourceAddress.push_back(Normalization::getIPv4(reader.readString(N_IP4_ADDRESS, ".")));
-		message->address[NETWORK_LAYER] = address;
+		message->address[IPV4] = address;
 		readSize -= N_IP4_CRC + 2 * N_IP4_ADDRESS;
 
 		message->data = reader.readUint8Vector(readSize);
@@ -204,7 +204,7 @@ LayerMessage *NetworkLayerMessage::create(Input &input, const Layer&)
 
 		address.destinationAddress.push_back(Normalization::getIPv6(reader.readString(N_IP6_ADDRESS_LENGTH, ".")));
 		address.sourceAddress.push_back(Normalization::getIPv6(reader.readString(N_IP6_ADDRESS_LENGTH, ".")));
-		message->address[NETWORK_LAYER] = address;
+		message->address[IPV6] = address;
 
 		message->data = reader.readUint8Vector(readSize);
 		message->show();

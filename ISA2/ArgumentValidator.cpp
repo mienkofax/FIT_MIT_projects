@@ -73,9 +73,10 @@ bool ArgumentValidator::port(const std::string &value)
 
 std::string Normalization::getIPv4(const std::string &ip)
 {
-	struct in_addr addr;
+/*	struct in_addr addr;
 	inet_aton(ip.c_str(), &addr);
-	return string(inet_ntoa(addr));
+	return string(inet_ntoa(addr));*/
+	return ip;
 }
 
 std::string Normalization::getIPv6(const std::string &ip)

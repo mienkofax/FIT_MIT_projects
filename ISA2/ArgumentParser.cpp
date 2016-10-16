@@ -76,7 +76,7 @@ bool ArgumentParser::validateArguments(const int &argc, char *argv[])
 		address.sourceAddress = getFilterValue(str, item);
 		address.destinationAddress = address.sourceAddress;
 
-		m_layerMessage.address[getLayerFromProtocol(item)] = address;
+		m_layerMessage.address[getProtocol(item)] = address;
 
 		i++;
 	}
@@ -96,14 +96,18 @@ string ArgumentParser::getNormalizeString(string data, string protocol)
 		return data;
 }
 
-Layer ArgumentParser::getLayerFromProtocol(string protocol)
+Protocols ArgumentParser::getProtocol(string protocol)
 {
 	if (protocol == "mac")
-		return LINK_LAYER;
-	else if (protocol == "ipv4" || protocol == "ipv6")
-		return NETWORK_LAYER;
-	else if (protocol == "tcp" || protocol == "udp")
-		return TRANSPORT_LAYER;
+		return MAC;
+	else if (protocol == "ipv4")
+		return IPV4;
+	else if (protocol == "ipv6")
+		return IPV6;
+	else if (protocol == "tcp")
+		return TCP;
+	else if (protocol == "udp")
+		return UDP;
 }
 
 LayerMessage ArgumentParser::getLayersMessage()
@@ -116,7 +120,7 @@ vector<std::string> ArgumentParser::getFilterValue(const std::string &str, const
 	std::vector<std::string> values;
 
 	for (std::string item : split(str, ',')) {
-		cout << "\t" << item << " " << filter << endl;
+		//cout << "\t" << item << " " << filter << endl;
 		if ((filter == "mac" &&  !ArgumentValidator::macAddress(item))
 			|| (filter == "ipv4" && !ArgumentValidator::ipv4Address(item))
 			|| (filter == "ipv6" && !ArgumentValidator::ipv6Address(item))

@@ -45,7 +45,7 @@ private:
 
 	std::string getNormalizeString(std::string data, std::string protocol);
 	void extractArguments(const int &argc, char *argv[]);
-	Layer getLayerFromProtocol(std::string protocol);
+	Protocols getProtocol(std::string protocol);
 	void validateRequired();
 	std::string getOptString();
 	Option &getOption(std::string shortName);

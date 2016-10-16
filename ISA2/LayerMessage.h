@@ -24,7 +24,7 @@ enum Layer {
 	TRANSPORT_LAYER,
 };
 
-enum COMMUNICATION_TYPE {
+enum Protocols {
 	MAC,
 	IPV4,
 	IPV6,
@@ -49,7 +49,7 @@ public:
 	bool destination;
 	bool source;
 
-	std::map<const Layer, LayerData> address;
+	std::map<const Protocols, LayerData> address;
 
 	void showItem(std::string itemName, std::vector<std::string> items)
     {
