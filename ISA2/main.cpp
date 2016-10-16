@@ -95,7 +95,7 @@ int main(int argc, char * argv[])
 
 	Statistics statistics;
 	GenericLayerMessageFactory factory;
-	LayerMessage *layerMessage;
+	shared_ptr<LayerMessage> layerMessage;
 
 	factory.registerLayer(LINK_LAYER);
 	factory.registerLayer(NETWORK_LAYER);

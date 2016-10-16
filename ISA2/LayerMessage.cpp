@@ -12,7 +12,7 @@
 
 using namespace std;
 
-LayerMessageFactory *GenericLayerMessageFactory::findFactory(const Layer &layer)
+shared_ptr<LayerMessageFactory> GenericLayerMessageFactory::findFactory(const Layer &layer)
 {
 	auto search = m_layers.find(layer);
 
@@ -22,9 +22,9 @@ LayerMessageFactory *GenericLayerMessageFactory::findFactory(const Layer &layer)
 		throw invalid_argument("Unknown layer, please register this layer");
 }
 
-LayerMessage *GenericLayerMessageFactory::create(Input &input, const Layer &layer)
+shared_ptr<LayerMessage> GenericLayerMessageFactory::create(Input &input, const Layer &layer)
 {
-	LayerMessage *msg;
+	shared_ptr<LayerMessage> msg(new LayerMessage);
 
 	msg = findFactory(LINK_LAYER)->create(input, layer);
 	if (layer == LINK_LAYER)
@@ -47,26 +47,24 @@ LayerMessage *GenericLayerMessageFactory::create(Input &input, const Layer &laye
 
 void GenericLayerMessageFactory::registerLayer(const Layer &layer)
 {
-	LayerMessageFactory *factoryObject;
+	shared_ptr <LayerMessageFactory> factoryObject;
 	switch(layer) {
 	case LINK_LAYER:
-		factoryObject = new LinkLayerMessage();
+		factoryObject.reset(new LinkLayerMessage());
 		m_layers.insert(std::make_pair(layer, factoryObject));
 		break;
 	case NETWORK_LAYER:
-		factoryObject = new NetworkLayerMessage();
+		factoryObject.reset(new NetworkLayerMessage());
 		m_layers.insert(std::make_pair(layer, factoryObject));
 		break;
 	case TRANSPORT_LAYER:
-		factoryObject = new TransportLayerMessage();
+		factoryObject.reset(new TransportLayerMessage());
 		m_layers.insert(std::make_pair(layer, factoryObject));
 	}
 }
 
 GenericLayerMessageFactory::~GenericLayerMessageFactory()
 {
-	for (auto item : m_layers)
-		delete item.second;
 }
 #define PCAP_HEADER_TIMESTAMP 4
 #define PCAP_HEADER_MICROSECONDS 4
@@ -83,11 +81,10 @@ GenericLayerMessageFactory::~GenericLayerMessageFactory()
 
 #define ETHERNET_PROTOCOL_8021Q   0x8100  /* Extended header */
 #define ETHERNET_PROTOCOL_8021ad  0x88a8 /* Q-in-Q */
-
-LayerMessage *LinkLayerMessage::create(Input &input, const Layer&)
+shared_ptr<LayerMessage> LinkLayerMessage::create(Input &input, const Layer&)
 {
 	PcapReaderFromFile reader(input.file);
-	LayerMessage *message = getLayerMessage();
+	shared_ptr<LayerMessage> message = getLayerMessage();
 	LayerData address;
 	int readSize = 0;
 	int frameType = 0;
@@ -162,10 +159,10 @@ LayerMessage *LinkLayerMessage::create(Input &input, const Layer&)
 #define N_IP6_HOP_LIMIT 1
 #define N_IP6_ADDRESS_LENGTH 16
 
-LayerMessage *NetworkLayerMessage::create(Input &input, const Layer&)
+shared_ptr<LayerMessage> NetworkLayerMessage::create(Input &input, const Layer&)
 {
 	PcapReaderFromVector reader(input.data);
-	LayerMessage *message = getLayerMessage();
+	shared_ptr<LayerMessage> message = getLayerMessage();
 	LayerData address;
 	int ipVersion = 0;
 	int tmpData = 0;
@@ -218,10 +215,37 @@ LayerMessage *NetworkLayerMessage::create(Input &input, const Layer&)
 }
 
 
-LayerMessage *TransportLayerMessage::create(Input &input, const Layer&)
+#define PORT 2
+#define TCP_SEQUENCE_NUMBER 4
+#define TCP_ACK 4
+#define TCP_OPTION 1
+#define TCP_DATA_OFFSET_MASK 0xf0
+#define UDP_DATA_LEN 2
+#define UDP_CHECKSUM 2
+
+
+shared_ptr<LayerMessage> TransportLayerMessage::create(Input &input, const Layer&)
 {
 	PcapReaderFromVector reader(input.data);
-	LayerMessage *message = new LayerMessage();
+	shared_ptr<LayerMessage> message = getLayerMessage();
+	LayerData address;
+	int readSize = 0;
+
+	address.sourceAddress.push_back(reader.readString(PORT, ""));
+	address.destinationAddress.push_back(reader.readString(PORT, ""));
+	message->address[TCP] = address;
+
+	readSize -= 2 * PORT + TCP_SEQUENCE_NUMBER + TCP_ACK;
+	reader.skip(TCP_SEQUENCE_NUMBER + TCP_ACK);
+
+	readSize -= TCP_OPTION;
+	readSize += ((reader.readIntLittleEndian(TCP_OPTION) & TCP_DATA_OFFSET_MASK) >> 4)*4;
+	reader.skip(readSize);
+
+	cout << dec << "size:: " << readSize << endl;
+
+	message->data = reader.readUint8Vector(10);
+	message->show();
 
 	
 	return message;

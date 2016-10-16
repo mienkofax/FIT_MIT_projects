@@ -12,6 +12,8 @@
 #include <vector>
 #include <iomanip>
 #include <iostream>
+#include <memory>
+
 using namespace std;
 
 struct Input {
@@ -88,21 +90,21 @@ public:
 
 class LayerMessageFactory {
 public:
-	virtual LayerMessage *create(Input &input, const Layer &layer) = 0;
+	virtual std::shared_ptr<LayerMessage> create(Input &input, const Layer &layer) = 0;
 	virtual ~LayerMessageFactory() {}
 
-	void setLayerMessage(LayerMessage *message)
+	void setLayerMessage(std::shared_ptr<LayerMessage> message)
 	{
 		m_message = message;
 	}
 
 protected:
-	LayerMessage *m_message;
+	std::shared_ptr<LayerMessage> m_message;
 
-	LayerMessage *getLayerMessage()
+	std::shared_ptr<LayerMessage> getLayerMessage()
 	{
-		if (m_message == NULL)
-			m_message = new LayerMessage();
+		if (!m_message)
+			m_message.reset(new LayerMessage());
 
 		return m_message;
 	}
@@ -110,29 +112,29 @@ protected:
 
 class GenericLayerMessageFactory : public LayerMessageFactory {
 public:
-	LayerMessage *create(Input &input, const Layer &layer) override;
+	std::shared_ptr<LayerMessage> create(Input &input, const Layer &layer) override;
 	~GenericLayerMessageFactory() override;
 	void registerLayer(const Layer &layer);
-	LayerMessageFactory *findFactory(const Layer &layer);
+	std::shared_ptr<LayerMessageFactory> findFactory(const Layer &layer);
 
 private:
-	std::map<const Layer, LayerMessageFactory*> m_layers;
+	std::map<const Layer, std::shared_ptr<LayerMessageFactory>> m_layers;
 };
 
 class LinkLayerMessage : public LayerMessageFactory {
 public:
-	LayerMessage *create(Input &input, const Layer &layer) override;
+	std::shared_ptr<LayerMessage> create(Input &input, const Layer &layer) override;
 	~LinkLayerMessage() override {}
 };
 
 class NetworkLayerMessage : public LayerMessageFactory {
 public:
-	LayerMessage *create(Input &input, const Layer &layer) override;
+	std::shared_ptr<LayerMessage> create(Input &input, const Layer &layer) override;
 	~NetworkLayerMessage() override {}
 };
 
 class TransportLayerMessage : public LayerMessageFactory {
 public:
-	LayerMessage *create(Input &input, const Layer &layer) override;
+	std::shared_ptr<LayerMessage> create(Input &input, const Layer &layer) override;
 	~TransportLayerMessage() override {}
 };
