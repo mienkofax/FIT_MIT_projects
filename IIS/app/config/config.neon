@@ -14,10 +14,13 @@ services:
 	- App\Model\InsurenceManager
 	- App\Model\SupplierManager
 	- App\Model\UserManager
+	- App\Model\MedicineManager
 	- App\Forms\UserForms
 	router: App\RouterFactory::createRouter
 	autenticator: App\Model\AuthenticatorManager
 	authorizator: App\AccessListFactory
+	cacheStorage:
+		class: Nette\Caching\Storages\DevNullStorage
 
 forms:
 	messages:

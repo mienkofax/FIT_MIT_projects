@@ -80,4 +80,14 @@ class OfficeManager extends BaseManager
 		$this->database->table(self::TABLE_NAME)
 			->where(self::COLUMND_ID, $id)->delete();
 	}
+
+	public function relatedMedicines($id)
+	{
+		$dat = $this->database->table(self::TABLE_NAME)->get($id);
+
+		foreach ($dat->related('pobocka_lek.ID_pobocky') as $med)
+			$pole[] = $med->ID_leku;
+
+		return $this->database->table('leky')->where('ID_leku', $pole);
+	}
 }

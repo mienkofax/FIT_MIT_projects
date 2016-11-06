@@ -17,6 +17,7 @@ class MenuManager extends BaseManager
 		$count['pojistovny'] = $this->database->table('pojistovny')->count('*');
 		$count['dodavatelia'] = $this->database->table('dodavatele')->count('*');
 		$count['uzivatelia'] = $this->database->table('uzivatele')->count('*');
+		$count['lieky'] = $this->database->table('leky')->count('*');
 		return $count;
 	}
 }

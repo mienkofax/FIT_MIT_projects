@@ -2,6 +2,7 @@
 
 namespace App\Presenters;
 
+use App\Model\MedicineManager;
 use App\Model\OfficeManager;
 use App\Presenters\BasePresenter;
 use Nette\Application\BadRequestException;
@@ -17,10 +18,17 @@ class OfficePresenter extends BasePresenter
 	/** @var OfficePresenter Informacie o pobockach a praca s nimi */
 	protected $officeManager;
 
+	protected $medicineManager;
+
 	public function __construct(OfficeManager $officeManager)
 	{
 		parent::__construct();
 		$this->officeManager = $officeManager;
+	}
+
+	public function injectMedicineManager(MedicineManager $medicineManager)
+	{
+		$this->medicineManager = $medicineManager;
 	}
 
 	/**
@@ -37,6 +45,7 @@ class OfficePresenter extends BasePresenter
 			throw new BadRequestException();
 
 		$this->template->office = $office;
+		$this->template->data = $this->officeManager->relatedMedicines($id);
 	}
 
 	/**
