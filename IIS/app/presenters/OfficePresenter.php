@@ -108,7 +108,7 @@ class OfficePresenter extends BasePresenter
 		$form->addSubmit('submit', "Uložiť pobočku");
 		$form->onSuccess[] = [$this, 'editFormSuccessed'];
 
-		return $this->customFormRender($form);
+		return $this->bootstrapFormRender($form);
 	}
 
 	/**

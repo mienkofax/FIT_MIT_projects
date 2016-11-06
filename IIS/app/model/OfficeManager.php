@@ -67,9 +67,10 @@ class OfficeManager extends BaseManager
 	 */
 	public function saveOffice($office)
 	{
-		if (!isset($office[self::COLUMND_ID]))
+		if (!$office[self::COLUMND_ID]) {
+			unset($office[self::COLUMND_ID]);
 			$this->database->table(self::TABLE_NAME)->insert($office);
-		else
+		} else
 			$this->database->table(self::TABLE_NAME)->where(self::COLUMND_ID,
 				$office[self::COLUMND_ID])->update($office);
 	}

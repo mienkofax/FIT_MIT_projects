@@ -56,7 +56,13 @@ abstract class BasePresenter extends Presenter
 		$this->template->count = $this->menuManager->getTableRecord();
 	}
 
-	public function customFormRender($form)
+	/**
+	 * Vlastne nastavenie stylu formular a jednotlivych inputov,
+	 * aby podporoval bootstrap style.
+	 * @param Form $form Formular, ktoremu sa ma nastavit bootstrap styl
+	 * @return Form Upraveny formular s bootstrap renderovacimi prvkami
+	 */
+	public function bootstrapFormRender($form)
 	{
 		$form->elementPrototype->addAttributes(array('novalidate' => 'novalidate'));
 		$form->elementPrototype->addAttributes(array('class' => 'form-horizontal'));

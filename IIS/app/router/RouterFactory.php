@@ -47,6 +47,7 @@ class RouterFactory
 			'column' => null,
 			'sort' => null
 		));
+		$router[] = new Route('[url]', 'Administration:default');
 
 		return $router;
 	}
