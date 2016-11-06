@@ -1,0 +1,24 @@
+parameters:
+
+application:
+	errorPresenter: Error
+	mapping:
+		*: App\*Module\Presenters\*Presenter
+
+session:
+	expiration: 14 days
+
+services:
+	- App\Model\OfficeManager
+	- App\Model\MenuManager
+	- App\Forms\UserForms
+	router: App\RouterFactory::createRouter
+	autenticator: App\Model\UserManager
+	authorizator: App\AccessListFactory
+
+forms:
+	messages:
+		REQUIRED: 'Povinne pole.'
+
+di:
+	debugger: true
