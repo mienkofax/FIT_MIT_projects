@@ -8,27 +8,27 @@ use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
 
 /**
- * Model pre pracu s jednotlivymi poistovnami. Umoznuje, editovanie a
- * vypis poistovni. Vypis poistovni moze byt ako detail jednej poistovne
- * alebo zoznam poistovni.
+ * Model pre pracu s jednotlivymi datavatelmi. Umoznuje, editovanie a
+ * vypis dadavatelov. Vypis dodavatelov moze byt ako detail jedneho dodavatela
+ * alebo zoznam dodavatelov.
  */
-class InsurenceManager extends BaseManager
+class SupplierManager extends BaseManager
 {
 	const
-		TABLE_NAME = 'pojistovny',
-		COLUMND_ID = 'ID_pojistovny',
+		TABLE_NAME = 'dodavatele',
+		COLUMND_ID = 'ID_dodavatele',
 		SORT_TABLE = array(
-			'nazov' => 'nazev_pojistovny',
+			'nazov' => 'nazev_dodavatele',
 			'cas' => 'date_time'
 		);
 
 	/**
-	 * Vyber vsetkych pojistovni z databaze a ich pripadne zotriedenie.
+	 * Vyber vsetkych dodavatelov z databaze a ich pripadne zotriedenie.
 	 * @param string $column Nazov stlpca podla, ktoreho sa ma triedit
 	 * @param string $sort Typ akym sa ma urobit triedenie ASC alebo DESC
-	 * @return mixed Zoznam pojistovni
+	 * @return mixed Zoznam dodavatelov
 	 */
-	public function getInsurences($column, $sort)
+	public function getSuppliers($column, $sort)
 	{
 		$default_column = self::SORT_TABLE['nazov'];
 		$default_sort = self::SORT_TYPE['asc'];
@@ -46,22 +46,22 @@ class InsurenceManager extends BaseManager
 	}
 
 	/**
-	 * Vyber pozadovanej pojistovne z databaze.
-	 * @param int $id Identifikator pojistovne v databaze
-	 * @return mixed Poistovna
+	 * Vyber pozadovaneho dodavatela z databaze.
+	 * @param int $id Identifikator dodavatela v databaze
+	 * @return mixed Dodavatel
 	 */
-	public function getInsurence($id)
+	public function getSupplier($id)
 	{
 		return $this->database->table(self::TABLE_NAME)
 			->where(self::COLUMND_ID, $id)->fetch();
 	}
 
 	/**
-	 * Ulozi pojistovnu do databaze. V pripade, ze nie je nastavene ID vlozi sa novy
-	 * zaznam o pojistovni, inak sa edituje existujuca pojistovna.
-	 * @param mixed $office Poistovna, ktora sa ma upravit alebo vlozit
+	 * Ulozi dodavatela do databaze. V pripade, ze nie je nastavene ID vlozi sa novy
+	 * zaznam o dodavatelovi, inak sa edituje existujuci dodavatel.
+	 * @param mixed $office Dodavatelo, ktory sa ma upravit alebo vlozit
 	 */
-	public function saveInsurence($office)
+	public function saveSupplier($office)
 	{
 		if (!$office[self::COLUMND_ID]) {
 			unset($office[self::COLUMND_ID]);
@@ -72,10 +72,10 @@ class InsurenceManager extends BaseManager
 	}
 
 	/**
-	 * Odstrani poistovnu z databaze.
-	 * @param int $id Identifikator poistovne v databaze
+	 * Odstrani dodavatela z databaze.
+	 * @param int $id Identifikator dodavatela v databaze
 	 */
-	public function removeInsurence($id)
+	public function removeSupplier($id)
 	{
 		$this->database->table(self::TABLE_NAME)
 			->where(self::COLUMND_ID, $id)->delete();

@@ -12,6 +12,7 @@ services:
 	- App\Model\OfficeManager
 	- App\Model\MenuManager
 	- App\Model\InsurenceManager
+	- App\Model\SupplierManager
 	- App\Forms\UserForms
 	router: App\RouterFactory::createRouter
 	autenticator: App\Model\UserManager

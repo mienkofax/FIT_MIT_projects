@@ -37,7 +37,7 @@ class OfficeManager extends BaseManager
 		if (isset(self::SORT_TABLE[$column]))
 			$default_column = self::SORT_TABLE[$column];
 
-		// Kontrola ci bolo zadane v akom poradi sa ma maju vypisat pobocky
+		// Kontrola ci bolo zadane v akom poradi sa ma maju vypisat
 		if (isset(self::SORT_TYPE[$sort]))
 			$default_sort = self::SORT_TYPE[$sort];
 
