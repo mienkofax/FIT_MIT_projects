@@ -4,6 +4,7 @@
  * @date October, 2016
  */
 
+#include <stdexcept>
 #include <sstream>
 
 #include "PcapReaderFromFile.h"
