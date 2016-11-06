@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<meta http-equiv="refresh" content="6">
+	<meta http-equiv="refresh" content="30">
 	<title>{ifset title}{include title|stripHtml} | {/ifset}Nette Web</title>
 
 	<link href="{$basePath}/css/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -54,7 +54,7 @@
 				<li><a href="#">Správa liekov</a></li>
 				<li><a n:href="Office:list">Správa pobočiek <span class="badge">{$count['pobocky']}</span></a></li>
 				<li><a n:href="Insurence:list">Správa poistovni <span class="badge">{$count['pojistovny']}</span></a></li>
-				<li><a href="#">Správa užívateľov</a></li>
+				<li><a n:href="User:list">Správa užívateľov <span class="badge">{$count['uzivatelia']}</span></a></li>
 			</ul>
 		</div>
 

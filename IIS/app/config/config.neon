@@ -13,9 +13,10 @@ services:
 	- App\Model\MenuManager
 	- App\Model\InsurenceManager
 	- App\Model\SupplierManager
+	- App\Model\UserManager
 	- App\Forms\UserForms
 	router: App\RouterFactory::createRouter
-	autenticator: App\Model\UserManager
+	autenticator: App\Model\AuthenticatorManager
 	authorizator: App\AccessListFactory
 
 forms:
