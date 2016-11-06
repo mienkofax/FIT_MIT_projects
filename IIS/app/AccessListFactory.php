@@ -19,6 +19,7 @@ class AccessListFactory extends Permission
 		// Zdroje ku, ktorym je mozne udelit pristup
 		$this->addResource('Administration');
 		$this->addResource('Office');
+		$this->addResource('Insurence');
 
 		// Zoznam pravidiel pre opravnenia
 		$this->allow('guest', 'Administration', array('login', 'logout', 'register'));

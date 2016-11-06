@@ -8,27 +8,27 @@ use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
 
 /**
- * Model pre pracu s jednotlivymi pobockami. Umoznuje vytvorenie, editovanie a
- * vypis pobočiek. Vypis pobociek moze byt ako detail jednej pobocky alebo
- * zoznam pobociek.
+ * Model pre pracu s jednotlivymi poistovnami. Umoznuje, editovanie a
+ * vypis poistovni. Vypis poistovni moze byt ako detail jednej poistovne
+ * alebo zoznam poistovni.
  */
-class OfficeManager extends BaseManager
+class InsurenceManager extends BaseManager
 {
 	const
-		TABLE_NAME = 'pobocky',
-		COLUMND_ID = 'ID_pobocky',
+		TABLE_NAME = 'pojistovny',
+		COLUMND_ID = 'ID_pojistovny',
 		SORT_TABLE = array(
-			'nazov' => 'nazev_pobocky',
+			'nazov' => 'nazev_pojistovny',
 			'cas' => 'date_time'
 		);
 
 	/**
-	 * Vyber vsetkych pobociek z databaze a ich pripadne zotriedenie.
+	 * Vyber vsetkych pojistovni z databaze a ich pripadne zotriedenie.
 	 * @param string $column Nazov stlpca podla, ktoreho sa ma triedit
 	 * @param string $sort Typ akym sa ma urobit triedenie ASC alebo DESC
-	 * @return mixed Zoznam pobociek
+	 * @return mixed Zoznam pojistovni
 	 */
-	public function getOffices($column, $sort)
+	public function getInsurences($column, $sort)
 	{
 		$default_column = self::SORT_TABLE['nazov'];
 		$default_sort = self::SORT_TYPE['asc'];
@@ -46,22 +46,22 @@ class OfficeManager extends BaseManager
 	}
 
 	/**
-	 * Vyber pozadovanej pobocky z databaze.
-	 * @param int $id Identifikator pobocky v databaze
-	 * @return mixed Pobocka
+	 * Vyber pozadovanej pojistovne z databaze.
+	 * @param int $id Identifikator pojistovne v databaze
+	 * @return mixed Poistovna
 	 */
-	public function getOffice($id)
+	public function getInsurence($id)
 	{
 		return $this->database->table(self::TABLE_NAME)
 			->where(self::COLUMND_ID, $id)->fetch();
 	}
 
 	/**
-	 * Ulozi pobocku do databaze. V pripade, ze nie je nastavene ID vlozi sa novy
-	 * zaznam o pobocke, inak sa edituje existujuca pobocka.
-	 * @param mixed $office Pobocka, ktora sa ma upravit alebo vlozit
+	 * Ulozi pojistovnu do databaze. V pripade, ze nie je nastavene ID vlozi sa novy
+	 * zaznam o pojistovni, inak sa edituje existujuca pojistovna.
+	 * @param mixed $office Poistovna, ktora sa ma upravit alebo vlozit
 	 */
-	public function saveOffice($office)
+	public function saveInsurence($office)
 	{
 		if (!$office[self::COLUMND_ID]) {
 			unset($office[self::COLUMND_ID]);
@@ -72,12 +72,13 @@ class OfficeManager extends BaseManager
 	}
 
 	/**
-	 * Odstrani pobocku z databaze.
-	 * @param int $id Identifikator pobocky v databaze
+	 * Odstrani poistovnu z databaze.
+	 * @param int $id Identifikator poistovne v databaze
 	 */
-	public function removeOffice($id)
+	public function removeInsurence($id)
 	{
 		$this->database->table(self::TABLE_NAME)
 			->where(self::COLUMND_ID, $id)->delete();
 	}
+
 }

@@ -14,6 +14,7 @@ class MenuManager extends BaseManager
 	public function getTableRecord()
 	{
 		$count['pobocky'] = $this->database->table('pobocky')->count('*');
+		$count['pojistovny'] = $this->database->table('pojistovny')->count('*');
 		return $count;
 	}
 }

@@ -1,0 +1,43 @@
+{define title}Výpis pobočiek{/define}
+{define description}Výpis všetkých pobočiek.{/define}
+{block content}
+<h2>Zoznam poistovní</h2>
+
+<table class="table table-hover">
+	<thead>
+	<tr>
+		<th>
+			Názov poisťovne
+			<a href="{link Insurence:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+			<a href="{link Insurence:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+		</th>
+		<th class="text-center">
+			Dátum vytvorenia poisťovne
+			<a href="{link Insurence:list}/cas/desc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+			<a href="{link Insurence:list}/cas/asc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+		</th>
+		<th colspan="2">Akcie s poisťovňou</th>
+	</tr>
+	</thead>
+	<tr n:foreach="$insurences as $insurence">
+		<td>
+			<a n:href="Insurence:detail $insurence->ID_pojistovny">{$insurence->nazev_pojistovny}</a>
+		</td>
+		<td class="text-center">
+			{$insurence->date_time}
+		</td>
+		<td>
+			<a n:href="Insurence:edit $insurence->ID_pojistovny">
+				<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
+			</a>
+		</td>
+
+		<td>
+			<a n:href="Insurence:remove $insurence->ID_pojistovny">
+				<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
+			</a>
+		</td>
+	</tr>
+</table>
+
+<a class="btn btn-primary btn-add" n:href="Insurence:edit">Pridať poisťovňu</a>

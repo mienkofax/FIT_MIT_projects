@@ -2,68 +2,68 @@
 
 namespace App\Presenters;
 
-use App\Model\OfficeManager;
+use App\Model\InsurenceManager;
 use App\Presenters\BasePresenter;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Database\UniqueConstraintViolationException;
 use Nette\Utils\Arrayhash;
 
-/**
- * Spracovanie vykreslenie formularov.
+/*
+ * Spracovanie vykreslenia formularov.
  */
-class OfficePresenter extends BasePresenter
+class InsurencePresenter extends BasePresenter
 {
-	/** @var OfficePresenter Informacie o pobockach a praca s nimi */
-	protected $officeManager;
+	/** @var InsurenceManager Informacie o poistovni a praca s nou */
+	protected $insurenceManager;
 
-	public function __construct(OfficeManager $officeManager)
+	public function __construct(InsurenceManager $insurenceManager)
 	{
 		parent::__construct();
-		$this->officeManager = $officeManager;
+		$this->insurenceManager = $insurenceManager;
 	}
 
 	/**
-	 * Nacita pobocku z databaze a vykresli ju podla zadanej url.
+	 * Nacita pojistovnu z databaze a vykresli ju podla zadanej url.
 	 * @param int $id Id clanku, ktory sa ma vypisat
-	 * @throws BadRequestException Neexistujuxe id pobocky
+	 * @throws BadRequestException Neexistujuxe id pojistovne
 	 */
 	public function renderDetail($id)
 	{
 		if (!$id)
 			$id = 1;
 
-		if (!($office = $this->officeManager->getOffice($id)))
+		if (!($insurence = $this->insurenceManager->getInsurence($id)))
 			throw new BadRequestException();
 
-		$this->template->office = $office;
+		$this->template->insurence = $insurence;
 	}
 
 	/**
-	 * Zobrazenie zoznamu pobociek a zotriedenie podla parametrov.
+	 * Zobrazenie zoznamu pojistovni a zotriedenie podla parametrov.
 	 * @param string $column Nazov stlpca pomocou, ktoreho sa bude zoradovat
 	 * @param string $sort Typ triedenia, zostupne alebo vzostupne
 	 */
 	public function renderList($column, $sort)
 	{
-		$this->template->offices = $this->officeManager->getOffices($column, $sort);
+		$this->template->insurences = $this->insurenceManager->getInsurences($column, $sort);
 	}
 
 	/**
-	 * Odstranenie pobocky z databaze a presmerovanie na zoznam pobociek.
-	 * @param ID pobocky, ktora sa ma odstranit
+	 * Odstranenie pojistovne z databaze a presmerovanie na zoznam poistovni.
+	 * @param ID poistovne, ktora sa ma odstranit
 	 */
 	public function actionRemove($id)
 	{
-		$this->officeManager->removeOffice($id);
-		$this->flashMessage('Pobočka bola odstranená.');
-		$this->redirect(':Office:list');
+		$this->insurenceManager->removeInsurence($id);
+		$this->flashMessage('Poisťovňa bola odstranená.');
+		$this->redirect('Insurence:list');
 	}
 
 	/**
-	 * Uprava pobocky na zaklade zadaneho ID. V pripade, ze nie je zadane
-	 * ID pobocky vykresli sa formular na vytvorenie novej pobocky.
-	 * @param int $id ID pobocky, ktora sa ma editovat
+	 * Uprava poistovne na zaklade zadaneho ID. V pripade, ze nie je zadane
+	 * ID poistovne vykresli sa formular na vytvorenie novej poistovne.
+	 * @param int $id ID poistovne, ktora sa ma editovat
 	 */
 	public function actionEdit($id)
 	{
@@ -72,26 +72,26 @@ class OfficePresenter extends BasePresenter
 			return;
 		}
 
-		if ($office = $this->officeManager->getOffice($id)) {
+		if ($insurence = $this->insurenceManager->getInsurence($id)) {
 			$this->template->isEditForm = true;
-			$this['editForm']->setDefaults($office);
+			$this['editForm']->setDefaults($insurence);
 		}
 		else {
-			$this->flashMessage('Pobočka nebola nájdená.');
-			$this->redirect('Office:list');
+			$this->flashMessage('Poisťovňa nebola nájdená.');
+			$this->redirect('Insurence:list');
 		}
 	}
 
 	/**
-	 * Vytvori formuar pre editovanie pobociek.
+	 * Vytvori formuar pre editovanie pojistovni.
 	 * @return Form vytvoreny formular, ktory sa ma vykreslit
 	 */
 	public function createComponentEditForm()
 	{
 		$form = new Form;
-		$form->addHidden('ID_pobocky');
-		$form->addText('nazev_pobocky', 'Názov pobočky')
-			->addRule(Form::FILLED, 'Zadajte názov pobočky');
+		$form->addHidden('ID_pojistovny');
+		$form->addText('nazev_pojistovny', 'Názov poisťovne')
+			->addRule(Form::FILLED, 'Zadajte názov poisťovne');
 		$form->addText('ulice', 'Ulica')
 			->setRequired(FALSE);
 		$form->addText('mesto', 'Mesto')
@@ -105,7 +105,7 @@ class OfficePresenter extends BasePresenter
 		$form->addText('email', 'E-mail')
 			->setRequired(FALSE)
 			->addRule(Form::EMAIL, 'Nesprávny tvar adresy');
-		$form->addSubmit('submit', "Uložiť pobočku");
+		$form->addSubmit('submit', "Uložiť poisťovňu");
 		$form->onSuccess[] = [$this, 'editFormSuccessed'];
 
 		return $this->bootstrapFormRender($form);
@@ -119,8 +119,8 @@ class OfficePresenter extends BasePresenter
 	 */
 	public function editFormSuccessed($form, $value)
 	{
-		$this->officeManager->saveOffice($value);
-		$this->flashMessage('Pobočka ' .$value['nazev_pobocky']. ' bola uložená');
-		$this->redirect('Office:list');
+		$this->insurenceManager->saveInsurence($value);
+		$this->flashMessage('Poisťovňa ' .$value['nazev_pojistovny']. ' bola uložená');
+		$this->redirect('Insurence:list');
 	}
 }

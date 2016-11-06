@@ -1,0 +1,25 @@
+{define title}Detail pobočky {$office->nazev_pobocky}{/define}
+{define description}Detail pobočky {$office->nazev_pobocky}.{/define}
+{block content}
+<h2>Detail pobočky</h2>
+
+
+<h4>Základné informácie</h4>
+<p><strong>Vedúci/vedúca pobočky:</strong> dopolnit</p>
+
+<h4>Adresa</h4>
+<p>{$office->ulice}, {$office->PSC} {$office->mesto}</p>
+
+<h4>Kontaktné údaje</h4>
+<p>
+	<strong>Telefón:</strong> {$office->telefonni_cislo}<br>
+	<strong>E-mail:</strong> {$office->email}
+</p>
+
+<div class="hr"></div>
+
+<h4>Ďalšie informácie o pobočke</h4>
+<div class="detail-links">
+	<p><a class="btn btn-primary btn-sm" href="#">Zoznam liekov na pobočke</a></p>
+	<p><a class="btn btn-primary btn-sm" href="#">Zoznam pracovníkov na pobočke</a></p>
+</div>
