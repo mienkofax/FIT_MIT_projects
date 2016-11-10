@@ -81,4 +81,44 @@ class InsurenceManager extends BaseManager
 			->where(self::COLUMND_ID, $id)->delete();
 	}
 
+	public function relatedMedicinesPaid($id, $paid)
+	{
+		$dat = $this->database->table(self::TABLE_NAME)->get($id);
+
+		$pole = array();
+		foreach ($dat->related('lek_pojistovny.ID_pojistovny') as $med)
+			$pole[] = $med->ID_leku;
+
+		if ($paid)
+			return $this->database->table('leky')->where('hradene', 'hradene')->where('ID_leku', $pole);
+		else
+			return $this->database->table('leky')->where('hradene', 'nehradene')->where('ID_leku', $pole);
+	}
+
+	public function relatedMedicinesAdditionalCharge($id)
+	{
+		$dat = $this->database->table(self::TABLE_NAME)->get($id);
+
+		$pole = array();
+		foreach ($dat->related('lek_pojistovny.ID_pojistovny') as $med)
+			$pole[] = $med->ID_leku;
+
+		return $this->database->table('leky')->where('hradene', 'doplatok')->where('ID_leku', $pole);
+	}
+
+	public function countDBItem($id)
+	{
+		$dat = $this->database->table(self::TABLE_NAME)->get($id);
+
+		$pole = array();
+		foreach ($dat->related('lek_pojistovny.ID_pojistovny') as $med)
+			$pole[] = $med->ID_leku;
+
+		$countData['hradene'] = $this->database->table('leky')->where('hradene', 'hradene')->where('ID_leku', $pole)->count();
+		$countData['nehradene'] = $this->database->table('leky')->where('hradene', 'nehradene')->where('ID_leku', $pole)->count();
+		$countData['doplatok'] = $this->database->table('leky')->where('hradene', 'doplatok')->where('ID_leku', $pole)->count();
+
+		return $countData;
+	}
+
 }

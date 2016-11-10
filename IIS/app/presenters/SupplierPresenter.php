@@ -3,6 +3,7 @@
 namespace App\Presenters;
 
 use App\Model\SupplierManager;
+use App\Model\OfficeManager;
 use App\Presenters\BasePresenter;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
@@ -16,6 +17,13 @@ class SupplierPresenter extends BasePresenter
 {
 	/** @var SupplerManager Informacie o dodavatelovi a praca s nou */
 	protected $supplierManager;
+
+	protected $officeManager;
+
+	public function injectOfficeManager(OfficeManager $officeManager)
+	{
+		$this->officeManager =$officeManager;
+	}
 
 	public function __construct(SupplierManager $supplierManager)
 	{
@@ -37,6 +45,7 @@ class SupplierPresenter extends BasePresenter
 			throw new BadRequestException();
 
 		$this->template->supplier = $supplier;
+		$this->template->offices = $this->supplierManager->relatedOffices($id);
 	}
 
 	/**
@@ -72,7 +81,8 @@ class SupplierPresenter extends BasePresenter
 			return;
 		}
 
-		if ($supplier = $this->supplierManager->getSupplier($id)) {
+		if ($supplier = $this->supplierManager->getSupplier($id)->toArray()) {
+			$supplier['ID_pobocky'] = $this->supplierManager->getOfficesID($id);
 			$this->template->isEditForm = true;
 			$this['editForm']->setDefaults($supplier);
 		}
@@ -105,6 +115,9 @@ class SupplierPresenter extends BasePresenter
 		$form->addText('email', 'E-mail')
 			->setRequired(FALSE)
 			->addRule(Form::EMAIL, 'Nesprávny tvar adresy');
+		$form->addGroup("sadf");
+		$form->addMultiSelect('ID_pobocky', 'Pobocka', $this->officeManager->getOfficesToSelectBox())
+			->setAttribute('class', 'form-control');
 		$form->addSubmit('submit', "Uložiť dodávateľa");
 		$form->onSuccess[] = [$this, 'editFormSuccessed'];
 

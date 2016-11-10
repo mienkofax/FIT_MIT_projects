@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use App\Model\BaseManager;
+use App\Model\OfficeManager;
 use Nette\Database\Table\IRow;
 use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
@@ -21,6 +22,13 @@ class SupplierManager extends BaseManager
 			'nazov' => 'nazev_dodavatele',
 			'cas' => 'date_time'
 		);
+
+	protected $officeManager;
+
+	public function injectMedicineManager(OfficeManager $officeManager)
+	{
+		$this->officeManager = $officeManager;
+	}
 
 	/**
 	 * Vyber vsetkych dodavatelov z databaze a ich pripadne zotriedenie.
@@ -63,12 +71,46 @@ class SupplierManager extends BaseManager
 	 */
 	public function saveSupplier($office)
 	{
+		$fKey = $office['ID_pobocky'];
+		unset($office['ID_pobocky']);
+
 		if (!$office[self::COLUMND_ID]) {
 			unset($office[self::COLUMND_ID]);
-			$this->database->table(self::TABLE_NAME)->insert($office);
-		} else
+
+			$this->database->beginTransaction();
+			try {
+				$result = array();
+
+				$primaryKey = $this->database->table(self::TABLE_NAME)->insert($office);
+				foreach ($fKey as $tmp)
+					$result[] = array("ID_dodavatele" => $primaryKey, "ID_pobocky" => $tmp);
+
+				$this->database->table('dodavatel_pobocka')->insert($result);
+			}
+			catch (Nette\Database\DriverException $ex) {
+				$this->database->rollback();
+				throw $ex;
+			}
+			$this->database->commit();
+
+		}
+		else {
 			$this->database->table(self::TABLE_NAME)->where(self::COLUMND_ID,
 				$office[self::COLUMND_ID])->update($office);
+
+			$data = $this->database->table('dodavatel_pobocka')->where('ID_dodavatele',$office['ID_dodavatele']);
+
+			foreach ($data as $key => $pobocka) {
+				if (!in_array($pobocka->ID_pobocky, $fKey)){
+					$pobocka->delete();
+				}
+				unset($fKey[array_search($pobocka->ID_pobocky, $fKey)]);
+			}
+
+			foreach ($fKey as $item) {
+				$this->database->table('dodavatel_pobocka')->insert(array('ID_pobocky' => $item, 'ID_dodavatele' => $office['ID_dodavatele']));
+			}
+		}
 	}
 
 	/**
@@ -81,4 +123,24 @@ class SupplierManager extends BaseManager
 			->where(self::COLUMND_ID, $id)->delete();
 	}
 
+	public function relatedOffices($id)
+	{
+		$dat = $this->database->table(self::TABLE_NAME)->get($id);
+
+		$pole = array();
+		foreach ($dat->related('dodavatel_pobocka.ID_dodavatele') as $med)
+			$pole[] = $med->ID_pobocky;
+		return $this->database->table('pobocky')->where('ID_pobocky', $pole);
+	}
+
+	public function getOfficesID($id)
+	{
+		$result = [];
+		$data = $this->database->table('dodavatel_pobocka')->select('ID_pobocky')
+			->where('ID_dodavatele', $id);
+
+		foreach ($data as $id)
+			$result[] = $id->ID_pobocky;
+		return $result;
+	}
 }

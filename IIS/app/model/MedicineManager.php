@@ -83,9 +83,21 @@ class MedicineManager extends BaseManager
 			->where(self::COLUMND_ID, $id)->delete();
 	}
 
-	public function relatedMedicines($id)
+	public function medicinesPaid($paid)
 	{
-	
+		if ($paid)
+			return $this->database->table(self::TABLE_NAME)->where('hradene', 'hradene');
+		else
+			return $this->database->table(self::TABLE_NAME)->where('hradene', 'nehradene');
+	}
 
+	public function medicinesAdditionalCharge()
+	{
+		return $this->database->table(self::TABLE_NAME)->where('hradene', 'doplatok');
+	}
+
+	public function medicinePrescription($withPrescription)
+	{
+		return $this->database->table(self::TABLE_NAME)->where('typ_leku', $withPrescription);
 	}
 }

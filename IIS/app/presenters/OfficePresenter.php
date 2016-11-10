@@ -3,7 +3,9 @@
 namespace App\Presenters;
 
 use App\Model\MedicineManager;
+use App\Model\SupplierManager;
 use App\Model\OfficeManager;
+use App\Model\UserManager;
 use App\Presenters\BasePresenter;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
@@ -18,7 +20,12 @@ class OfficePresenter extends BasePresenter
 	/** @var OfficePresenter Informacie o pobockach a praca s nimi */
 	protected $officeManager;
 
+	/***/
+	protected $supplierManager;
+
 	protected $medicineManager;
+
+	protected $userManager;
 
 	public function __construct(OfficeManager $officeManager)
 	{
@@ -29,6 +36,16 @@ class OfficePresenter extends BasePresenter
 	public function injectMedicineManager(MedicineManager $medicineManager)
 	{
 		$this->medicineManager = $medicineManager;
+	}
+
+	public function injectSupplierManager(SupplierManager $supplierManager)
+	{
+		$this->supplierManager = $supplierManager;
+	}
+
+	public function injectUserManger(UserManager $userManager)
+	{
+		$this->userManager = $userManager;
 	}
 
 	/**
@@ -45,7 +62,10 @@ class OfficePresenter extends BasePresenter
 			throw new BadRequestException();
 
 		$this->template->office = $office;
-		$this->template->data = $this->officeManager->relatedMedicines($id);
+		$this->template->medicines = $this->officeManager->relatedMedicines($id);
+		$this->template->suppliers = $this->officeManager->relatedSupplier($id);
+		$this->template->users = $this->officeManager->relatedUser($id);
+		$this->template->CountDBItem = $this->officeManager->countDBItem($id);
 	}
 
 	/**
@@ -62,11 +82,25 @@ class OfficePresenter extends BasePresenter
 	 * Odstranenie pobocky z databaze a presmerovanie na zoznam pobociek.
 	 * @param ID pobocky, ktora sa ma odstranit
 	 */
-	public function actionRemove($id)
+	public function actionRemove($idd, $table, $id)
 	{
-		$this->officeManager->removeOffice($id);
-		$this->flashMessage('Pobočka bola odstranená.');
-		$this->redirect(':Office:list');
+		if ($table == 'pobocka') {
+			$this->officeManager->removeOffice($id);
+			$this->flashMessage('Pobočka bola odstranená.');
+			$this->redirect('Office:list');
+		}
+		else if ($table == 'dodavat') {
+			$this->supplierManager->removeSupplier($id);
+			$this->redirect('Office:detail', $idd);
+		}
+		else if ($table == 'liek') {
+			$this->medicineManager->removeMedicine($id);
+			$this->redirect('detail', $idd);
+		}
+		else if ($table == 'uzivatel') {
+			$this->userManager->removeUser($id);
+			$this->redirect('detail', $idd);
+		}
 	}
 
 	/**

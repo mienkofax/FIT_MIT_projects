@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
 	<meta http-equiv="refresh" content="30">
-	<title>{ifset title}{include title|stripHtml} | {/ifset}Nette Web</title>
+	<title>{ifset title}{include title|stripHtml} | {/ifset}IIS projekt</title>
 
 	<link href="{$basePath}/css/bootstrap.min.css" rel="stylesheet" media="screen">
 	<link href="{$basePath}/css/custom.css" rel="stylesheet" media="screen">
@@ -47,19 +47,19 @@
 	{/foreach}
 
 	<div class="container space-top">
-		<div class="col-md-4">
+		<div class="col-md-3">
 			<ul class="menu menu-bg">
 				<li><a href="#">Rezervácia liekov</a></li>
 				<li><a n:href="Supplier:list">Správa dodávateľov <span class="badge">{$count['dodavatelia']}</span></a></li>
 				<li><a n:href="Medicine:list">Správa liekov <span class="badge">{$count['lieky']}</span></a></li>
 				<li><a n:href="Office:list">Správa pobočiek <span class="badge">{$count['pobocky']}</span></a></li>
-				<li><a n:href="Insurence:list">Správa poistovni <span class="badge">{$count['pojistovny']}</span></a></li>
+				<li><a n:href="Insurence:list">Správa poisťovní <span class="badge">{$count['pojistovny']}</span></a></li>
 				<li><a n:href="User:list">Správa užívateľov <span class="badge">{$count['uzivatelia']}</span></a></li>
 			</ul>
 		</div>
 
 		<!-- obsah modulov -->
-		<div class="col-md-8 content">
+		<div class="col-md-9">
 			{include content}
 		</div>
 
@@ -80,6 +80,26 @@
 		$('lable').addClass('control-label');
 	})*/
 	</script>
+	<script>
+	splitdata = $(location).attr('pathname').split('/')[2];
+	$('.detail.nav-tabs li a').click(function() {
+		data = $(this).attr("href");
+		if (typeof(Storage) !== "undefined")
+			localStorage.setItem(splitdata, data);
+	});
+
+	data = localStorage.getItem(splitdata);
+	if (!data)
+		data = "#sectionA";
+
+	$('a[href="'+data+'"]').tab('show');
+
+
+
+// Check browser support
+
+
+</script>
 	{/block}
 </body>
 </html>

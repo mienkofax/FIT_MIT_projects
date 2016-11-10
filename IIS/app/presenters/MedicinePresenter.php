@@ -53,17 +53,25 @@ class MedicinePresenter extends BasePresenter
 	public function renderList($column, $sort)
 	{
 		$this->template->medicines = $this->medicineManager->getMedicines($column, $sort);
+		$this->template->relatedMedineWithPaid = $this->medicineManager->medicinesPaid(true);
+		$this->template->relatedMedineWithoutPaid = $this->medicineManager->medicinesPaid(false);
+		$this->template->medicinesAdditionalCharge = $this->medicineManager->medicinesAdditionalCharge();
+		$this->template->medicineWithPrescription = $this->medicineManager->medicinePrescription(true);
+		$this->template->medicineWithoutPrescription = $this->medicineManager->medicinePrescription(false);
+
 	}
 
 	/**
 	 * Odstranenie lieku z databaze a presmerovanie na zoznam liekov.
 	 * @param ID lieku, ktory sa ma odstranit
 	 */
-	public function actionRemove($id)
+	public function actionRemove($idd, $table, $id)
 	{
-		$this->medicineManager->removeMedicine($id);
-		$this->flashMessage('Liek bol odstránený.');
-		$this->redirect('Medicine:list');
+		if ($table == 'liek') {
+			$this->medicineManager->removeMedicine($id);
+			$this->flashMessage('Liek bol odstránený.');
+			$this->redirect('Medicine:list');
+		}
 	}
 
 	/**

@@ -85,9 +85,50 @@ class OfficeManager extends BaseManager
 	{
 		$dat = $this->database->table(self::TABLE_NAME)->get($id);
 
+		$pole = array();
 		foreach ($dat->related('pobocka_lek.ID_pobocky') as $med)
 			$pole[] = $med->ID_leku;
-
 		return $this->database->table('leky')->where('ID_leku', $pole);
+	}
+
+	public function relatedSupplier($id)
+	{
+		$dat = $this->database->table(self::TABLE_NAME)->get($id);
+
+		$pole = array();
+		foreach ($dat->related('dodavatel_pobocka.ID_pobocky') as $med)
+			$pole[] = $med->ID_dodavatele;
+		return $this->database->table('dodavatele')->where('ID_dodavatele', $pole);
+	}
+
+	public function relatedUser($id)
+	{
+		$dat = $this->database->table(self::TABLE_NAME)->get($id);
+
+		$pole = array();
+		foreach ($dat->related('pobocka_zamestnanec.ID_pobocky') as $med)
+			$pole[] = $med->ID_uzivatele;
+		return $this->database->table('uzivatele')->where('ID_uzivatele', $pole);
+	}
+
+	public function countDBItem($id)
+	{
+		$dat = $this->database->table(self::TABLE_NAME)->get($id);
+
+		$countData['user'] = $dat->related('pobocka_zamestnanec.ID_pobocky')->count();
+		$countData['supplier'] = $dat->related('dodavatel_pobocka.ID_pobocky')->count();
+		$countData['medicine'] =  $dat->related('pobocka_lek.ID_pobocky')->count();
+
+		return $countData;
+	}
+
+	public function getOfficesToSelectBox() {
+		$data = $this->database->table('pobocky')->fetchAll();
+		$result = [];
+
+		foreach ($data as $key => $value)
+			$result[$value->ID_pobocky] = $value->nazev_pobocky;
+
+		return $result;
 	}
 }

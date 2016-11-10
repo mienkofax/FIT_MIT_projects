@@ -3,6 +3,7 @@
 namespace App\Presenters;
 
 use App\Model\InsurenceManager;
+use App\Model\MedicineManager;
 use App\Presenters\BasePresenter;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
@@ -16,6 +17,13 @@ class InsurencePresenter extends BasePresenter
 {
 	/** @var InsurenceManager Informacie o poistovni a praca s nou */
 	protected $insurenceManager;
+
+	protected $medicineManager;
+
+	public function injectMedicineManager(MedicineManager $medicineManager)
+	{
+		$this->medicineManager = $medicineManager;
+	}
 
 	public function __construct(InsurenceManager $insurenceManager)
 	{
@@ -37,6 +45,10 @@ class InsurencePresenter extends BasePresenter
 			throw new BadRequestException();
 
 		$this->template->insurence = $insurence;
+		$this->template->medicinesWithPaid = $this->insurenceManager->relatedMedicinesPaid($id, true);
+		$this->template->medicinesWithoutPaid = $this->insurenceManager->relatedMedicinesPaid($id, true);
+		$this->template->medicinesAdditionalCharge = $this->insurenceManager->relatedMedicinesAdditionalCharge($id, true);
+		$this->template->CountDBItem = $this->insurenceManager->countDBItem($id);
 	}
 
 	/**
@@ -53,11 +65,17 @@ class InsurencePresenter extends BasePresenter
 	 * Odstranenie pojistovne z databaze a presmerovanie na zoznam poistovni.
 	 * @param ID poistovne, ktora sa ma odstranit
 	 */
-	public function actionRemove($id)
+	public function actionRemove($idd, $table, $id)
 	{
-		$this->insurenceManager->removeInsurence($id);
-		$this->flashMessage('Poisťovňa bola odstranená.');
-		$this->redirect('Insurence:list');
+		if ($table == 'poistovna') {
+			$this->insurenceManager->removeInsurence($id);
+			$this->flashMessage('Poisťovňa bola odstranená.');
+			$this->redirect('Insurence:list');
+		} else if ($table == 'liek') {
+			$this->flashMessage('Lek bola odstranená.');
+			$this->medicineManager->removeMedicine($id);
+			$this->redirect('Insurence:detail');
+		}
 	}
 
 	/**

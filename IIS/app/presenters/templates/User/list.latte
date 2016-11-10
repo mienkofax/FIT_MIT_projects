@@ -1,51 +1,51 @@
 {define title}Výpis užívateľov{/define}
 {define description}Výpis všetkých užívateľov.{/define}
 {block content}
-<h2>Zoznam užívateľov</h2>
+<ul class="list nav nav-tabs">
+	<li><a data-toggle="tab" href="#sectionA">Zoznam užívateľov</a></li>
+</ul>
 
-<table class="table table-hover">
-	<thead>
-	<tr>
-		<th>
-			Meno
-			<a href="{link User:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
-			<a href="{link User:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
-		</th>
-		<th>
-			Priezvisko
-			<a href="{link User:list}/priezvisko/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
-			<a href="{link User:list}/priezvisko/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
-		</th>
-		<th class="text-center">
-			Dátum vytvorenia pobočky
-			<a href="{link User:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
-			<a href="{link User:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
-		</th>
-		<th colspan="2">Akcie s Užívateľom</th>
-	</tr>
-	</thead>
-	<tr n:foreach="$users as $userItem">
-		<td>
-			<a n:href="User:detail $userItem->ID_uzivatele">{$userItem->jmeno}</a>
-		</td>
-		<td>
-			<a n:href="User:detail $userItem->ID_uzivatele">{$userItem->prijmeni}</a>
-		</td>
-		<td class="text-center">
-			{$userItem->date_time}
-		</td>
-		<td>
-			<a n:href="User:edit $userItem->ID_uzivatele">
-				<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
-			</a>
-		</td>
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		<h2>Zoznam užívateľov</h2>
 
-		<td>
-			<a n:href="User:remove $userItem->ID_uzivatele">
-				<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
-			</a>
-		</td>
-	</tr>
-</table>
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Meno a priezvisko
+					<a href="{link User:list}/priezvisko/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link User:list}/priezvisko/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum registrovania
+					<a href="{link User:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link User:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s Užívateľom</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$users as $userItem">
+				<td>
+					<a n:href="User:detail $userItem->ID_uzivatele">{$userItem->prijmeni} {$userItem->jmeno}</a>
+				</td>
+				<td class="text-center">
+					{$userItem->date_time}
+				</td>
+				<td>
+					<a n:href="User:edit $userItem->ID_uzivatele">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+					</a>
+				</td>
 
-<a class="btn btn-primary btn-add" n:href="User:edit">Pridať užívateľa</a>
+				<td>
+					<a n:href="User:remove $userItem->ID_uzivatele">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					</a>
+				</td>
+			</tr>
+		</table>
+
+		<a class="btn btn-primary btn-add" n:href="User:edit">Pridať užívateľa</a>
+	</div>
+</div>

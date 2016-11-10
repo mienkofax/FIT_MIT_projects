@@ -36,7 +36,7 @@ class UserPresenter extends BasePresenter
 		if (!($user = $this->userManager->getUser($id)))
 			throw new BadRequestException();
 
-		$this->template->user = $user;
+		$this->template->userData = $user;
 	}
 
 	/**

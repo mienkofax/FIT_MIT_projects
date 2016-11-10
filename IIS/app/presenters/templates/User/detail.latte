@@ -1,25 +1,18 @@
-{define title}Detail pobočky {$office->nazev_pobocky}{/define}
-{define description}Detail pobočky {$office->nazev_pobocky}.{/define}
+{define title}Detail užívateľa {$userData->jmeno} {$userData->prijmeni}{/define}
+{define description}Detail užívateľa {$userData->jmeno} {$userData->prijmeni}.{/define}
 {block content}
-<h2>Detail pobočky</h2>
+<ul class="detail nav nav-tabs">
+	<li><a data-toggle="tab" href="#sectionA">Detail užívateľa</a></li>
+</ul>
 
 
-<h4>Základné informácie</h4>
-<p><strong>Vedúci/vedúca pobočky:</strong> dopolnit</p>
 
-<h4>Adresa</h4>
-<p>{$office->ulice}, {$office->PSC} {$office->mesto}</p>
-
-<h4>Kontaktné údaje</h4>
-<p>
-	<strong>Telefón:</strong> {$office->telefonni_cislo}<br>
-	<strong>E-mail:</strong> {$office->email}
-</p>
-
-<div class="hr"></div>
-
-<h4>Ďalšie informácie o pobočke</h4>
-<div class="detail-links">
-	<p><a class="btn btn-primary btn-sm" href="#">Zoznam liekov na pobočke</a></p>
-	<p><a class="btn btn-primary btn-sm" href="#">Zoznam pracovníkov na pobočke</a></p>
-</div>
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		<h2>Detail užívateľa</h2>
+		<h4>Základné informácie</h4>
+		<p><strong>Meno:</strong> {$userData->jmeno}</p>
+		<p><strong>Priezvisko:</strong> {$userData->prijmeni}</p>
+		<p><strong>Oprávnenie:</strong> {$userData->opravneni}</p>
+	</div>
+</div<

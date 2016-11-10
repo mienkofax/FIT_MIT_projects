@@ -69,6 +69,10 @@ ul.menu li a:hover {
 	padding-bottom: 10px;
 	overflow: hidden;
 	color: #5b5b5b;
+	border-top-left-radius: 0px;
+	border-top-right-radius: 0px;
+	border-top: none !Important;
+	padding: 0 15px 15px 15px;
 }
 
 h4 {

@@ -56,6 +56,11 @@ abstract class BasePresenter extends Presenter
 		$this->template->count = $this->menuManager->getTableRecord();
 	}
 
+	public function createRedirectLink($presenter, $action, $id)
+	{
+		return $presenter . '/' . $action . '/' . $id;
+	}
+
 	/**
 	 * Vlastne nastavenie stylu formular a jednotlivych inputov,
 	 * aby podporoval bootstrap style.

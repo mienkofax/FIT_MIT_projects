@@ -1,43 +1,51 @@
 {define title}Výpis pobočiek{/define}
 {define description}Výpis všetkých pobočiek.{/define}
 {block content}
-<h2>Zoznam pobočiek</h2>
+<ul class="list nav nav-tabs">
+	<li><a data-toggle="tab" href="#sectionA">Zoznam pobočiek</a></li>
+</ul>
 
-<table class="table table-hover">
-	<thead>
-	<tr>
-		<th>
-			Názov pobočky
-			<a href="{link Office:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
-			<a href="{link Office:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
-		</th>
-		<th class="text-center">
-			Dátum vytvorenia pobočky
-			<a href="{link Office:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
-			<a href="{link Office:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
-		</th>
-		<th colspan="2">Akcie s pobočkou</th>
-	</tr>
-	</thead>
-	<tr n:foreach="$offices as $office">
-		<td>
-			<a n:href="Office:detail $office->ID_pobocky">{$office->nazev_pobocky}</a>
-		</td>
-		<td class="text-center">
-			{$office->date_time}
-		</td>
-		<td>
-			<a n:href=":Office:edit $office->ID_pobocky">
-				<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
-			</a>
-		</td>
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		<h2>Zoznam pobočiek</h2>
 
-		<td>
-			<a n:href=":Office:remove $office->ID_pobocky">
-				<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
-			</a>
-		</td>
-	</tr>
-</table>
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Názov pobočky
+					<a href="{link Office:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Office:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia pobočky
+					<a href="{link Office:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Office:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s pobočkou</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$offices as $office">
+				<td>
+					<a n:href="Office:detail $office->ID_pobocky">{$office->nazev_pobocky}</a>
+				</td>
+				<td class="text-center">
+					{$office->date_time}
+				</td>
+				<td>
+					<a n:href=":Office:edit $office->ID_pobocky">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+					</a>
+				</td>
 
-<a class="btn btn-primary btn-add" n:href="Office:edit">Pridať pobočku</a>
+				<td>
+					<a href="{link Office:remove}/{$office->ID_pobocky}/pobocka/{$office->ID_pobocky}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					</a>
+				</td>
+			</tr>
+		</table>
+
+		<a class="btn btn-primary btn-add" n:href="Office:edit">Pridať pobočku</a>
+	</div>
+</div>

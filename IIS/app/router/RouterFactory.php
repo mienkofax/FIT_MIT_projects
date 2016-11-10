@@ -29,15 +29,27 @@ class RouterFactory
 					Route::FILTER_TABLE => array(
 						'editor' => 'edit',
 						'odstranit' => 'remove',
-						'detail' => 'detail'
+						'detail' => 'detail',
+						'pridat' => 'add'
 					),
 					Route::FILTER_STRICT => true
 			),
 		));
+		$router[] = new Route('<presenter>/<action>/<idd [0-9]+>/<table>/<id [0-9]+>/[<sect>]', array(
+			'action' => array(
+				Route::FILTER_TABLE => array(
+					'odstranit' => 'remove',
+					'editor' => 'edit',
+				),
+				Route::FILTER_STRICT => true
+			),
+			'column' => null,
+			'sort' => null
+		));
 		$router[] = new Route('<presenter>/<action>[/<column>][/<sort>]', array(
 			'action' => array(
 				Route::FILTER_TABLE => array(
-					'seznam-clanku' => 'list'
+					'zoznam' => 'list'
 				),
 				Route::FILTER_STRICT => true
 			),

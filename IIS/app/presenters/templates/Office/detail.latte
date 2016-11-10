@@ -1,29 +1,157 @@
 {define title}Detail pobočky {$office->nazev_pobocky}{/define}
 {define description}Detail pobočky {$office->nazev_pobocky}.{/define}
 {block content}
-<h2>Detail pobočky</h2>
+<ul class="detail nav nav-tabs">
+	<li><a data-toggle="tab" href="#sectionA">Detail pobočky</a></li>
+	<li><a data-toggle="tab" href="#sectionB">Lieky</a></li>
+	<li><a data-toggle="tab" href="#sectionC">Dodávatelia</a></li>
+	<li><a data-toggle="tab" href="#sectionD">Zamestnanci</a></li>
+</ul>
 
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+	<h2>Detail pobočky</h2>
+		<h4>Základné informácie</h4>
+		<p><strong>Vedúci/vedúca pobočky:</strong> dopolnit</p>
+		<p><strong>Počet zamestnancov:</strong> {$CountDBItem['user']}</p>
+		<p><strong>Počet dodávateľov:</strong> {$CountDBItem['supplier']}</p>
+		<p><strong>Počet liekov:</strong> {$CountDBItem['medicine']}</p>
 
-<h4>Základné informácie</h4>
-<p><strong>Vedúci/vedúca pobočky:</strong> dopolnit</p>
+		<h4>Adresa</h4>
+		<p>{$office->ulice}, {$office->PSC} {$office->mesto}</p>
 
-<h4>Adresa</h4>
-<p>{$office->ulice}, {$office->PSC} {$office->mesto}</p>
+		<h4>Kontaktné údaje</h4>
+		<p>
+			<strong>Telefón:</strong> {$office->telefonni_cislo}<br>
+			<strong>E-mail:</strong> {$office->email}
+		</p>
+	</div>
+	<div id="sectionB" class="tab-pane fade">
+		<h2>Dostupné lieky na pobočke</h2>
 
-<h4>Kontaktné údaje</h4>
-<p>
-	<strong>Telefón:</strong> {$office->telefonni_cislo}<br>
-	<strong>E-mail:</strong> {$office->email}
-</p>
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Názov lieku
+					<a href="{link Medicine:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia
+					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s liekom</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$medicines as $medicine">
+				<td>
+					<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+				</td>
+				<td class="text-center">
+					{$medicine->date_time}
+				</td>
+				<td>
+					<a n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
+					</a>
+				</td>
 
-<div class="hr"></div>
+				<td>
+					<a href="{link Office:remove}/{$office->ID_pobocky}/liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
+					</a>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="sectionC" class="tab-pane fade">
+		<h2>Zoznam dodávateľov</h2>
 
-<h4>Ďalšie informácie o pobočke</h4>
-<div class="detail-links">
-	<p><a class="btn btn-primary btn-sm" href="#">Zoznam liekov na pobočke</a></p>
-	<p><a class="btn btn-primary btn-sm" href="#">Zoznam pracovníkov na pobočke</a></p>
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Názov dodávateľa
+					<a href="{link Supplier:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Supplier:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia dodávateľa
+					<a href="{link Supplier:list}/cas/desc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Supplier:list}/cas/asc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s dodávateľom</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$suppliers as $supplier">
+				<td>
+					<a n:href="Supplier:detail $supplier->ID_dodavatele">{$supplier->nazev_dodavatele}</a>
+				</td>
+				<td class="text-center">
+					{$supplier->date_time}
+				</td>
+				<td>
+					<a n:href="Office:remove $supplier->ID_dodavatele">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
+					</a>
+				</td>
+
+				<td>
+					<a href="{plink Office:remove}/{$office->ID_pobocky}/dodavatele/{$supplier->ID_dodavatele}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
+					</a>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="sectionD" class="tab-pane fade">
+		<h2>Zoznam zamestnancov</h2>
+
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Meno
+					<a href="{link User:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link User:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th>
+					Priezvisko
+					<a href="{link User:list}/priezvisko/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link User:list}/priezvisko/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia pobočky
+					<a href="{link User:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link User:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s Užívateľom</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$users as $userItem">
+				<td>
+					<a n:href="User:detail $userItem->ID_uzivatele">{$userItem->jmeno}</a>
+				</td>
+				<td>
+					<a n:href="User:detail $userItem->ID_uzivatele">{$userItem->prijmeni}</a>
+				</td>
+				<td class="text-center">
+					{$userItem->date_time}
+				</td>
+				<td>
+					<a n:href="User:edit $userItem->ID_uzivatele">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
+					</a>
+				</td>
+
+				<td>
+					<a href="{plink Office:remove}/{$office->ID_pobocky}/uzivatel/{$userItem->ID_uzivatele}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
+					</a>
+				</td>
+			</tr>
+		</table>
+	</div>
 </div>
-
-{foreach $data as $dat}
-{$dat->nazev_leku}
-{/foreach}

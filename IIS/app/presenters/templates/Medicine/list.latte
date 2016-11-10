@@ -1,43 +1,272 @@
 {define title}Výpis liekov{/define}
 {define description}Výpis všetkých liekov.{/define}
 {block content}
-<h2>Zoznam liekov</h2>
+<ul class="list nav nav-tabs">
+	<li><a data-toggle="tab" href="#sectionA">Zoznam liekov</a></li>
+	<li><a data-toggle="tab" href="#sectionB">Hradené</a></li>
+	<li><a data-toggle="tab" href="#sectionC">Nehradené</a></li>
+	<li><a data-toggle="tab" href="#sectionD">S doplatkom</a></li>
+	<li><a data-toggle="tab" href="#sectionE">Na predpis</a></li>
+	<li><a data-toggle="tab" href="#sectionF">Bez predpisu</a></li>
+</ul>
 
-<table class="table table-hover">
-	<thead>
-	<tr>
-		<th>
-			Názov lieku
-			<a href="{link Medicine:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
-			<a href="{link Medicine:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
-		</th>
-		<th class="text-center">
-			Dátum vytvorenia
-			<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
-			<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
-		</th>
-		<th colspan="2">Akcie s liekom</th>
-	</tr>
-	</thead>
-	<tr n:foreach="$medicines as $medicine">
-		<td>
-			<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
-		</td>
-		<td class="text-center">
-			{$medicine->date_time}
-		</td>
-		<td>
-			<a n:href="Medicine:edit $medicine->ID_leku">
-				<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
-			</a>
-		</td>
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		<h2>Zoznam liekov</h2>
 
-		<td>
-			<a n:href="Medicine:remove $medicine->ID_leku">
-				<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
-			</a>
-		</td>
-	</tr>
-</table>
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Názov lieku
+					<a href="{link Medicine:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia
+					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s liekom</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$medicines as $medicine">
+				<td>
+					<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+				</td>
+				<td class="text-center">
+					{$medicine->date_time}
+				</td>
+				<td>
+					<a n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+					</a>
+				</td>
 
-<a class="btn btn-primary btn-add" n:href="Medicine:edit">Pridať liek</a>
+				<td>
+					<a n:href="Medicine:remove $medicine->ID_leku">
+					<a href="{link Medicine:remove}/{$medicine->ID_leku}/liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					</a>
+				</td>
+			</tr>
+		</table>
+
+		<a class="btn btn-primary btn-add" n:href="Medicine:edit">Pridať liek</a>
+	</div>
+	<div id="sectionB" class="tab-pane fade in active">
+		<h2>Hradené lieky poisťovňou</h2>
+
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Názov lieku
+					<a href="{link Medicine:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia
+					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s liekom</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$relatedMedineWithPaid as $medicine">
+				<td>
+					<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+				</td>
+				<td class="text-center">
+					{$medicine->date_time}
+				</td>
+				<td>
+					<a n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+					</a>
+				</td>
+
+				<td>
+					<a n:href="Medicine:remove $medicine->ID_leku">
+					<a href="{link Medicine:remove}/{$medicine->ID_leku}/liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					</a>
+				</td>
+			</tr>
+		</table>
+
+		<a class="btn btn-primary btn-add" n:href="Medicine:edit">Pridať liek</a>
+	</div>
+	<div id="sectionC" class="tab-pane fade in active">
+		<h2>Nehradené lieky poisťovňou</h2>
+
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Názov lieku
+					<a href="{link Medicine:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia
+					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s liekom</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$relatedMedineWithoutPaid as $medicine">
+				<td>
+					<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+				</td>
+				<td class="text-center">
+					{$medicine->date_time}
+				</td>
+				<td>
+					<a n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+					</a>
+				</td>
+
+				<td>
+					<a n:href="Medicine:remove $medicine->ID_leku">
+					<a href="{link Medicine:remove}/{$medicine->ID_leku}/liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					</a>
+				</td>
+			</tr>
+		</table>
+
+		<a class="btn btn-primary btn-add" n:href="Medicine:edit">Pridať liek</a>
+	</div>
+	<div id="sectionD" class="tab-pane fade in active">
+		<h2>Lieky s doplatkom</h2>
+
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Názov lieku
+					<a href="{link Medicine:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia
+					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s liekom</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$medicinesAdditionalCharge as $medicine">
+				<td>
+					<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+				</td>
+				<td class="text-center">
+					{$medicine->date_time}
+				</td>
+				<td>
+					<a n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+					</a>
+				</td>
+
+				<td>
+					<a n:href="Medicine:remove $medicine->ID_leku">
+					<a href="{link Medicine:remove}/{$medicine->ID_leku}/liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					</a>
+				</td>
+			</tr>
+		</table>
+
+		<a class="btn btn-primary btn-add" n:href="Medicine:edit">Pridať liek</a>
+	</div>
+	<div id="sectionE" class="tab-pane fade in active">
+		<h2>Lieky na predpis</h2>
+
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Názov lieku
+					<a href="{link Medicine:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia
+					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s liekom</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$medicineWithPrescription as $medicine">
+				<td>
+					<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+				</td>
+				<td class="text-center">
+					{$medicine->date_time}
+				</td>
+				<td>
+					<a n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+					</a>
+				</td>
+
+				<td>
+					<a n:href="Medicine:remove $medicine->ID_leku">
+					<a href="{link Medicine:remove}/{$medicine->ID_leku}/liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					</a>
+				</td>
+			</tr>
+		</table>
+
+		<a class="btn btn-primary btn-add" n:href="Medicine:edit">Pridať liek</a>
+	</div>
+	<div id="sectionF" class="tab-pane fade in active">
+		<h2>Lieky bez predpisu</h2>
+
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Názov lieku
+					<a href="{link Medicine:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia
+					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s liekom</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$medicineWithoutPrescription as $medicine">
+				<td>
+					<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+				</td>
+				<td class="text-center">
+					{$medicine->date_time}
+				</td>
+				<td>
+					<a n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+					</a>
+				</td>
+
+				<td>
+					<a n:href="Medicine:remove $medicine->ID_leku">
+					<a href="{link Medicine:remove}/{$medicine->ID_leku}/liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					</a>
+				</td>
+			</tr>
+		</table>
+
+		<a class="btn btn-primary btn-add" n:href="Medicine:edit">Pridať liek</a>
+	</div>
+</div>
