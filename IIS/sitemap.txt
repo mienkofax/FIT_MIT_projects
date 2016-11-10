@@ -1,0 +1,45 @@
+Sprava uzivatelov:
+	Vyhladat
+	Detail:
+
+Sprava poistovni:
+	Vyhladat
+	Detail:
+		- hradene lieky
+		- nehradene lieky
+		- lieky s doplatkom
+
+Sprava pobociek:
+	Vyhladat
+	Detail:
+		- Zoznam liekov na pobocke
+		- Zoznam dodavatelov
+		- Zoznam zamestnancov
+		- Zoznam rezervacia liekov
+
+Sprava liekov:
+	Vyhladat
+	Hradene lieky
+	Nehradene lieky
+	Lieky s doplatkom
+	Lieky na predpis
+	Lieky bez predpisu
+	Detail:
+		- Dostupnost na pobockach
+		- Poistovne preplacajuce liek
+		- Zoznam rezervacii na tento liek
+
+Sprava dodavatelov:
+	Vyhladat
+	Detail:
+		- zoznam dodavanych liekov
+		- zoznam zasobovanych pobociek
+
+Rezervacia liekov:
+	Vyhladat
+	Detail:
+
+prihlasenie
+odhlasenie
+registracia
+zabudnute heslo
