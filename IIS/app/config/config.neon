@@ -29,3 +29,6 @@ forms:
 
 di:
 	debugger: true
+
+extensions:
+    replicator: Kdyby\Replicator\DI\ReplicatorExtension
