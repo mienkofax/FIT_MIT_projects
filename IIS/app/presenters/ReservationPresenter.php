@@ -134,31 +134,39 @@ class ReservationPresenter extends BasePresenter
 		$form->addGroup('');
 		$form->addHidden('ID_rezervace');
 		$form->addSelect('stav_rezervace', 'Stav rezervácie lieku', self::RESERVATION_STATE)
+			->setPrompt('Zvoľte stav rezervácie lieku')
+			->setRequired(TRUE)
 			->setAttribute('class', 'form-control');
 		$form->addText('jmeno', 'Meno zákazníka')
 			->addRule(Form::FILLED, 'Zadajte meno');
-		$form->addText('prijmeni', 'Prezvisko zákazníka')
+		$form->addText('prijmeni', 'Priezvisko zákazníka')
 			->addRule(Form::FILLED, 'Zadajte priezvisko');
 
-		$form->addGroup('');
+		$form->addGroup('Rezervované lieky');
 		$removeEvent = [$this, 'removeElementClicked'];
 		$reservations = $form->addDynamic(
 			'reservations',
 			function (Container $reservation) use ($removeEvent) {
 				$reservation->addHidden('ID_rezervace');
 				$reservation->addSelect('ID_leku', 'Lieky', $this->medicineManager->getMedicinesToSelectBox())
+					->setPrompt('Zvoľte liek')
+					->setRequired(TRUE)
 					->setAttribute('class', 'form-control');
 				$reservation->addText('pocet_rezervovanych', 'Počet rezervovaných')
 					->setRequired(TRUE)
-					->addRule(Form::INTEGER, 'Počet kusov musí být číslo');
+					->addRule(Form::INTEGER, 'Počet kusov musí být číslo')
+					->addRule(Form::RANGE, 'Počet kusok musí byť kladné číslo', array(0, null))
+					->setDefaultValue('1');
 				$reservation->addSelect('ID_pobocky', 'Pobočky', $this->officeManager->getOfficesToSelectBox())
+					->setPrompt('Zvoľte pobočku')
+					->setRequired(TRUE)
 					->setAttribute('class', 'form-control');
 
 				$removeBtn = $reservation->addSubmit('remove', 'Odstrániť liek')
 					->setAttribute('class', 'btn-danger')
 					->setValidationScope(false);
 				$removeBtn->onClick[] = $removeEvent;
-			}, 0
+			}, 1
 		);
 
 		$form->addGroup('');

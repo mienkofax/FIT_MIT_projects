@@ -131,21 +131,24 @@ class InsurencePresenter extends BasePresenter
 			->setRequired(FALSE)
 			->addRule(Form::EMAIL, 'Nesprávny tvar adresy');
 
-		$form->addGroup('');
+		$form->addGroup('Hradené lieky');
 		$removeEvent = [$this, 'removeElementClicked'];
 		$medicines = $form->addDynamic(
 			'medicines',
 			function (Container $medicine) use ($removeEvent) {
 				$medicine->addHidden('ID_pojistovny');
-				$medicine->addSelect('ID_leku', 'Lieky', $this->medicineManager->getMedicinesToSelectBox())
+				$medicine->addSelect('ID_leku', 'Liek', $this->medicineManager->getMedicinesToSelectBox())
+					->setPrompt('Zvoľte liek')
+					->setRequired(TRUE)
 					->setAttribute('class', 'form-control');
 				$medicine->addText('cena', 'Cena lieku')
 					->setRequired(FALSE)
 					->addRule(Form::FLOAT, 'Cena musí byť číslo');
-				$medicine->addText('doplatek', 'Doplatok na liek')
+				$medicine->addText('doplatek', 'Doplatok za liek')
 					->setRequired(FALSE)
 					->addRule(Form::FLOAT, 'Doplatok musí byť číslo');
-				$medicine->addSelect('hradene', 'Typ lieku', array('hradene' => 'Hradený', 'nehradene' => 'Nehradený', 'doplatok' => 'Liek je s doplatkom'))
+				$medicine->addSelect('hradene', 'Typ lieku', array('hradene' => 'Hradený', 'nehradene' => 'Nehradený', 'doplatok' => 'Liek s doplatkom'))
+					->setPrompt('Zvoľte typ lieku')
 					->setRequired(TRUE)
 					->setAttribute('class', 'form-control');
 
@@ -153,7 +156,7 @@ class InsurencePresenter extends BasePresenter
 					->setAttribute('class', 'btn-danger')
 					->setValidationScope(false);
 				$removeBtn->onClick[] = $removeEvent;
-			}, 0
+			}, 1
 		);
 
 

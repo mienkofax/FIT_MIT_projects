@@ -127,7 +127,7 @@ class SupplierPresenter extends BasePresenter
 			->setRequired(FALSE)
 			->addRule(Form::EMAIL, 'Nesprávny tvar adresy');
 		$form->addGroup('');
-		$form->addMultiSelect('ID_pobocky', 'Pobočky', $this->officeManager->getOfficesToSelectBox())
+		$form->addMultiSelect('ID_pobocky', 'Zásobované pobočky', $this->officeManager->getOfficesToSelectBox())
 			->setAttribute('class', 'form-control');
 		$form->addSubmit('submit', "Uložiť dodávateľa")
 			->setAttribute('class', 'btn-primary');

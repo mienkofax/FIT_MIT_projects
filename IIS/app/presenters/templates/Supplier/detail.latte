@@ -2,7 +2,7 @@
 {define description}Detail dodávateľa {$supplier->nazev_dodavatele}.{/define}
 {block content}
 <ul class="detail nav nav-tabs">
-	<li><a data-toggle="tab" href="#sectionA">Zoznam dodávateľov</a></li>
+	<li><a data-toggle="tab" href="#sectionA">Detail dodávateľa</a></li>
 	<li><a data-toggle="tab" href="#sectionB">Zoznam zásobovaných pobočiek</a></li>
 </ul>
 
@@ -34,7 +34,7 @@
 					<a href="{link Office:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
 				<th class="text-center">
-					Dátum vytvorenia pobočky
+					Dátum vytvorenia
 					<a href="{link Office:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link Office:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>

@@ -156,28 +156,32 @@ class OfficePresenter extends BasePresenter
 			->addRule(Form::PATTERN, 'PSČ musí mať 5 číslic', '([0-9]\s*){5}');
 		$form->addText('telefonni_cislo', 'Telefónne číslo')
 			->setRequired(FALSE)
-			->addRule(Form::INTEGER, 'Telefónne číslo musí být číslo');
+			->setAttribute('placeholder', '+420 123 456 789')
+			->addRule(Form::PATTERN, 'Nesprávny tvar telefónneho čísla', '(\+?\(?((?:\d[\s\)]*){3})?(?:\d[\s\-]*){9})');
 		$form->addText('email', 'E-mail')
 			->setRequired(FALSE)
 			->addRule(Form::EMAIL, 'Nesprávny tvar adresy');
-		$form->addGroup('');
+		$form->addGroup('Dodávatelia');
 		$form->addMultiSelect('ID_dodavatele', 'Dodávatelia', $this->supplierManager->getSuppliersToSelectBox())
 			->setAttribute('class', 'form-control');
-		$form->addGroup('');
+		$form->addGroup('Zamestnanci');
 		$form->addMultiSelect('ID_uzivatele', 'Zamestnanci', $this->userManager->getUsersToSelectBox())
 			->setAttribute('class', 'form-control');
 
-		$form->addGroup('');
+		$form->addGroup('Lieky');
 		$removeEvent = [$this, 'removeElementClicked'];
 		$medicines = $form->addDynamic(
 			'medicines',
 			function (Container $medicine) use ($removeEvent) {
 				$medicine->addHidden('ID_pojistovny');
 				$medicine->addSelect('ID_leku', 'Lieky', $this->medicineManager->getMedicinesToSelectBox())
+					->setPrompt('Zvoľte liek')
 					->setAttribute('class', 'form-control');
 				$medicine->addText('pocet_na_sklade', 'Počet kusov na sklade')
+					->setDefaultValue('1')
 					->setRequired(FALSE)
-					->addRule(Form::FLOAT, 'Počet musí byť číslo');
+					->addRule(Form::FLOAT, 'Počet musí byť číslo')
+					->addRule(Form::RANGE, 'Počet kusov musí byť kladné číslo', array(0, null));
 
 				$removeBtn = $medicine->addSubmit('remove', 'Odstrániť liek')
 					->setAttribute('class', 'btn-danger')
@@ -191,7 +195,7 @@ class OfficePresenter extends BasePresenter
 			->setValidationScope(false)
 			->onClick[] = [$this, 'addElementClicked'];
 
-		$form->addGroup("");
+		$form->addGroup('');
 		$form->addSubmit('submit', 'Uložiť pobočku')
 			->setAttribute('class', 'btn-primary')
 			->onClick[] = [$this, 'submitElementClicked'];

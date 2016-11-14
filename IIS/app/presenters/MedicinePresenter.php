@@ -155,6 +155,7 @@ class MedicinePresenter extends BasePresenter
 			->addRule(Form::FILLED, 'Zadajte názov lieku');
 		$form->addSelect('typ_leku', 'Typ lieku', self::MEDICINE_TYPE)
 			->setPrompt('Zvoľte typ lieku')
+			->setRequired(TRUE)
 			->setAttribute('class', 'form-control');
 
 		$form->addGroup("Poisťovne");
@@ -164,6 +165,8 @@ class MedicinePresenter extends BasePresenter
 			function (Container $insurence) use ($removeEvent) {
 				$insurence->addHidden('ID_leku');
 				$insurence->addSelect('ID_pojistovny', 'Poisťovňa', $this->insurenceManager->getInsurenceToSelectBox())
+					->setRequired(TRUE)
+					->setPrompt('Zvoľte poisťovňu')
 					->setAttribute('class', 'form-control');
 				$insurence->addText('cena', 'Cena lieku')
 					->setRequired(FALSE)
@@ -171,14 +174,15 @@ class MedicinePresenter extends BasePresenter
 				$insurence->addText('doplatek', 'Doplatok na liek')
 					->setRequired(FALSE)
 					->addRule(Form::FLOAT, 'Doplatok musí byť číslo');
-				$insurence->addSelect('hradene', 'Typ lieku', array('hradene' => 'Hradený', 'nehradene' => 'Nehradený', 'doplatok' => 'Liek je s doplatkom'))
+				$insurence->addSelect('hradene', 'Typ lieku', array('hradene' => 'Hradený', 'nehradene' => 'Nehradený', 'doplatok' => 'Liek s doplatkom'))
+					->setPrompt('Zvoľte typ lieku')
 					->setRequired(TRUE)
 					->setAttribute('class', 'form-control');
-				$removeBtn = $insurence->addSubmit('remove', 'Odstrániť pobočku')
+				$removeBtn = $insurence->addSubmit('remove', 'Odstrániť poisťovňu')
 					->setAttribute('class', 'btn-danger')
 					->setValidationScope(false);
 				$removeBtn->onClick[] = $removeEvent;
-			}, 0
+			}, 1
 		);
 
 		$insurences->addSubmit('add', 'Pridať poisťovňu')
@@ -192,16 +196,20 @@ class MedicinePresenter extends BasePresenter
 			function (Container $office) use ($removeEvent) {
 				$office->addHidden('ID_leku');
 				$office->addSelect('ID_pobocky', 'Pobočka', $this->officeManager->getOfficesToSelectBox())
+					->setRequired(TRUE)
+					->setPrompt('Zvoľte pobočku')
 					->setAttribute('class', 'form-control');
 				$office->addText('pocet_na_sklade', 'Počet kusov')
-					->setRequired(FALSE)
-					->addRule(Form::INTEGER, 'Počet kusov musí byť číslo');
+					->setRequired(TRUE)
+					->setDefaultValue('1')
+					->addRule(Form::INTEGER, 'Počet kusov musí byť číslo')
+					->addRule(Form::RANGE, 'Počet kusov musí byť kladné číslo', array(0, null));
 
-				$removeBtn = $office->addSubmit('remove', 'Odstrániť poisťovňu')
+				$removeBtn = $office->addSubmit('remove', 'Odstrániť pobočku')
 					->setAttribute('class', 'btn-danger')
 					->setValidationScope(false);
 				$removeBtn->onClick[] = $removeEvent;
-			}, 0
+			}, 1
 		);
 
 		$offices->addSubmit('add', 'Pridať pobočku')
