@@ -58,9 +58,9 @@ CREATE TABLE leky
 (
 	ID_leku INTEGER NOT NULL AUTO_INCREMENT,
 	nazev_leku VARCHAR(128) NOT NULL,
-	cena FLOAT(6, 2) NOT NULL,
-	doplatek FLOAT(6, 2),
-	hradene enum('hradene', 'nehradene', 'doplatok') NOT NULL, -- 0 - hradene , 1 - nehradene
+	-- cena FLOAT(6, 2) NOT NULL,
+	-- doplatek FLOAT(6, 2),
+	-- hradene enum('hradene', 'nehradene', 'doplatok') NOT NULL, -- 0 - hradene , 1 - nehradene
 	typ_leku BOOLEAN NOT NULL, -- 0 - bez predpisu, 1 - na predpis
 	date_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -100,8 +100,9 @@ CREATE TABLE rezervace_leku
 (
 	ID_rezervace INTEGER NOT NULL AUTO_INCREMENT,
 	stav_rezervace ENUM('prijata', 'rozpracovana', 'pripravena', 'dokoncena') DEFAULT 'prijata',
-	ID_pobocky INTEGER NOT NULL,
-	ID_zakaznika INTEGER NOT NULL,
+	jmeno VARCHAR(128),
+	prijmeni VARCHAR(128),
+	-- ID_zakaznika INTEGER NOT NULL,
 	date_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 	CONSTRAINT PK_rezervace PRIMARY KEY (ID_rezervace)
@@ -128,7 +129,7 @@ CREATE TABLE pobocka_lek
 	ID_pobocky INTEGER NOT NULL,
 	ID_leku INTEGER NOT NULL,
 	pocet_na_sklade INTEGER NOT NULL,
-	pocet_prodanych INTEGER NOT NULL,
+	pocet_prodanych INTEGER NOT NULL DEFAULT 0,
 
 	CONSTRAINT PK_pobocka_lek PRIMARY KEY (ID_pobocky, ID_leku)
 );
@@ -137,14 +138,19 @@ CREATE TABLE lek_pojistovny
 (
 	ID_pojistovny INTEGER NOT NULL,
 	ID_leku INTEGER NOT NULL,
+	cena FLOAT(6, 2) NOT NULL DEFAULT 0,
+	doplatek FLOAT(6, 2),
+	hradene enum('hradene', 'nehradene', 'doplatok') NOT NULL, -- 0 - hradene , 1 - nehradene
 
-	CONSTRAINT PK_lek_pojistovny PRIMARY KEY (ID_pojistovny, ID_leku)
+	CONSTRAINT PK_lek_pojistovny PRIMARY KEY (ID_pojistovny, ID_leku, hradene)
 );
 
 CREATE TABLE rezervace_leku_lek
 (
 	ID_rezervace INTEGER NOT NULL,
 	ID_leku INTEGER NOT NULL,
+	pocet_rezervovanych INTEGER NOT NULL DEFAULT 0,
+	ID_pobocky INTEGER NOT NULL,
 
 	CONSTRAINT PK_rezervace_leku_lek PRIMARY KEY (ID_rezervace, ID_leku)
 );
@@ -172,6 +178,8 @@ ALTER TABLE rezervace_leku_lek ADD CONSTRAINT FK_rezervace_leku_lek1 FOREIGN KEY
 	REFERENCES rezervace_leku (ID_rezervace) ON DELETE CASCADE;
 ALTER TABLE rezervace_leku_lek ADD CONSTRAINT FK_rezervace_leku_lek2 FOREIGN KEY (ID_leku)
 	REFERENCES leky (ID_leku) ON DELETE CASCADE;
+ALTER TABLE rezervace_leku_lek ADD CONSTRAINT FK_pobocky2 FOREIGN KEY (ID_pobocky)
+	REFERENCES pobocky (ID_pobocky) ON DELETE CASCADE;
 
 -- leky - pojistovny
 ALTER TABLE lek_pojistovny ADD CONSTRAINT FK_lek_pojistovny1 FOREIGN KEY (ID_leku)
@@ -180,10 +188,10 @@ ALTER TABLE lek_pojistovny ADD CONSTRAINT FK_lek_pojistovny2 FOREIGN KEY (ID_poj
 	REFERENCES pojistovny (ID_pojistovny) ON DELETE CASCADE;
 
 -- rezervace_leku
-ALTER TABLE rezervace_leku ADD CONSTRAINT FK_pobocky FOREIGN KEY (ID_pobocky)
-	REFERENCES pobocky (ID_pobocky) ON DELETE CASCADE;
-ALTER TABLE rezervace_leku ADD CONSTRAINT FK_zakaznika FOREIGN KEY (ID_zakaznika)
-	REFERENCES zakaznici (ID_zakaznika) ON DELETE CASCADE;
+-- ALTER TABLE rezervace_leku ADD CONSTRAINT FK_pobocky FOREIGN KEY (ID_pobocky)
+--	REFERENCES pobocky (ID_pobocky) ON DELETE CASCADE;
+-- ALTER TABLE rezervace_leku ADD CONSTRAINT FK_zakaznika FOREIGN KEY (ID_zakaznika)
+--	REFERENCES zakaznici (ID_zakaznika) ON DELETE CASCADE;
 
 -- pobocky
 INSERT INTO pobocky
@@ -240,58 +248,40 @@ ALTER TABLE dodavatele AUTO_INCREMENT = 8;
 -- leky
 -- leky bez predpisu
 INSERT INTO leky
-VALUES(1, 'Ibalgin Rapid', 140, NULL, 'nehradene', 0, CURRENT_TIMESTAMP);
+VALUES(1, 'Ibalgin Rapid', 0, CURRENT_TIMESTAMP);
 INSERT INTO leky
-VALUES(2, 'ACC LONG', 165, NULL, 'nehradene', 0, CURRENT_TIMESTAMP+4);
+VALUES(2, 'ACC LONG', 0, CURRENT_TIMESTAMP+4);
 INSERT INTO leky
-VALUES(3, 'ASPIRIN', 165, NULL, 'nehradene', 0, CURRENT_TIMESTAMP+8);
+VALUES(3, 'ASPIRIN', 0, CURRENT_TIMESTAMP+8);
 
 -- leky na predpis
 INSERT INTO leky
-VALUES(4, 'Pamycon', 60, NULL, 'hradene', 1, CURRENT_TIMESTAMP+10);
+VALUES(4, 'Pamycon', 1, CURRENT_TIMESTAMP+10);
 INSERT INTO leky
-VALUES(5, 'Klacid', 266.20, NULL, 'hradene', 1, CURRENT_TIMESTAMP+11);
+VALUES(5, 'Klacid', 1, CURRENT_TIMESTAMP+11);
 INSERT INTO leky
-VALUES(6, 'Lipobase Repair', 166, 47.52, 'doplatok', 1, CURRENT_TIMESTAMP+12);
+VALUES(6, 'Lipobase Repair', 1, CURRENT_TIMESTAMP+12);
 INSERT INTO leky
-VALUES(7, 'Clarinase Repetabs', 140.50, 30.40, 'doplatok', 1, CURRENT_TIMESTAMP+13);
+VALUES(7, 'Clarinase Repetabs', 1, CURRENT_TIMESTAMP+13);
 ALTER TABLE leky AUTO_INCREMENT = 8;
 
--- zakaznici
-INSERT INTO zakaznici
-VALUES(1, '761222/1001', 'jmeno', 'prijmeni', CURRENT_TIMESTAMP);
-INSERT INTO zakaznici
-VALUES(2, '770919/6407', 'jmeno', 'prijmeni', CURRENT_TIMESTAMP+1);
-INSERT INTO zakaznici
-VALUES(3, '801101/4374', 'jmeno', 'prijmeni', CURRENT_TIMESTAMP+2);
-INSERT INTO zakaznici
-VALUES(4, '850218/6968', 'jmeno', 'prijmeni', CURRENT_TIMESTAMP+3);
-INSERT INTO zakaznici
-VALUES(5, '581223/1128', 'jmeno', 'prijmeni', CURRENT_TIMESTAMP+4);
-INSERT INTO zakaznici
-VALUES(6, '790123/8642', 'jmeno', 'prijmeni', CURRENT_TIMESTAMP+5);
-INSERT INTO zakaznici
-VALUES(7, '810209/7399', 'jmeno', 'prijmeni', CURRENT_TIMESTAMP+6);
-ALTER TABLE zakaznici AUTO_INCREMENT = 8;
-
--- rezervace_leku
--- predvedeni triggeru pro automaticke generovani hodnot primarniho klice
-INSERT INTO rezervace_leku(stav_rezervace, ID_pobocky, ID_zakaznika, date_time)
-VALUES('prijata', 2, 1, CURRENT_TIMESTAMP);
-INSERT INTO rezervace_leku(stav_rezervace, ID_pobocky, ID_zakaznika, date_time)
-VALUES('prijata', 2, 5, CURRENT_TIMESTAMP+1);
-INSERT INTO rezervace_leku(stav_rezervace, ID_pobocky, ID_zakaznika, date_time)
-VALUES('prijata',  3, 4, CURRENT_TIMESTAMP+2);
-INSERT INTO rezervace_leku(stav_rezervace, ID_pobocky, ID_zakaznika, date_time)
-VALUES('prijata', 5, 4, CURRENT_TIMESTAMP+3);
-INSERT INTO rezervace_leku(ID_pobocky, ID_zakaznika, date_time)
-VALUES(6, 2, CURRENT_TIMESTAMP+4);
-INSERT INTO rezervace_leku(ID_pobocky, ID_zakaznika, date_time)
-VALUES(6, 6, CURRENT_TIMESTAMP+5);
-INSERT INTO rezervace_leku(ID_pobocky, ID_zakaznika, date_time)
-VALUES(4, 6, CURRENT_TIMESTAMP+6);
-INSERT INTO rezervace_leku(ID_pobocky, ID_zakaznika, date_time)
-VALUES(4, 6, CURRENT_TIMESTAMP+7);
+INSERT INTO rezervace_leku
+VALUES(1, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP);
+INSERT INTO rezervace_leku
+VALUES(2, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP+1);
+INSERT INTO rezervace_leku
+VALUES(3, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP+2);
+INSERT INTO rezervace_leku
+VALUES(4, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP+3);
+INSERT INTO rezervace_leku
+VALUES(5, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP+4);
+INSERT INTO rezervace_leku
+VALUES(6, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP+5);
+INSERT INTO rezervace_leku
+VALUES(7, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP+6);
+INSERT INTO rezervace_leku
+VALUES(8, 'prijata', "meno", "priezvisko",  CURRENT_TIMESTAMP+7);
+ALTER TABLE rezervace_leku AUTO_INCREMENT = 9;
 
 -- pojistovny
 INSERT INTO pojistovny
@@ -336,13 +326,13 @@ VALUES('7', '6', 10, 1);
 
 -- rezervace_leku_lek
 INSERT INTO rezervace_leku_lek
-VALUES('6', '3');
+VALUES('6', '3', 0, 1);
 INSERT INTO rezervace_leku_lek
-VALUES('1', '4');
+VALUES('1', '4', 0, 1);
 INSERT INTO rezervace_leku_lek
-VALUES('6', '5');
+VALUES('6', '5', 0, 2);
 INSERT INTO rezervace_leku_lek
-VALUES('6', '7');
+VALUES('6', '7', 0, 2);
 
 -- pobocka_zamestnanec
 INSERT INTO pobocka_zamestnanec
@@ -356,12 +346,12 @@ VALUES('3', '5');
 
 -- lek_pojistovny
 INSERT INTO lek_pojistovny
-VALUES('2', '4');
+VALUES('2', '4', 140, NULL, 'nehradene');
 INSERT INTO lek_pojistovny
-VALUES('1', '5');
+VALUES('1', '5', 165, NULL, 'nehradene');
 INSERT INTO lek_pojistovny
-VALUES('6', '7');
+VALUES('6', '7', 165, NULL, 'doplatok');
 INSERT INTO lek_pojistovny
-VALUES('3', '6');
+VALUES('3', '6', 165, NULL, 'hradene');
 INSERT INTO lek_pojistovny
-VALUES('2', '6');
+VALUES('2', '6', 165, NULL, 'nehradene');
