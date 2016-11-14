@@ -42,13 +42,20 @@ void Statistics::showTop10()
 	sort(m_data.begin(), m_data.end(), compare);
 	for (vector<mytuple>::iterator it = m_data.begin();
 		it != m_data.end() && a < TOP10_RECORDS; it++, a++)
-		cout << get<0>(*it) << " " << get<1>(*it) << " "<< get<2>(*it) << endl;
+		cout << dec <<get<0>(*it) << " " << get<1>(*it) << " "<< get<2>(*it) << endl;
 }
 
 void Statistics::showFilterStatistics()
 {
-	sort(m_data.begin(), m_data.end(), compare);
+	//sort(m_data.begin(), m_data.end(), compare);
+	double value1 = 0;
+	double value2 = 0;
+
 	for (vector<mytuple>::iterator it = m_data.begin();
-		it != m_data.end(); it++)
-		cout << get<1>(*it) << " "<< get<2>(*it) << endl;
+		it != m_data.end(); it++) {
+		value1 += get<1>(*it);
+		value2 += get<2>(*it);
+	}
+
+	cout << value1 << " " << value2 << endl;
 }

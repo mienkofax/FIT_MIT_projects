@@ -35,12 +35,15 @@ shared_ptr<LayerMessage> LinkLayerMessage::create(Input &input, const Layer&)
 	int frameType = 0;
 	bool trailer = false;
 
+	message->address.clear();
+
 	// Preskocenie pcap hlavicky
 	reader.skip(PCAP_HEADER_TIMESTAMP + PCAP_HEADER_MICROSECONDS
 		+ PCAP_HEADER_FRAME_LENGTH);
 
 	// Nacitanie velkosti daneho packetu
 	readSize = reader.readIntBigEndian(PCAP_HEADER_CAPTURE_LENGTH);
+	address.value1 = readSize;
 
 	readSize -= 2 * ETHERNET_ADDRESS;
 	address.destinationAddress.push_back(

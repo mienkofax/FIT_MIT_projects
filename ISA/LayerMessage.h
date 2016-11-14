@@ -53,6 +53,7 @@ struct LayerData {
 	std::vector<std::string> sourceAddress;
 	std::vector<std::string> destinationAddress;
 	size_t dataSize;
+	size_t value1;
 };
 
 /*

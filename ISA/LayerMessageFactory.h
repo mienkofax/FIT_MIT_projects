@@ -53,11 +53,11 @@ protected:
 	 * @param message sprava s naplnenymi udajmi o adresach a velkostiach data
 	 * na jednotlivych vrstvach
 	 */
-	 std::shared_ptr<LayerMessage> getLayerMessage()
- 	{
- 		if (!m_message)
- 			m_message.reset(new LayerMessage());
+	std::shared_ptr<LayerMessage> getLayerMessage()
+	{
+		if (!m_message)
+			m_message.reset(new LayerMessage());
 
- 		return m_message;
- 	}
+		return m_message;
+	}
 };

@@ -26,7 +26,7 @@ shared_ptr<LayerMessage> TransportLayerMessage::create(Input &input, const Layer
 	int readSize = 0;
 
 	if (message->nextProtocol != 0x06 && message->nextProtocol != 0x11)
-		throw runtime_error("Unsupported transport protocol " + to_string(message->nextProtocol));
+		throw runtime_error("Unsupported transport protocol " + to_string(message->nextProtocol) + "\n");
 
 	address.sourceAddress.push_back(to_string(reader.readIntLittleEndian(PORT)));
 	address.destinationAddress.push_back(to_string(reader.readIntLittleEndian(PORT)));
@@ -56,5 +56,6 @@ shared_ptr<LayerMessage> TransportLayerMessage::create(Input &input, const Layer
 		address.dataSize = message->data.size();
 		message->address[UDP] = address;
 	}
+
 	return message;
 }

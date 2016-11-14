@@ -87,15 +87,16 @@ int main(int argc, char * argv[])
 
 	optionMessage.show();
 
+	int value1 = 0;
+
 	string keyS, keyD;
 	while(file.tellg() < end) {
 		try {
 			layerMessage = factory.create(input, layer);
-			file.close();
 		}
 		catch (exception &ex) {
 			cerr << ex.what();
-			break;
+			continue;
 		}
 		layerMessage->show();
 
@@ -129,28 +130,27 @@ int main(int argc, char * argv[])
 					|| search2 == layerMessage->address.end())
 					continue;
 
-				if (item == "mac") {
-					keyS = search2->second.sourceAddress[0];
-					keyD = search2->second.destinationAddress[0];
-				}
+				// Vytvorenie klucov pre ulozenie
+				auto searchKey = layerMessage->address.find(
+					layerMessage->extractProtocol("mac"));
 
-				if (optionMessage.destination) {
+				value1 = searchKey->second.value1;
+
+				if (optionMessage.source) {
 					for (const auto &add : search->second.sourceAddress) {
 						if (add == search2->second.sourceAddress[0])
-							statistics.insert(add, 0, 0);
+							statistics.insert(add, value1, search2->second.dataSize);
 					}
 				}
 
-				if (optionMessage.source) {
+				if (optionMessage.destination) {
 					for (const auto &add : search->second.destinationAddress) {
 						if (add == search2->second.destinationAddress[0])
-							statistics.insert(add, 0, 0);
+							statistics.insert(add, value1, search2->second.dataSize);
 					}
 				}
 			}
 		} //koniec prechodu medzi filtrami
-
-		break;
 	}
 
 	cout << "--------Statistika----------\n";

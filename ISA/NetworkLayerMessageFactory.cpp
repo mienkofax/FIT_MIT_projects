@@ -46,7 +46,7 @@ shared_ptr<LayerMessage> NetworkLayerMessage::create(Input &input, const Layer&)
 
 	if (message->nextProtocol != 0x0800 && message->nextProtocol != 0x86dd)
 		throw runtime_error("Unsupported network protocol "
-		+ to_string(message->nextProtocol));
+		+ to_string(message->nextProtocol) + "\n");
 
 	tmpData = reader.readIntLittleEndian(N_IP4_VERSION_AND_IHL);
 	ipVersion = (tmpData & N_IP4_VERSION_MASK) >> 4;

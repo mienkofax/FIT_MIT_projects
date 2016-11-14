@@ -31,7 +31,7 @@ void LayerMessage::showItem(const std::string &itemName,
 void LayerMessage::showItem(const std::string &itemName, const int &number)
 {
 	cout << itemName << ": ";
-		cout << setfill('0') << setw(2) << hex << number << " ";
+		cout <<  hex << setfill('0') << setw(2) << hex << number << " ";
 	cout << endl;
 }
 
@@ -40,7 +40,8 @@ void LayerMessage::show() {
 	for (const auto &item : address) {
 		showItem("source address", item.second.sourceAddress);
 		showItem("destiation address", item.second.destinationAddress);
-		showItem("size", item.second.dataSize);
+//		showItem("size", item.second.dataSize);
+		cout << "size: " << dec <<item.second.dataSize << endl;
 	}
 
 	showItem("next protocol", nextProtocol);

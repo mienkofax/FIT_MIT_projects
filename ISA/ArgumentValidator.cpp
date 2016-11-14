@@ -95,7 +95,7 @@ std::string Normalization::getIPv6(const std::string &ip)
 std::string Normalization::getMac(std::string mac)
 {
 	for (auto & c: mac)
-		c = toupper(c);
+		c = tolower(c);
 
 	return mac;
 }
