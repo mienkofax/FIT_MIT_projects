@@ -1,25 +1,11 @@
 {define title}Editor{/define}
-{define description}Editor pobočiek.{/define}
+{define description}Editor dodávateľov.{/define}
 {block content}
-<ul class="list nav nav-tabs">
-	{if $isEditForm}
-	<li><a data-toggle="tab" href="#sectionA">Editácia pobočky</a></li>
-	{else}
-	<li><a data-toggle="tab" href="#sectionA">Vytvorenie novej pobočky</a></li>
-	{/if}
-</ul>
 
-<div class="tab-content content">
-	<div id="sectionA" class="tab-pane fade in active">
-		{if $isEditForm}
-		<h2>Editácia pobočky</h2>
-		{else}
-		<h2>Vytvorenie novej pobočky</h2>
-		{/if}
-		{control editForm}
-		{/block}
-	</div>
-</div>
+
+{* Formulár pre editáciu. *}
+{control testForm}
+{/block}
 
 {block scripts}
 {include parent}

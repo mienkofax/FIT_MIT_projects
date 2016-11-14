@@ -1,14 +1,25 @@
 {define title}Editor{/define}
 {define description}Editor liekov.{/define}
 {block content}
-{if $isEditForm}
-<h2>Editácia lieku</h2>
-{else}
-<h2>Vytvorenie nového lieku</h2>
-{/if}
-{control editForm}
-{/block}
+<ul class="list nav nav-tabs">
+	{if $isEditForm}
+	<li><a data-toggle="tab" href="#sectionA">Editácia lieku</a></li>
+	{else}
+	<li><a data-toggle="tab" href="#sectionA">Vytvorenie nového lieku</a></li>
+	{/if}
+</ul>
 
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		{if $isEditForm}
+		<h2>Editácia lieku</h2>
+		{else}
+		<h2>Vytvorenie nového lieku</h2>
+		{/if}
+		{control editForm}
+		{/block}
+	</div>
+</div>
 {block scripts}
 {include parent}
 <script type="text/javascript" src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>

@@ -1,13 +1,25 @@
 {define title}Editor{/define}
 {define description}Editor užívateľov.{/define}
 {block content}
-{if $isEditForm}
-<h2>Editácia užívateľa</h2>
-{else}
-<h2>Vytvorenie nového užívateľa</h2>
-{/if}
-{* Formulár pre editáciu. *}
-{control editForm}
+<ul class="list nav nav-tabs">
+	{if $isEditForm}
+	<li><a data-toggle="tab" href="#sectionA">Editácia užívateľa</a></li>
+	{else}
+	<li><a data-toggle="tab" href="#sectionA">Vytvorenie nového užívateľa</a></li>
+	{/if}
+</ul>
+
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		{if $isEditForm}
+		<h2>Editácia užívateľa</h2>
+		{else}
+		<h2>Vytvorenie nového užívateľa</h2>
+		{/if}
+		{* Formulár pre editáciu. *}
+		{control editForm}
+	</div>
+</div>
 {/block}
 
 {block scripts}

@@ -15,6 +15,7 @@ services:
 	- App\Model\SupplierManager
 	- App\Model\UserManager
 	- App\Model\MedicineManager
+	- App\Model\ReservationManager
 	- App\Forms\UserForms
 	router: App\RouterFactory::createRouter
 	autenticator: App\Model\AuthenticatorManager

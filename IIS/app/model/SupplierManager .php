@@ -3,15 +3,16 @@
 namespace App\Model;
 
 use App\Model\BaseManager;
-use App\Model\OfficeManager;
 use Nette\Database\Table\IRow;
 use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
+use Nette\Database\DriverException;
 
 /**
  * Model pre pracu s jednotlivymi datavatelmi. Umoznuje, editovanie a
  * vypis dadavatelov. Vypis dodavatelov moze byt ako detail jedneho dodavatela
- * alebo zoznam dodavatelov.
+ * alebo zoznam dodavatelov. Pri ukladani dodavatelov sa ukladaju aj udaje o
+ * pobockach na, ktore sa dodava.
  */
 class SupplierManager extends BaseManager
 {
@@ -22,13 +23,6 @@ class SupplierManager extends BaseManager
 			'nazov' => 'nazev_dodavatele',
 			'cas' => 'date_time'
 		);
-
-	protected $officeManager;
-
-	public function injectMedicineManager(OfficeManager $officeManager)
-	{
-		$this->officeManager = $officeManager;
-	}
 
 	/**
 	 * Vyber vsetkych dodavatelov z databaze a ich pripadne zotriedenie.
@@ -66,51 +60,47 @@ class SupplierManager extends BaseManager
 
 	/**
 	 * Ulozi dodavatela do databaze. V pripade, ze nie je nastavene ID vlozi sa novy
-	 * zaznam o dodavatelovi, inak sa edituje existujuci dodavatel.
+	 * zaznam o dodavatelovi, inak sa edituje existujuci dodavatel. Pri pridavani
+	 * sa kontroluje ci boli oznacene aj pobocky a tym padom sa vlozi/upravi
+	 * aj tabulka, ktora obsahuje spojenie medzi dodavatelom a pobockou.
+	 * Operacie v ramci vkladania su spracovane ako tranzakcie.
 	 * @param mixed $office Dodavatelo, ktory sa ma upravit alebo vlozit
+	 * @throws DriverException Problem pri praci s db
 	 */
-	public function saveSupplier($office)
+	public function saveSupplier($supplier)
 	{
-		$fKey = $office['ID_pobocky'];
-		unset($office['ID_pobocky']);
+		$fKey = $supplier['ID_pobocky'];
+		unset($supplier['ID_pobocky']);
 
-		if (!$office[self::COLUMND_ID]) {
-			unset($office[self::COLUMND_ID]);
+		$this->database->beginTransaction();
+		try {
+			if (!$supplier[self::COLUMND_ID]) {
+				unset($supplier[self::COLUMND_ID]);
 
-			$this->database->beginTransaction();
-			try {
 				$result = array();
-
-				$primaryKey = $this->database->table(self::TABLE_NAME)->insert($office);
-				foreach ($fKey as $tmp)
-					$result[] = array("ID_dodavatele" => $primaryKey, "ID_pobocky" => $tmp);
-
-				$this->database->table('dodavatel_pobocka')->insert($result);
+				$primaryKey = $this->database->table(self::TABLE_NAME)->insert($supplier);
+				$this->insertFKKey($primaryKey, $supplier, $fKey,
+					"ID_pobocky", self::COLUMND_ID, "dodavatel_pobocka");
 			}
-			catch (Nette\Database\DriverException $ex) {
-				$this->database->rollback();
-				throw $ex;
-			}
-			$this->database->commit();
+			else {
+				$this->database->table(self::TABLE_NAME)->where(self::COLUMND_ID,
+					$supplier[self::COLUMND_ID])->update($supplier);
 
-		}
-		else {
-			$this->database->table(self::TABLE_NAME)->where(self::COLUMND_ID,
-				$office[self::COLUMND_ID])->update($office);
+				// Odstranenie vsetkych starych spojeni v db tabulke a pridanie novych
+				$data = $this->database->table('dodavatel_pobocka')
+					->where(self::COLUMND_ID, $supplier[self::COLUMND_ID]);
+				$fKey = $this->removeFKKey($data, "ID_pobocky", $fKey);
 
-			$data = $this->database->table('dodavatel_pobocka')->where('ID_dodavatele',$office['ID_dodavatele']);
-
-			foreach ($data as $key => $pobocka) {
-				if (!in_array($pobocka->ID_pobocky, $fKey)){
-					$pobocka->delete();
-				}
-				unset($fKey[array_search($pobocka->ID_pobocky, $fKey)]);
-			}
-
-			foreach ($fKey as $item) {
-				$this->database->table('dodavatel_pobocka')->insert(array('ID_pobocky' => $item, 'ID_dodavatele' => $office['ID_dodavatele']));
+				foreach ($fKey as $item)
+					$this->database->table('dodavatel_pobocka')->insert(array('ID_pobocky' => $item, self::COLUMND_ID  => $supplier['ID_dodavatele']));
 			}
 		}
+		catch (DriverException $ex) {
+			$this->database->rollback();
+			throw $ex;
+		}
+
+		$this->database->commit();
 	}
 
 	/**
@@ -123,6 +113,14 @@ class SupplierManager extends BaseManager
 			->where(self::COLUMND_ID, $id)->delete();
 	}
 
+	/**
+	 * Zoznam pobociek, ktore su priradene k dodavatelovi. Poskytne
+	 * vsetky informacie o danej pobocke potrebne pri zobrazovani zosobovanych
+	 * pobociek, aby bolo mozne vypisat vsetky potrebne informacie o nich.
+	 * Pouziva sa pri detaile dodavatela.
+	 * @param int $id Identifikator dodavatela
+	 * @return mixed pole identifikatorov pobociek
+	 */
 	public function relatedOffices($id)
 	{
 		$dat = $this->database->table(self::TABLE_NAME)->get($id);
@@ -130,9 +128,18 @@ class SupplierManager extends BaseManager
 		$pole = array();
 		foreach ($dat->related('dodavatel_pobocka.ID_dodavatele') as $med)
 			$pole[] = $med->ID_pobocky;
+
 		return $this->database->table('pobocky')->where('ID_pobocky', $pole);
 	}
 
+	/**
+	 * Zoznam identifikator pobociek, ktore su aktualne zasobovane dodavatelom.
+	 * Potrebne pre vypis pri editacii dodavatela. Vracia pole pobociek
+	 * na zaklade, ktoreho sa oznacia v select potrebne pobocky, ktore su ulozene
+	 * v databaze k danemu dodavatelovi.
+	 * @param int $id Identifikator dodavatela
+	 * @return mixed Pole identifikatorov pobociek prisluchajucich dodavatelovi
+	 */
 	public function getOfficesID($id)
 	{
 		$result = [];
@@ -142,5 +149,31 @@ class SupplierManager extends BaseManager
 		foreach ($data as $id)
 			$result[] = $id->ID_pobocky;
 		return $result;
+	}
+
+	/**
+	 * Zoznam vsetkych dodavatelov.
+	 * @return mixed Zoznam vsetkych dodavatelov.
+	 */
+	public function getSuppliersToSelectBox() {
+		$data = $this->database->table('dodavatele')->fetchAll();
+		$result = [];
+
+		foreach ($data as $key => $value)
+			$result[$value->ID_dodavatele] = $value->nazev_dodavatele;
+
+		return $result;
+	}
+
+	/**
+	 * Odstranie dodavania na urcitu pobocku.
+	 * @param int $idSupplier Identifikator dodavatela
+	 * @param int $idOffice Identifikator pobocky
+	 */
+	public function removeOfficeFromSupplier($idSupplier, $idOffice)
+	{
+		$this->database->table('dodavatel_pobocka')
+			->where('ID_dodavatele', $idSupplier)
+			->where('ID_pobocky', $idOffice)->delete();
 	}
 }

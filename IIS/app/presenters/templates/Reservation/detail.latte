@@ -1,0 +1,61 @@
+{define title}Detail dodávateľa {$reservation->jmeno} {$reservation->prijmeni}{/define}
+{define description}Detail dodávateľa {$reservation->jmeno} {$reservation->prijmeni}.{/define}
+{block content}
+<ul class="detail nav nav-tabs">
+	<li><a data-toggle="tab" href="#sectionA">Detail rezervácie</a></li>
+	<li><a data-toggle="tab" href="#sectionB">Zoznam zezervovaných liekov</a></li>
+</ul>
+
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		<h2>Detail rezervácie</h2>
+
+		<h4>Základné informácie</h4>
+			<p>
+				<strong>Meno:</strong> {$reservation->jmeno}<br>
+				<strong>Priezvisko:</strong> {$reservation->prijmeni}<br>
+				<strong>Stav rezervácie:</strong> {$reservationState[$reservation->stav_rezervace]}
+			</p>
+	</div>
+	<div id="sectionB" class="tab-pane fade in active">
+		<h2>Zoznam rezervovaných liekov</h2>
+
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Názov lieku
+					<a href="{link Medicine:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia
+					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s liekom</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$medicines as $medicine">
+				<td>
+					<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+				</td>
+				<td class="text-center">
+					{$medicine->date_time}
+				</td>
+				<td>
+					<a n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+					</a>
+				</td>
+
+				<td>
+					<a n:href="Medicine:remove $medicine->ID_leku">
+					<a href="{link Reservation:remove}/{$medicine->ID_leku}/rezervovany-liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					</a>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>

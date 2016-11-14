@@ -1,15 +1,24 @@
 {define title}Editor{/define}
 {define description}Editor poisťovne.{/define}
 {block content}
-{if $isEditForm}
-<h2>Editácia poisťovne</h2>
-{else}
-<h2>Vytvorenie novej poisťovne</h2>
-{/if}
-{* Formulár pre editáciu. 
-{control editForm}
-{/block}
+<ul class="list nav nav-tabs">
+	{if $isEditForm}
+	<li><a data-toggle="tab" href="#sectionA">Editácia poisťovne</a></li>
+	{else}
+	<li><a data-toggle="tab" href="#sectionA">Vytvorenie novej poisťovne</a></li>
+	{/if}
+</ul>
 
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		{if $isEditForm}
+		<h2>Editácia poisťovne</h2>
+		{else}
+		<h2>Vytvorenie novej poisťovne</h2>
+		{/if}
+		{control editForm}
+	</div>
+</div>
 {block scripts}
 {include parent}
 <script type="text/javascript" src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>

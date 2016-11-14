@@ -9,6 +9,7 @@ use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Database\UniqueConstraintViolationException;
 use Nette\Utils\Arrayhash;
+use Nette\Forms\Container;
 
 /*
  * Spracovanie vykreslenia formularov.
@@ -18,17 +19,18 @@ class SupplierPresenter extends BasePresenter
 	/** @var SupplerManager Informacie o dodavatelovi a praca s nou */
 	protected $supplierManager;
 
+	/** @var OfficeManager Informacie o pobocke a praca s nou */
 	protected $officeManager;
-
-	public function injectOfficeManager(OfficeManager $officeManager)
-	{
-		$this->officeManager =$officeManager;
-	}
 
 	public function __construct(SupplierManager $supplierManager)
 	{
 		parent::__construct();
 		$this->supplierManager = $supplierManager;
+	}
+
+	public function injectOfficeManager(OfficeManager $officeManager)
+	{
+		$this->officeManager =$officeManager;
 	}
 
 	/**
@@ -62,11 +64,18 @@ class SupplierPresenter extends BasePresenter
 	 * Odstranenie dodavatela z databaze a presmerovanie na zoznam dodavatelov.
 	 * @param ID dodavatela, ktora sa ma odstranit
 	 */
-	public function actionRemove($id)
+	public function actionRemove($idd, $table, $id)
 	{
-		$this->supplierManager->removeSupplier($id);
-		$this->flashMessage('Dodávateľ bol odstránený.');
-		$this->redirect('Supplier:list');
+		if ($table == 'dodavatel') {
+			$this->supplierManager->removeSupplier($id);
+			$this->flashMessage('Dodávateľ bol odstránený.');
+			$this->redirect('Supplier:list');
+		}
+		else if ($table == 'pobocka') {
+			$this->supplierManager->removeOfficeFromSupplier($idd, $id);
+			$this->flashMessage('Dodávanie na danú pobočku bolo odstránené.');
+			$this->redirect('Supplier:detail', $idd);
+		}
 	}
 
 	/**
@@ -99,9 +108,10 @@ class SupplierPresenter extends BasePresenter
 	public function createComponentEditForm()
 	{
 		$form = new Form;
+		$form->addGroup('');
 		$form->addHidden('ID_dodavatele');
-		$form->addText('nazev_dodavatele', 'Názov poisťovne')
-			->addRule(Form::FILLED, 'Zadajte názov poisťovne');
+		$form->addText('nazev_dodavatele', 'Názov dodávateľa')
+			->addRule(Form::FILLED, 'Zadajte názov dodávateľa');
 		$form->addText('ulice', 'Ulica')
 			->setRequired(FALSE);
 		$form->addText('mesto', 'Mesto')
@@ -111,14 +121,16 @@ class SupplierPresenter extends BasePresenter
 			->addRule(Form::PATTERN, 'PSČ musí mať 5 číslic', '([0-9]\s*){5}');
 		$form->addText('telefonni_cislo', 'Telefónne číslo')
 			->setRequired(FALSE)
-			->addRule(Form::INTEGER, 'Telefónne číslo musí být číslo');
+			->setAttribute('placeholder', '+420 123 456 789')
+			->addRule(Form::PATTERN, 'Nesprávny tvar telefónneho čísla', '(\+?\(?((?:\d[\s\)]*){3})?(?:\d[\s\-]*){9})');
 		$form->addText('email', 'E-mail')
 			->setRequired(FALSE)
 			->addRule(Form::EMAIL, 'Nesprávny tvar adresy');
-		$form->addGroup("sadf");
-		$form->addMultiSelect('ID_pobocky', 'Pobocka', $this->officeManager->getOfficesToSelectBox())
+		$form->addGroup('');
+		$form->addMultiSelect('ID_pobocky', 'Pobočky', $this->officeManager->getOfficesToSelectBox())
 			->setAttribute('class', 'form-control');
-		$form->addSubmit('submit', "Uložiť dodávateľa");
+		$form->addSubmit('submit', "Uložiť dodávateľa")
+			->setAttribute('class', 'btn-primary');
 		$form->onSuccess[] = [$this, 'editFormSuccessed'];
 
 		return $this->bootstrapFormRender($form);

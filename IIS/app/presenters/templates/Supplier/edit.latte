@@ -1,30 +1,40 @@
 {define title}Editor{/define}
 {define description}Editor dodávateľov.{/define}
 {block content}
-{if $isEditForm}
-<h2>Editácia dodávateľov</h2>
-{else}
-<h2>Vytvorenie nového dodávateľa</h2>
-{/if}
-{* Formulár pre editáciu. *}
-{control editForm}
-{/block}
+<ul class="list nav nav-tabs">
+	{if $isEditForm}
+	<li><a data-toggle="tab" href="#sectionA">Editácia dodávateľa</a></li>
+	{else}
+	<li><a data-toggle="tab" href="#sectionA">Vytvorenie nového dodávateľa</a></li>
+	{/if}
+</ul>
 
-{block scripts}
-{include parent}
-<script type="text/javascript" src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
-<script type="text/javascript">
-	tinymce.init({
-		selector: "textarea[name=content]",
-		plugins: [
-			"advlist autolink lists link image charmap print preview anchor",
-			"searchreplace visualblocks code fullscreen",
-			"insertdatetime media table contextmenu paste"
-		],
-		toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
-		entities: "160,nbsp",
-		entity_encoding: "named",
-		entity_encoding: "raw"
-});
-</script>
-{/block}
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		{if $isEditForm}
+		<h2>Editácia dodávateľa</h2>
+		{else}
+		<h2>Vytvorenie nového dodávateľa</h2>
+		{/if}
+		{control editForm}
+	</div>
+</div>
+	{/block}
+	{block scripts}
+	{include parent}
+	<script type="text/javascript" src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+	<script type="text/javascript">
+		tinymce.init({
+			selector: "textarea[name=content]",
+			plugins: [
+				"advlist autolink lists link image charmap print preview anchor",
+				"searchreplace visualblocks code fullscreen",
+				"insertdatetime media table contextmenu paste"
+			],
+			toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+			entities: "160,nbsp",
+			entity_encoding: "named",
+			entity_encoding: "raw"
+	});
+	</script>
+	{/block}

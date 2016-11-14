@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<meta http-equiv="refresh" content="30">
+	<meta http-equiv="refresh" content="60">
 	<title>{ifset title}{include title|stripHtml} | {/ifset}IIS projekt</title>
 
 	<link href="{$basePath}/css/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -49,11 +49,13 @@
 	<div class="container space-top">
 		<div class="col-md-3">
 			<ul class="menu menu-bg">
-				<li><a href="#">Rezervácia liekov</a></li>
 				<li><a n:href="Supplier:list">Správa dodávateľov <span class="badge">{$count['dodavatelia']}</span></a></li>
-				<li><a n:href="Medicine:list">Správa liekov <span class="badge">{$count['lieky']}</span></a></li>
-				<li><a n:href="Office:list">Správa pobočiek <span class="badge">{$count['pobocky']}</span></a></li>
 				<li><a n:href="Insurence:list">Správa poisťovní <span class="badge">{$count['pojistovny']}</span></a></li>
+				<li><a n:href="Reservation:list">Rezervácia liekov <span class="badge">{$count['rezervacie']}</span></a></li>
+				<li><a n:href="Medicine:list">Správa liekov <span class="badge">{$count['lieky']}</span></a></li>
+				<li>&nbsp;</li>
+				<li>&nbsp;</li>
+				<li><a n:href="Office:list">Správa pobočiek <span class="badge">{$count['pobocky']}</span></a></li>
 				<li><a n:href="User:list">Správa užívateľov <span class="badge">{$count['uzivatelia']}</span></a></li>
 			</ul>
 		</div>
@@ -88,17 +90,31 @@
 			localStorage.setItem(splitdata, data);
 	});
 
+ 	if ($('.detail.nav-tabs').length) {
+		console.log("data");
 	data = localStorage.getItem(splitdata);
 	if (!data)
 		data = "#sectionA";
 
-	$('a[href="'+data+'"]').tab('show');
-
+	$('a[href="'+data+'"]').tab('show');}
+	else
+		$('a[href="#sectionA"]').tab('show');
 
 
 // Check browser support
 
 
+</script>
+<script>
+$(document).ready(function(){
+	/*$('fieldset:nth-child(2)').addClass("liek_pocet");
+	$('.liek_pocet select').attr('name', 'ID_leku[]');
+	$('.liek_pocet input').attr('name', 'pocet_rezervovanych[]');
+	$('.clone_item').click(function() {
+		//console.log("asdf");
+		$(".liek_pocet").clone().insertAfter(".liek_pocet").removeClass("liek_pocet");
+	});*/
+});
 </script>
 	{/block}
 </body>

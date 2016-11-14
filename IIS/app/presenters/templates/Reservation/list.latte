@@ -1,0 +1,59 @@
+{define title}Výpis rezervácií liekov{/define}
+{define description}Výpis všetkých rezervácií.{/define}
+{block content}
+<ul class="list nav nav-tabs">
+	<li><a data-toggle="tab" href="#sectionA">Zoznam rezervácií</a></li>
+</ul>
+
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		<h2>Zoznam rezervácií</h2>
+
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Meno a priezvisko
+					<a href="{link Reservation:list}/meno/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Reservation:list}/meno/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th>
+					Stav
+					<a href="{link Reservation:list}/stav/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Reservation:list}/stav/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia
+					<a href="{link Reservation:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Reservation:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s rezerváciou</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$reservations as $reservation">
+				<td>
+					<a n:href="Reservation:detail $reservation->ID_rezervace">{$reservation->prijmeni} {$reservation->jmeno}</a>
+				</td>
+				<td>
+					<a n:href="Reservation:detail $reservation->ID_rezervace">{$reservation->stav_rezervace}</a>
+				</td>
+				<td class="text-center">
+					{$reservation->date_time}
+				</td>
+				<td>
+					<a n:href=":Reservation:edit $reservation->ID_rezervace">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+					</a>
+				</td>
+
+				<td>
+					<a href="{link Reservation:remove}/{$reservation->ID_rezervace}/rezervacia/{$reservation->ID_rezervace}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					</a>
+				</td>
+			</tr>
+		</table>
+
+		<a class="btn btn-primary btn-add" n:href="Reservation:edit">Pridať rezerváciu</a>
+	</div>
+</div>

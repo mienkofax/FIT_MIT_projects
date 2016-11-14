@@ -11,6 +11,11 @@ use App\Model\BaseManager;
  */
 class MenuManager extends BaseManager
 {
+
+	/**
+	 * Pocet jednotlivych zaznamov v databaze k tabulkam.
+	 * @return Array Pole obsahujuce pocet zaznamov k danej tabulke
+	 */
 	public function getTableRecord()
 	{
 		$count['pobocky'] = $this->database->table('pobocky')->count('*');
@@ -18,6 +23,7 @@ class MenuManager extends BaseManager
 		$count['dodavatelia'] = $this->database->table('dodavatele')->count('*');
 		$count['uzivatelia'] = $this->database->table('uzivatele')->count('*');
 		$count['lieky'] = $this->database->table('leky')->count('*');
+		$count['rezervacie'] = $this->database->table('rezervace_leku')->count('*');
 		return $count;
 	}
 }

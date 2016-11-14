@@ -9,6 +9,9 @@ use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Database\UniqueConstraintViolationException;
 use Nette\Utils\Arrayhash;
+use Nette\Forms\Container;
+use Nette\Forms\Controls\SubmitButton;
+use Nette\Callback;
 
 /*
  * Spracovanie vykreslenia formularov.
@@ -18,17 +21,18 @@ class InsurencePresenter extends BasePresenter
 	/** @var InsurenceManager Informacie o poistovni a praca s nou */
 	protected $insurenceManager;
 
+	/** @var MedicineManager Informacie o liekoch a praca s nimi */
 	protected $medicineManager;
-
-	public function injectMedicineManager(MedicineManager $medicineManager)
-	{
-		$this->medicineManager = $medicineManager;
-	}
 
 	public function __construct(InsurenceManager $insurenceManager)
 	{
 		parent::__construct();
 		$this->insurenceManager = $insurenceManager;
+	}
+
+	public function injectMedicineManager(MedicineManager $medicineManager)
+	{
+		$this->medicineManager = $medicineManager;
 	}
 
 	/**
@@ -46,7 +50,7 @@ class InsurencePresenter extends BasePresenter
 
 		$this->template->insurence = $insurence;
 		$this->template->medicinesWithPaid = $this->insurenceManager->relatedMedicinesPaid($id, true);
-		$this->template->medicinesWithoutPaid = $this->insurenceManager->relatedMedicinesPaid($id, true);
+		$this->template->medicinesWithoutPaid = $this->insurenceManager->relatedMedicinesPaid($id, false);
 		$this->template->medicinesAdditionalCharge = $this->insurenceManager->relatedMedicinesAdditionalCharge($id, true);
 		$this->template->CountDBItem = $this->insurenceManager->countDBItem($id);
 	}
@@ -72,9 +76,9 @@ class InsurencePresenter extends BasePresenter
 			$this->flashMessage('Poisťovňa bola odstranená.');
 			$this->redirect('Insurence:list');
 		} else if ($table == 'liek') {
-			$this->flashMessage('Lek bola odstranená.');
-			$this->medicineManager->removeMedicine($id);
-			$this->redirect('Insurence:detail');
+			$this->insurenceManager->removeOfficeFromSupplier($idd, $id);
+			$this->flashMessage('Liek bol odstranený z danej poisťovne.');
+			$this->redirect('Insurence:detail', $idd);
 		}
 	}
 
@@ -90,8 +94,9 @@ class InsurencePresenter extends BasePresenter
 			return;
 		}
 
-		if ($insurence = $this->insurenceManager->getInsurence($id)) {
+		if ($insurence = $this->insurenceManager->getInsurence($id)->toArray()) {
 			$this->template->isEditForm = true;
+			$insurence['medicines'] = $this->insurenceManager->getMedicinesEditValues($id);
 			$this['editForm']->setDefaults($insurence);
 		}
 		else {
@@ -107,6 +112,7 @@ class InsurencePresenter extends BasePresenter
 	public function createComponentEditForm()
 	{
 		$form = new Form;
+		$form->addGroup('');
 		$form->addHidden('ID_pojistovny');
 		$form->addText('nazev_pojistovny', 'Názov poisťovne')
 			->addRule(Form::FILLED, 'Zadajte názov poisťovne');
@@ -119,12 +125,47 @@ class InsurencePresenter extends BasePresenter
 			->addRule(Form::PATTERN, 'PSČ musí mať 5 číslic', '([0-9]\s*){5}');
 		$form->addText('telefonni_cislo', 'Telefónne číslo')
 			->setRequired(FALSE)
-			->addRule(Form::INTEGER, 'Telefónne číslo musí být číslo');
+			->setAttribute('placeholder', '+420 123 456 789')
+			->addRule(Form::PATTERN, 'Nesprávny tvar telefónneho čísla', '(\+?\(?((?:\d[\s\)]*){3})?(?:\d[\s\-]*){9})');
 		$form->addText('email', 'E-mail')
 			->setRequired(FALSE)
 			->addRule(Form::EMAIL, 'Nesprávny tvar adresy');
-		$form->addSubmit('submit', "Uložiť poisťovňu");
-		$form->onSuccess[] = [$this, 'editFormSuccessed'];
+
+		$form->addGroup('');
+		$removeEvent = [$this, 'removeElementClicked'];
+		$medicines = $form->addDynamic(
+			'medicines',
+			function (Container $medicine) use ($removeEvent) {
+				$medicine->addHidden('ID_pojistovny');
+				$medicine->addSelect('ID_leku', 'Lieky', $this->medicineManager->getMedicinesToSelectBox())
+					->setAttribute('class', 'form-control');
+				$medicine->addText('cena', 'Cena lieku')
+					->setRequired(FALSE)
+					->addRule(Form::FLOAT, 'Cena musí byť číslo');
+				$medicine->addText('doplatek', 'Doplatok na liek')
+					->setRequired(FALSE)
+					->addRule(Form::FLOAT, 'Doplatok musí byť číslo');
+				$medicine->addSelect('hradene', 'Typ lieku', array('hradene' => 'Hradený', 'nehradene' => 'Nehradený', 'doplatok' => 'Liek je s doplatkom'))
+					->setRequired(TRUE)
+					->setAttribute('class', 'form-control');
+
+				$removeBtn = $medicine->addSubmit('remove', 'Odstrániť liek')
+					->setAttribute('class', 'btn-danger')
+					->setValidationScope(false);
+				$removeBtn->onClick[] = $removeEvent;
+			}, 0
+		);
+
+
+		$medicines->addSubmit('add', 'Pridať liek')
+			->setValidationScope(false)
+			->setAttribute('class', 'btn-success')
+			->onClick[] = [$this, 'addElementClicked'];
+
+		$form->addGroup('');
+		$form->addSubmit('submit', 'Uložiť poisťovňu')
+			->setAttribute('class', 'btn-primary')
+			->onClick[] = [$this, 'submitElementClicked'];
 
 		return $this->bootstrapFormRender($form);
 	}
@@ -132,13 +173,13 @@ class InsurencePresenter extends BasePresenter
 	/**
 	 * Spracovanie hodnot z formulara. Ulozenie do databaze a informovanie o
 	 * uspesnom ulozeni.
-	 * @param Form $form formular, s ktoreho sa maju spracovat udaje
-	 * @param array $value Obsahuje informacie, ktore sa maju ulozit do databaze
+	 * @param SubmitButton
 	 */
-	public function editFormSuccessed($form, $value)
+	public function submitElementClicked(SubmitButton $button)
 	{
-		$this->insurenceManager->saveInsurence($value);
-		$this->flashMessage('Poisťovňa ' .$value['nazev_pojistovny']. ' bola uložená');
+		$this->insurenceManager->saveInsurence($button->getForm()->getValues(true));
+		$this->flashMessage('Poisťovňa bola uložená');
 		$this->redirect('Insurence:list');
 	}
+
 }

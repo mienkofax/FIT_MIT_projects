@@ -3,24 +3,23 @@
 {block content}
 <ul class="list nav nav-tabs">
 	{if $isEditForm}
-	<li><a data-toggle="tab" href="#sectionA">Editácia pobočky</a></li>
+	<li><a data-toggle="tab" href="#sectionA">Editácia rezervácie</a></li>
 	{else}
-	<li><a data-toggle="tab" href="#sectionA">Vytvorenie novej pobočky</a></li>
+	<li><a data-toggle="tab" href="#sectionA">Vytvorenie novej rezervácie</a></li>
 	{/if}
 </ul>
 
 <div class="tab-content content">
 	<div id="sectionA" class="tab-pane fade in active">
 		{if $isEditForm}
-		<h2>Editácia pobočky</h2>
+		<h2>Editácia rezervácie</h2>
 		{else}
-		<h2>Vytvorenie novej pobočky</h2>
+		<h2>Vytvorenie novej rezervácie</h2>
 		{/if}
 		{control editForm}
 		{/block}
 	</div>
 </div>
-
 {block scripts}
 {include parent}
 <script type="text/javascript" src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>

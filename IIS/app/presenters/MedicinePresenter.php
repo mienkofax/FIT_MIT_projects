@@ -3,11 +3,17 @@
 namespace App\Presenters;
 
 use App\Model\MedicineManager;
+use App\Model\InsurenceManager;
+use App\Model\OfficeManager;
+use App\Model\ReservationManager;
 use App\Presenters\BasePresenter;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Database\UniqueConstraintViolationException;
 use Nette\Utils\Arrayhash;
+use Nette\Forms\Container;
+use Nette\Forms\Controls\SubmitButton;
+use Nette\Callback;
 
 /*
  * Spracovanie vykreslenia formularov.
@@ -23,10 +29,31 @@ class MedicinePresenter extends BasePresenter
 	/** @var MedicineManager Informacie o lieku a praca s nim */
 	protected $medicineManager;
 
+	protected $insurenceManager;
+
+	protected $officeManager;
+
+	protected $reservationManager;
+
 	public function __construct(MedicineManager $medicineManager)
 	{
 		parent::__construct();
 		$this->medicineManager = $medicineManager;
+	}
+
+	public function injectInsurenceManager(InsurenceManager $insurenceManager)
+	{
+		$this->insurenceManager = $insurenceManager;
+	}
+
+	public function injectOfficeManager(OfficeManager $officeManager)
+	{
+		$this->officeManager = $officeManager;
+	}
+
+	public function injectReservationManager(ReservationManager $reservationManager)
+	{
+		$this->reservationManager = $reservationManager;
 	}
 
 	/**
@@ -43,6 +70,9 @@ class MedicinePresenter extends BasePresenter
 			throw new BadRequestException();
 
 		$this->template->medicine = $medicine;
+		$this->template->reservations = $this->medicineManager->relatedReservation($id);
+		$this->template->offices = $this->medicineManager->relatedOffices($id);
+		$this->template->insurences = $this->medicineManager->relatedInsurences($id);
 	}
 
 	/**
@@ -58,7 +88,6 @@ class MedicinePresenter extends BasePresenter
 		$this->template->medicinesAdditionalCharge = $this->medicineManager->medicinesAdditionalCharge();
 		$this->template->medicineWithPrescription = $this->medicineManager->medicinePrescription(true);
 		$this->template->medicineWithoutPrescription = $this->medicineManager->medicinePrescription(false);
-
 	}
 
 	/**
@@ -71,6 +100,21 @@ class MedicinePresenter extends BasePresenter
 			$this->medicineManager->removeMedicine($id);
 			$this->flashMessage('Liek bol odstránený.');
 			$this->redirect('Medicine:list');
+		}
+		else if ($table == 'odstranenie-lieku') {
+			$this->medicineManager->removeMedicineFromReservation($idd, $id);
+			$this->flashMessage('Liek bol odstránený z rezervácie.');
+			$this->redirect('Medicine:detail', $idd);
+		}
+		else if ($table == 'pobocka') {
+			$this->medicineManager->removeMedicineFromOffice($idd, $id);
+			$this->flashMessage('Liek bol odstránený z pobočky.');
+			$this->redirect('Medicine:detail', $idd);
+		}
+		else if ($table == 'poistovna') {
+			$this->medicineManager->removeMedicineFromInsurence($idd, $id);
+			$this->flashMessage('Liek bol odstránený z poisťovne.');
+			$this->redirect('Medicine:detail', $idd);
 		}
 	}
 
@@ -86,7 +130,9 @@ class MedicinePresenter extends BasePresenter
 			return;
 		}
 
-		if ($medicine = $this->medicineManager->getMedicine($id)) {
+		if ($medicine = $this->medicineManager->getMedicine($id)->toArray()) {
+			$medicine['offices'] = $this->medicineManager->getOfficesEditValues($id);
+			$medicine['insurences'] = $this->medicineManager->getInsurencesEditValues($id);
 			$this->template->isEditForm = true;
 			$this['editForm']->setDefaults($medicine);
 		}
@@ -103,20 +149,70 @@ class MedicinePresenter extends BasePresenter
 	public function createComponentEditForm()
 	{
 		$form = new Form;
+		$form->addGroup();
 		$form->addHidden('ID_leku');
 		$form->addText('nazev_leku', 'Názov lieku')
 			->addRule(Form::FILLED, 'Zadajte názov lieku');
 		$form->addSelect('typ_leku', 'Typ lieku', self::MEDICINE_TYPE)
 			->setPrompt('Zvoľte typ lieku')
 			->setAttribute('class', 'form-control');
-		$form->addText('cena', 'Cena lieku')
-			->setRequired(FALSE)
-			->addRule(Form::FLOAT, 'Cena musí byť číslo');
-		$form->addText('pocet_na_sklade', 'Počet kusov')
-			->setRequired(FALSE)
-			->addRule(Form::INTEGER, 'Počet kusov musí bzť číslo');
-		$form->addSubmit('submit', "Uložiť liek");
-		$form->onSuccess[] = [$this, 'editFormSuccessed'];
+
+		$form->addGroup("Poisťovne");
+		$removeEvent = [$this, 'removeElementClicked'];
+		$insurences = $form->addDynamic(
+			'insurences',
+			function (Container $insurence) use ($removeEvent) {
+				$insurence->addHidden('ID_leku');
+				$insurence->addSelect('ID_pojistovny', 'Poisťovňa', $this->insurenceManager->getInsurenceToSelectBox())
+					->setAttribute('class', 'form-control');
+				$insurence->addText('cena', 'Cena lieku')
+					->setRequired(FALSE)
+					->addRule(Form::FLOAT, 'Cena musí byť číslo');
+				$insurence->addText('doplatek', 'Doplatok na liek')
+					->setRequired(FALSE)
+					->addRule(Form::FLOAT, 'Doplatok musí byť číslo');
+				$insurence->addSelect('hradene', 'Typ lieku', array('hradene' => 'Hradený', 'nehradene' => 'Nehradený', 'doplatok' => 'Liek je s doplatkom'))
+					->setRequired(TRUE)
+					->setAttribute('class', 'form-control');
+				$removeBtn = $insurence->addSubmit('remove', 'Odstrániť pobočku')
+					->setAttribute('class', 'btn-danger')
+					->setValidationScope(false);
+				$removeBtn->onClick[] = $removeEvent;
+			}, 0
+		);
+
+		$insurences->addSubmit('add', 'Pridať poisťovňu')
+			->setAttribute('class', 'btn-success')
+			->setValidationScope(false)
+			->onClick[] = [$this, 'addElementClicked'];
+
+		$form->addGroup("Pobočky");
+		$offices = $form->addDynamic(
+			'offices',
+			function (Container $office) use ($removeEvent) {
+				$office->addHidden('ID_leku');
+				$office->addSelect('ID_pobocky', 'Pobočka', $this->officeManager->getOfficesToSelectBox())
+					->setAttribute('class', 'form-control');
+				$office->addText('pocet_na_sklade', 'Počet kusov')
+					->setRequired(FALSE)
+					->addRule(Form::INTEGER, 'Počet kusov musí byť číslo');
+
+				$removeBtn = $office->addSubmit('remove', 'Odstrániť poisťovňu')
+					->setAttribute('class', 'btn-danger')
+					->setValidationScope(false);
+				$removeBtn->onClick[] = $removeEvent;
+			}, 0
+		);
+
+		$offices->addSubmit('add', 'Pridať pobočku')
+			->setAttribute('class', 'btn-success')
+			->setValidationScope(false)
+			->onClick[] = [$this, 'addElementClicked'];
+
+		$form->addGroup('');
+		$form->addSubmit('submit', 'Uložiť liek')
+			->setAttribute('class', 'btn-primary')
+			->onClick[] = [$this, 'submitElementClicked'];
 
 		return $this->bootstrapFormRender($form);
 	}
@@ -124,13 +220,12 @@ class MedicinePresenter extends BasePresenter
 	/**
 	 * Spracovanie hodnot z formulara. Ulozenie do databaze a informovanie o
 	 * uspesnom ulozeni.
-	 * @param Form $form formular, s ktoreho sa maju spracovat udaje
-	 * @param array $value Obsahuje informacie, ktore sa maju ulozit do databaze
+	 * @param SubmitButton $button
 	 */
-	public function editFormSuccessed($form, $value)
+	public function submitElementClicked(SubmitButton $button)
 	{
-		$this->medicineManager->saveMedicine($value);
-		$this->flashMessage('Liek ' .$value['nazev_leku']. ' bol uložený.');
+		$this->medicineManager->saveMedicine($button->getForm()->getValues(true));
+		$this->flashMessage('Liek bol uložený.');
 		$this->redirect('Medicine:list');
 	}
 }

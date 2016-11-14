@@ -63,12 +63,58 @@ class OfficeManager extends BaseManager
 	 */
 	public function saveOffice($office)
 	{
-		if (!$office[self::COLUMND_ID]) {
-			unset($office[self::COLUMND_ID]);
-			$this->database->table(self::TABLE_NAME)->insert($office);
-		} else
-			$this->database->table(self::TABLE_NAME)->where(self::COLUMND_ID,
-				$office[self::COLUMND_ID])->update($office);
+		$fKey = $office['ID_dodavatele'];
+		$fKeyUser = $office['ID_uzivatele'];
+		$medicines = $office['medicines'];
+		unset($office['ID_dodavatele']);
+		unset($office['ID_uzivatele']);
+		unset($office['medicines']);
+		$primaryKey;
+
+		$this->database->beginTransaction();
+		try {
+			if (!$office[self::COLUMND_ID]) {
+				unset($office[self::COLUMND_ID]);
+
+				$primaryKey = $this->database->table(self::TABLE_NAME)->insert($office);
+
+				$this->insertFKKey($primaryKey, $office, $fKey,
+					"ID_dodavatele", "ID_pobocky", "dodavatel_pobocka");
+
+				$this->insertFKKey($primaryKey, $office, $fKeyUser,
+					"ID_uzivatele", "ID_pobocky", "pobocka_zamestnanec");
+			}
+			else {
+				$this->database->table(self::TABLE_NAME)->where(self::COLUMND_ID,
+					$office[self::COLUMND_ID])->update($office);
+
+				$data = $this->database->table('dodavatel_pobocka')->where('ID_pobocky', $office['ID_pobocky']);
+				$fKey = $this->removeFKKey($data, "ID_dodavatele", $fKey);
+				foreach ($fKey as $item)
+					$this->database->table('dodavatel_pobocka')->insert(array('ID_pobocky' => $office['ID_pobocky'], 'ID_dodavatele' => $item));
+
+				$data = $this->database->table('pobocka_zamestnanec')->where('ID_pobocky', $office['ID_pobocky']);
+				$fKeyUser = $this->removeFKKey($data, "ID_uzivatele", $fKeyUser);
+				foreach ($fKeyUser as $item)
+					$this->database->table('pobocka_zamestnanec')->insert(array('ID_pobocky' => $office['ID_pobocky'], 'ID_uzivatele' => $item));
+
+				$this->database->table('pobocka_lek')->where('ID_pobocky', $office['ID_pobocky'])->delete();
+				$primaryKey = $office['ID_pobocky'];
+			}
+
+			// Ulozenie novych spojeni v tabulke M:N
+			foreach ($medicines as $key => $item) {
+				$this->database->table('pobocka_lek')->insert(
+					array('ID_pobocky' => $primaryKey,
+					'ID_leku' => $item['ID_leku'],
+					'pocet_na_sklade' => $this->defaultNumberZero($item['pocet_na_sklade'])));
+			}
+		}
+		catch (Nette\Databse\DriverException $ex) {
+			$this->database->rollback();
+			throw $ex;
+		}
+		$this->database->commit();
 	}
 
 	/**
@@ -81,6 +127,13 @@ class OfficeManager extends BaseManager
 			->where(self::COLUMND_ID, $id)->delete();
 	}
 
+	/**
+	 * Zoznam liekov, ktore su priradene k danej pobocke. Poskytuje vsetky
+	 * informacie o danom lieku potrebne pri zobrazeni liekov. Pouziva sa pri
+	 * detaile pobocky.
+	 * @param int $id Identifikator pobocky
+	 * @return mixed Pole udajov o liekoch
+	 */
 	public function relatedMedicines($id)
 	{
 		$dat = $this->database->table(self::TABLE_NAME)->get($id);
@@ -91,6 +144,13 @@ class OfficeManager extends BaseManager
 		return $this->database->table('leky')->where('ID_leku', $pole);
 	}
 
+	/**
+	 * Zoznam dodavatelov, ktori su priradeni k danej pobocke. Poskytuje vsetky
+	 * informacie o danom dodavatelovi potrebne pri zobrazeni dodavatela.
+	 * Pouziva sa pri detaile pobocky.
+	 * @param int $id Identifikator pobocky
+	 * @return mixed Pole udajov o dodavateloch
+	 */
 	public function relatedSupplier($id)
 	{
 		$dat = $this->database->table(self::TABLE_NAME)->get($id);
@@ -101,6 +161,13 @@ class OfficeManager extends BaseManager
 		return $this->database->table('dodavatele')->where('ID_dodavatele', $pole);
 	}
 
+	/**
+	 * Zoznam uzivatelov, ktori su priradeni k danej pobocke. Poskytuje vsetky
+	 * informacie o uzivatelovi potrebne pri zobrazeni uzivatela.
+	 * Pouziva sa pri detaile pobocky.
+	 * @param int $id Identifikator pobocky
+	 * @return mixed Pole udajov o uzivateloch
+	 */
 	public function relatedUser($id)
 	{
 		$dat = $this->database->table(self::TABLE_NAME)->get($id);
@@ -111,6 +178,22 @@ class OfficeManager extends BaseManager
 		return $this->database->table('uzivatele')->where('ID_uzivatele', $pole);
 	}
 
+	public function relatedReservation($id)
+	{
+		$dat = $this->database->table(self::TABLE_NAME)->get($id);
+
+		$pole = array();
+		foreach ($dat->related('rezervace_leku_lek.ID_pobocky') as $med)
+			$pole[] = $med->ID_rezervace;
+		return $this->database->table('rezervace_leku')->where('ID_rezervace', $pole);
+	}
+
+	/**
+	 * Zistenie poctu jednotlivych udajov v databaze. Tieto data sa viazu k danej
+	 * pobocke. Zistenie kolko je na pobocke uzivatelov, dodavatelov a liekov.
+	 * @param int $id Identifikator pobocky
+	 * @return mixed Pocet jednotlivych udajov v databaze
+	 */
 	public function countDBItem($id)
 	{
 		$dat = $this->database->table(self::TABLE_NAME)->get($id);
@@ -122,6 +205,10 @@ class OfficeManager extends BaseManager
 		return $countData;
 	}
 
+	/**
+	 * Zoznam vsetkych pobociek pre formular.
+	 * @return mixed Zoznam vsetkych pobociek.
+	 */
 	public function getOfficesToSelectBox() {
 		$data = $this->database->table('pobocky')->fetchAll();
 		$result = [];
@@ -130,5 +217,74 @@ class OfficeManager extends BaseManager
 			$result[$value->ID_pobocky] = $value->nazev_pobocky;
 
 		return $result;
+	}
+
+	/**
+	 * Vyberie z databaze dodavatelov, ktori boli priradeni k danej pobocke.
+	 * Pouzivate sa pri editacii pobocky, aby sa nacitali udaje o dodavateloch,
+	 * ktori danu pobocku zasobuju.
+	 * @param int $id Identifikator pobocky
+	 * @return mixed Zoznam dodavatelov k danej pobocke
+	 */
+	public function getSuppliersEditValues($id)
+	{
+		$result = [];
+		$data = $this->database->table('dodavatel_pobocka')->select('ID_dodavatele')
+			->where('ID_pobocky', $id);
+
+		foreach ($data as $id)
+			$result[] = $id->ID_dodavatele;
+		return $result;
+	}
+
+	/**
+	 * Vyberie z databaze uzivatelov, ktori boli priradeni k danej pobocke.
+	 * Pouziva sa pri editacii pobocky, aby sa nacitali udaje o uzivateloch,
+	 * ktori pracuju na danej pobocke.
+	 */
+	public function getUsersEditValues($id)
+	{
+		$result = [];
+		$data = $this->database->table('pobocka_zamestnanec')->select('ID_uzivatele')
+			->where('ID_pobocky', $id);
+
+		foreach ($data as $id)
+			$result[] = $id->ID_uzivatele;
+		return $result;
+	}
+
+	/**
+	 * Vyberie z databaze lieky, ktore boli priradene k danej pobocke.
+	 * Pouziva sa pri editacii pobocky, aby sa nacitali udaje o liekoch,
+	 * ktore sa predavaju na danej pobocke.
+	 * @param int $id Identifikator pobocky
+	 * @return mixed Zoznam liekov na danej pobocke.
+	 */
+	public function getMedicinesEditValues($id)
+	{
+		$result = [];
+		$data = $this->database->table('pobocka_lek')
+			->where('ID_pobocky', $id);
+
+		foreach ($data as $item)
+			$result[] = array(
+				"ID_leku" => $item->ID_leku,
+				"ID_pobocky" => $item->ID_pobocky,
+				"pocet_na_sklade" => $item->pocet_na_sklade
+			);
+
+		return $result;
+	}
+
+	/**
+	 * Odstranie rezervacie z pobocky.
+	 * @param int $idOffice Identifikator pobocky
+	 * @param int $idReservation Identifikator rezervacie, ktora sa ma odstranit
+	 */
+	public function removeReservationFromOffice($idOffice, $idReservation)
+	{
+		$this->database->table('rezervace_leku_lek')
+			->where('ID_rezervace', $idReservation)
+			->where('ID_pobocky', $idOffice)->delete();
 	}
 }

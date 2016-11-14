@@ -6,6 +6,7 @@
 	<li><a data-toggle="tab" href="#sectionB">Lieky</a></li>
 	<li><a data-toggle="tab" href="#sectionC">Dodávatelia</a></li>
 	<li><a data-toggle="tab" href="#sectionD">Zamestnanci</a></li>
+	<li><a data-toggle="tab" href="#sectionE">Rezervácie</a></li>
 </ul>
 
 <div class="tab-content content">
@@ -99,7 +100,7 @@
 				</td>
 
 				<td>
-					<a href="{plink Office:remove}/{$office->ID_pobocky}/dodavatele/{$supplier->ID_dodavatele}">
+					<a href="{plink Office:remove}/{$office->ID_pobocky}/dodavatel/{$supplier->ID_dodavatele}">
 						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
 					</a>
 				</td>
@@ -149,6 +150,54 @@
 				<td>
 					<a href="{plink Office:remove}/{$office->ID_pobocky}/uzivatel/{$userItem->ID_uzivatele}">
 						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
+					</a>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="sectionE" class="tab-pane fade">
+		<h2>Zoznam rezervácií</h2>
+
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Meno a priezvisko
+					<a href="{link Reservation:list}/meno/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Reservation:list}/meno/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th>
+					Stav
+					<a href="{link Reservation:list}/stav/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Reservation:list}/stav/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia
+					<a href="{link Reservation:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
+					<a href="{link Reservation:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
+				</th>
+				<th colspan="2">Akcie s rezerváciou</th>
+			</tr>
+			</thead>
+			<tr n:foreach="$reservations as $reservation">
+				<td>
+					<a n:href="Reservation:detail $reservation->ID_rezervace">{$reservation->prijmeni} {$reservation->jmeno}</a>
+				</td>
+				<td>
+					<a n:href="Reservation:detail $reservation->ID_rezervace">{$reservation->stav_rezervace}</a>
+				</td>
+				<td class="text-center">
+					{$reservation->date_time}
+				</td>
+				<td>
+					<a n:href=":Reservation:edit $reservation->ID_rezervace">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+					</a>
+				</td>
+
+				<td>
+					<a href="{link Office:remove}/{$office->ID_pobocky}/rezervacia/{$reservation->ID_rezervace}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
 					</a>
 				</td>
 			</tr>

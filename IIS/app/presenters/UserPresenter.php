@@ -89,6 +89,7 @@ class UserPresenter extends BasePresenter
 	public function createComponentEditForm()
 	{
 		$form = new Form;
+		$form->addGroup('');
 		$form->addHidden('ID_uzivatele');
 		$form->addText('login', 'Prihlasovacie meno')
 			->addRule(Form::FILLED, "Musí byť zadané prihlasovanie meno");
@@ -101,7 +102,9 @@ class UserPresenter extends BasePresenter
 			->addRule(Form::FILLED, 'Zadajte meno');
 		$form->addText('prijmeni', 'Prezvisko užívateľa')
 			->addRule(Form::FILLED, 'Zadajte priezvisko');
-		$form->addSubmit('submit', "Uložiť užívateľa");
+		$form->addGroup('');
+		$form->addSubmit('submit', "Uložiť užívateľa")
+			->setAttribute('class', 'btn-primary');
 		$form->onSuccess[] = [$this, 'editFormSuccessed'];
 
 		return $this->bootstrapFormRender($form);

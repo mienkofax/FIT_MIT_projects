@@ -83,4 +83,30 @@ class UserManager extends BaseManager
 		$this->database->table(self::TABLE_NAME)
 			->where(self::COLUMN_ID, $id)->delete();
 	}
+
+	/**
+	 * Zoznam vsetkych uzivatelov pre formular.
+	 * @return mixed Zoznam vsetkych uzivatelov.
+	 */
+	public function getUsersToSelectBox() {
+		$data = $this->database->table('uzivatele')->fetchAll();
+		$result = [];
+
+		foreach ($data as $key => $value)
+			$result[$value->ID_uzivatele] = $value->jmeno . " " . $value->prijmeni ;
+
+		return $result;
+	}
+
+	/**
+	 * Odstranie uzivatela z pobocky.
+	 * @param int $idUser Identifikator uzivatela
+	 * @param int $idOffice Identifikator pobocky, ktora sa ma zmazat
+	 */
+	public function removeUserFromOffice($idUser, $idOffice)
+	{
+		$this->database->table('pobocka_zamestnanec')
+			->where('ID_pobocky', $idOffice)
+			->where('ID_uzivatele', $idUser)->delete();
+	}
 }

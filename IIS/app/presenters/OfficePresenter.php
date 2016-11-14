@@ -11,6 +11,9 @@ use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Database\UniqueConstraintViolationException;
 use Nette\Utils\Arrayhash;
+use Nette\Forms\Container;
+use Nette\Forms\Controls\SubmitButton;
+use Nette\Callback;
 
 /**
  * Spracovanie vykreslenie formularov.
@@ -65,6 +68,7 @@ class OfficePresenter extends BasePresenter
 		$this->template->medicines = $this->officeManager->relatedMedicines($id);
 		$this->template->suppliers = $this->officeManager->relatedSupplier($id);
 		$this->template->users = $this->officeManager->relatedUser($id);
+		$this->template->reservations = $this->officeManager->relatedReservation($id);
 		$this->template->CountDBItem = $this->officeManager->countDBItem($id);
 	}
 
@@ -89,16 +93,20 @@ class OfficePresenter extends BasePresenter
 			$this->flashMessage('Pobočka bola odstranená.');
 			$this->redirect('Office:list');
 		}
-		else if ($table == 'dodavat') {
-			$this->supplierManager->removeSupplier($id);
+		else if ($table == 'dodavatel') {
+			$this->supplierManager->removeOfficeFromSupplier($id, $idd);
 			$this->redirect('Office:detail', $idd);
 		}
 		else if ($table == 'liek') {
-			$this->medicineManager->removeMedicine($id);
+			$this->medicineManager->removeMedicineFromOffice($id, $idd);
 			$this->redirect('detail', $idd);
 		}
 		else if ($table == 'uzivatel') {
-			$this->userManager->removeUser($id);
+			$this->userManager->removeUserFromOffice($id, $idd);
+			$this->redirect('detail', $idd);
+		}
+		else if ($table == 'rezervacia') {
+			$this->officeManager->removeReservationFromOffice($idd, $id);
 			$this->redirect('detail', $idd);
 		}
 	}
@@ -115,7 +123,10 @@ class OfficePresenter extends BasePresenter
 			return;
 		}
 
-		if ($office = $this->officeManager->getOffice($id)) {
+		if ($office = $this->officeManager->getOffice($id)->toArray()) {
+			$office['ID_dodavatele'] = $this->officeManager->getSuppliersEditValues($id);
+			$office['ID_uzivatele'] = $this->officeManager->getUsersEditValues($id);
+			$office['medicines'] = $this->officeManager->getMedicinesEditValues($id);
 			$this->template->isEditForm = true;
 			$this['editForm']->setDefaults($office);
 		}
@@ -132,6 +143,7 @@ class OfficePresenter extends BasePresenter
 	public function createComponentEditForm()
 	{
 		$form = new Form;
+		$form->addGroup('');
 		$form->addHidden('ID_pobocky');
 		$form->addText('nazev_pobocky', 'Názov pobočky')
 			->addRule(Form::FILLED, 'Zadajte názov pobočky');
@@ -148,8 +160,41 @@ class OfficePresenter extends BasePresenter
 		$form->addText('email', 'E-mail')
 			->setRequired(FALSE)
 			->addRule(Form::EMAIL, 'Nesprávny tvar adresy');
-		$form->addSubmit('submit', "Uložiť pobočku");
-		$form->onSuccess[] = [$this, 'editFormSuccessed'];
+		$form->addGroup('');
+		$form->addMultiSelect('ID_dodavatele', 'Dodávatelia', $this->supplierManager->getSuppliersToSelectBox())
+			->setAttribute('class', 'form-control');
+		$form->addGroup('');
+		$form->addMultiSelect('ID_uzivatele', 'Zamestnanci', $this->userManager->getUsersToSelectBox())
+			->setAttribute('class', 'form-control');
+
+		$form->addGroup('');
+		$removeEvent = [$this, 'removeElementClicked'];
+		$medicines = $form->addDynamic(
+			'medicines',
+			function (Container $medicine) use ($removeEvent) {
+				$medicine->addHidden('ID_pojistovny');
+				$medicine->addSelect('ID_leku', 'Lieky', $this->medicineManager->getMedicinesToSelectBox())
+					->setAttribute('class', 'form-control');
+				$medicine->addText('pocet_na_sklade', 'Počet kusov na sklade')
+					->setRequired(FALSE)
+					->addRule(Form::FLOAT, 'Počet musí byť číslo');
+
+				$removeBtn = $medicine->addSubmit('remove', 'Odstrániť liek')
+					->setAttribute('class', 'btn-danger')
+					->setValidationScope(false);
+				$removeBtn->onClick[] = $removeEvent;
+			}, 1
+		);
+
+		$medicines->addSubmit('add', 'Pridať liek')
+			->setAttribute('class', 'btn-success')
+			->setValidationScope(false)
+			->onClick[] = [$this, 'addElementClicked'];
+
+		$form->addGroup("");
+		$form->addSubmit('submit', 'Uložiť pobočku')
+			->setAttribute('class', 'btn-primary')
+			->onClick[] = [$this, 'submitElementClicked'];
 
 		return $this->bootstrapFormRender($form);
 	}
@@ -157,13 +202,12 @@ class OfficePresenter extends BasePresenter
 	/**
 	 * Spracovanie hodnot z formulara. Ulozenie do databaze a informovanie o
 	 * uspesnom ulozeni.
-	 * @param Form $form formular, s ktoreho sa maju spracovat udaje
-	 * @param array $value Obsahuje informacie, ktore sa maju ulozit do databaze
+	 * @param SubmitButton $button
 	 */
-	public function editFormSuccessed($form, $value)
+	public function submitElementClicked(SubmitButton $button)
 	{
-		$this->officeManager->saveOffice($value);
-		$this->flashMessage('Pobočka ' .$value['nazev_pobocky']. ' bola uložená');
+		$this->officeManager->saveOffice($button->getForm()->getValues(true));
+		$this->flashMessage('Pobočka bola uložená');
 		$this->redirect('Office:list');
 	}
 }

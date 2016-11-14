@@ -5,6 +5,8 @@ namespace App\Presenters;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Presenter;
 use App\Model\MenuManager;
+use Kdyby\Replicator\Container;
+use Nette\Forms\Controls\SubmitButton;
 
 /**
  * Rozhranie pre spracovanie vykreslenia urciteho modelu.
@@ -56,11 +58,6 @@ abstract class BasePresenter extends Presenter
 		$this->template->count = $this->menuManager->getTableRecord();
 	}
 
-	public function createRedirectLink($presenter, $action, $id)
-	{
-		return $presenter . '/' . $action . '/' . $id;
-	}
-
 	/**
 	 * Vlastne nastavenie stylu formular a jednotlivych inputov,
 	 * aby podporoval bootstrap style.
@@ -81,8 +78,27 @@ abstract class BasePresenter extends Presenter
 		$renderer->wrappers['control']['.password'] = 'form-control';
 		$renderer->wrappers['control']['.email'] = 'form-control';
 		$renderer->wrappers['control']['.number'] = 'form-control';
-		$renderer->wrappers['control']['.submit'] = 'btn btn-primary';
+		$renderer->wrappers['control']['.submit'] = 'btn';
 
 		return $form;
+	}
+
+	/**
+	 * Duplikovanie elementov vo formulari pomocou Kdyby.
+	 * @param SubmitButton $button
+	 */
+	public function addElementClicked(SubmitButton $button)
+	{
+		$button->parent->createOne();
+	}
+
+	/**
+	 * Odstranenie duplikovanych elementov vo formulari pomocou Kdyby.
+	 * @param SubmitButton $button
+	 */
+	public function removeElementClicked(SubmitButton $button)
+	{
+		$users = $button->parent->parent;
+		$users->remove($button->parent, true);
 	}
 }
