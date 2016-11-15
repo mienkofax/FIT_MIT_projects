@@ -49,6 +49,13 @@ public:
 		const std::string &separator, const bool &hexFormat = false) override;
 
 	/*
+	 * Nacitanie IPv6 adresy ako string.
+	 * @param &size pocet bajtov, ktore sa maju nacitat ako retazec
+	 * @return nacitana IPv6 adresa
+	 */
+	std::string readIPv6(const size_t &size);
+
+	/*
 	 * Vytvori vektor dat o danej velkosti.
 	 * @param &size velkost nacitanych dat
 	 * @param vektor obsahujuci nacitane data

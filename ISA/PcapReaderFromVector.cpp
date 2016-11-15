@@ -51,6 +51,18 @@ string PcapReaderFromVector::readString(const size_t &size,
 	return stream.str();
 }
 
+string PcapReaderFromVector::readIPv6(const size_t &size)
+{
+	stringstream stream;
+
+	for (size_t i = 0; i < size; i++) {
+		stream << setfill('0') << setw(2) << hex << (uint32_t) (uint8_t)m_data[currentPosition + i];
+		if ((i+1)%2 == 0 && i != 0 && i+1 != size)
+			stream << ":";
+	}
+	return stream.str();
+}
+
 std::vector<uint8_t> PcapReaderFromVector::readUint8Vector(const size_t &size)
 {
 	std::vector<uint8_t> data;

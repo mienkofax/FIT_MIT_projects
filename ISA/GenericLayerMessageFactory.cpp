@@ -28,15 +28,13 @@ shared_ptr<LayerMessage> GenericLayerMessageFactory::create(Input &input,
 
 	// Spracovanie linkovej vrstvy
 	msg = findFactory(LINK_LAYER)->create(input, layer);
-	if (layer == LINK_LAYER)
-		return msg;
 
 	// Spracovanie sietovej vrstvy
 	input.data = msg->data;
 	findFactory(NETWORK_LAYER)->setLayerMessage(msg);
 
 	msg = findFactory(NETWORK_LAYER)->create(input, layer);
-	if (layer == NETWORK_LAYER)
+	if (layer == NETWORK_LAYER || layer == LINK_LAYER)
 		return msg;
 
 	// Spracovanie transportnej vrstvy

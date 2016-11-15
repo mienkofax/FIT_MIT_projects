@@ -35,7 +35,8 @@ using namespace std;
 #define N_IP6_HOP_LIMIT 1
 #define N_IP6_ADDRESS_LENGTH 16
 
-shared_ptr<LayerMessage> NetworkLayerMessage::create(Input &input, const Layer&)
+shared_ptr<LayerMessage> NetworkLayerMessage::create(Input &input,
+	const Layer &layer)
 {
 	PcapReaderFromVector reader(input.data);
 	shared_ptr<LayerMessage> message = getLayerMessage();
@@ -43,6 +44,13 @@ shared_ptr<LayerMessage> NetworkLayerMessage::create(Input &input, const Layer&)
 	int ipVersion = 0;
 	int tmpData = 0;
 	int readSize = 0;
+	int totalLength = 0;
+
+	// Spracovanie arp packetu
+	if (message->nextProtocol == 0x0806) {
+		message->address[MAC].dataSize -= 18;
+		return message;
+	}
 
 	if (message->nextProtocol != 0x0800 && message->nextProtocol != 0x86dd)
 		throw runtime_error("Unsupported network protocol "
@@ -55,7 +63,18 @@ shared_ptr<LayerMessage> NetworkLayerMessage::create(Input &input, const Layer&)
 	if (ipVersion == N_IP4_VERSION) {
 		reader.skip(N_IP4_TYPE_OF_SEVICE);
 		readSize -= N_IP4_TYPE_OF_SEVICE;
-		readSize += reader.readIntLittleEndian(N_IP4_LENGTH) - N_IP4_LENGTH;
+		totalLength = reader.readIntLittleEndian(N_IP4_LENGTH);
+
+		// Kontrola na padding
+		int padding = message->address[MAC].value1;
+		if (totalLength + 14 < padding)
+			message->address[MAC].dataSize -= padding - 14 - totalLength;
+
+		if (layer == LINK_LAYER)
+			return message;
+		// Koniec kontroly paddingu
+
+		readSize += totalLength - N_IP4_LENGTH;
 
 		reader.skip(N_IP4_IDENTIFICATION + N_IP4_OFFSET + N_IP4_TTL);
 		readSize -= N_IP4_IDENTIFICATION + N_IP4_OFFSET + N_IP4_TTL;
@@ -75,14 +94,17 @@ shared_ptr<LayerMessage> NetworkLayerMessage::create(Input &input, const Layer&)
 		address.dataSize = message->data.size();
 		message->address[IPV4] = address;
 	} else if (ipVersion == N_IP6_VERSION) {
+		if (layer == LINK_LAYER)
+			return message;
+
 		reader.skip(N_IP6_TRAFFIC_CLASS + N_IP6_FLOW_LABEL);
 		readSize = reader.readIntLittleEndian(N_IP6_PAYLOAD_LENGTH);
 
 		message->nextProtocol = reader.readIntLittleEndian(N_IP6_NEXT_HEADER);
 		reader.skip(N_IP6_HOP_LIMIT);
 
-		address.sourceAddress.push_back(Normalization::getIPv6(reader.readString(N_IP6_ADDRESS_LENGTH, ".")));
-		address.destinationAddress.push_back(Normalization::getIPv6(reader.readString(N_IP6_ADDRESS_LENGTH, ".")));
+		address.sourceAddress.push_back(Normalization::getIPv6(reader.readIPv6(N_IP6_ADDRESS_LENGTH)));
+		address.destinationAddress.push_back(Normalization::getIPv6(reader.readIPv6(N_IP6_ADDRESS_LENGTH)));
 
 		message->data = reader.readUint8Vector(readSize);
 

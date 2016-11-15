@@ -85,9 +85,10 @@ int main(int argc, char * argv[])
 	vector<string> enteredFilter = args.getFilter();
 	Layer layer = optionMessage.extractHighestLayer(enteredFilter);
 
-	optionMessage.show();
+//	optionMessage.show();
 
 	int value1 = 0;
+	int counter = 1;
 
 	string keyS, keyD;
 	while(file.tellg() < end) {
@@ -96,9 +97,10 @@ int main(int argc, char * argv[])
 		}
 		catch (exception &ex) {
 			cerr << ex.what();
+			counter++;
 			continue;
 		}
-		layerMessage->show();
+//		layerMessage->show();
 
 		//prechod dostupnymi filtrami
 		for (const auto &item : filterType) {
@@ -111,6 +113,12 @@ int main(int argc, char * argv[])
 			auto search2 = layerMessage->address.find(
 				layerMessage->extractProtocol(item));
 
+			// Vytvorenie klucov pre ulozenie
+			auto searchKey = layerMessage->address.find(
+				layerMessage->extractProtocol("mac"));
+
+			value1 = searchKey->second.value1;
+
 			if (args.isTop10()) {
 				if (search2 == layerMessage->address.end())
 					continue;
@@ -120,21 +128,15 @@ int main(int argc, char * argv[])
 				keyD = search2->second.destinationAddress[0];
 
 				if (optionMessage.source)
-					statistics.insert(keyS, 0, 0);
+					statistics.insert(keyS, value1, search2->second.dataSize);
 
 				if (optionMessage.destination)
-					statistics.insert(keyD, 0, 0);
+					statistics.insert(keyD, value1, search2->second.dataSize);
 			}
 			else {
 				if (search == optionMessage.address.end()
 					|| search2 == layerMessage->address.end())
 					continue;
-
-				// Vytvorenie klucov pre ulozenie
-				auto searchKey = layerMessage->address.find(
-					layerMessage->extractProtocol("mac"));
-
-				value1 = searchKey->second.value1;
 
 				if (optionMessage.source) {
 					for (const auto &add : search->second.sourceAddress) {
@@ -151,13 +153,16 @@ int main(int argc, char * argv[])
 				}
 			}
 		} //koniec prechodu medzi filtrami
+
+//		cout << "COUNT: " << dec << counter << endl;
+		counter++;
 	}
 
-	cout << "--------Statistika----------\n";
-	statistics.showTop10();
-	cout << "--------Statistika2---------\n";
-	statistics.showFilterStatistics();
-	cout << "----------------------------\n";
+	// Zobrazenie statistik
+	if (args.isTop10())
+		statistics.showTop10();
+	else
+		statistics.showFilterStatistics();
 
 	return 0;
 }
