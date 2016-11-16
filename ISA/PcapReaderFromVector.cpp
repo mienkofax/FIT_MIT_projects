@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include "PcapReaderFromVector.h"
-
+#include <iostream>
 using namespace std;
 
 #define BYTE_SIZE   8
@@ -60,6 +60,8 @@ string PcapReaderFromVector::readIPv6(const size_t &size)
 		if ((i+1)%2 == 0 && i != 0 && i+1 != size)
 			stream << ":";
 	}
+
+	currentPosition += size;
 	return stream.str();
 }
 
@@ -67,10 +69,12 @@ std::vector<uint8_t> PcapReaderFromVector::readUint8Vector(const size_t &size)
 {
 	std::vector<uint8_t> data;
 
-	for (size_t i = 0; i < size; i++)
-		data.push_back(m_data[currentPosition + i]);
+	for (size_t i = 0; i < size && currentPosition < m_data.size(); i++) {
+		data.push_back(m_data[currentPosition]);
 
-	currentPosition += size;
+		currentPosition++;
+	}
+
 	return data;
 }
 

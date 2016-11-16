@@ -100,7 +100,7 @@ int main(int argc, char * argv[])
 			counter++;
 			continue;
 		}
-//		layerMessage->show();
+		//layerMessage->show();
 
 		//prechod dostupnymi filtrami
 		for (const auto &item : filterType) {
@@ -152,9 +152,9 @@ int main(int argc, char * argv[])
 					}
 				}
 			}
+		//cout << "COUNT: " << dec << counter << endl;
 		} //koniec prechodu medzi filtrami
-
-//		cout << "COUNT: " << dec << counter << endl;
+		//if (counter == 585) break;
 		counter++;
 	}
 
