@@ -67,8 +67,9 @@ shared_ptr<LayerMessage> NetworkLayerMessage::create(Input &input,
 
 		// Kontrola na padding
 		int padding = message->address[MAC].value1;
-		if (totalLength + 14 < padding)
+		if (totalLength + 14 < padding && !message->address[MAC].isVLAN) {
 			message->address[MAC].dataSize -= padding - 14 - totalLength;
+		}
 
 		if (layer == LINK_LAYER)
 			return message;

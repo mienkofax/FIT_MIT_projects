@@ -34,6 +34,7 @@ shared_ptr<LayerMessage> LinkLayerMessage::create(Input &input, const Layer&)
 	int readSize = 0;
 	int frameType = 0;
 	bool trailer = false;
+	bool isVLAN = false;
 
 	message->address.clear();
 
@@ -61,6 +62,7 @@ shared_ptr<LayerMessage> LinkLayerMessage::create(Input &input, const Layer&)
 	}
 
 	if (frameType == ETHERNET_PROTOCOL_8021Q) {
+		isVLAN = true;
 		readSize -= ETHERNET_VLAN_TYPE;
 		reader.skip(ETHERNET_VLAN_TYPE);
 
@@ -78,6 +80,11 @@ shared_ptr<LayerMessage> LinkLayerMessage::create(Input &input, const Layer&)
 
 	address.dataSize = message->data.size();
 	message->address[MAC] = address;
+
+	message->address[MAC].isVLAN = isVLAN;
+
+	if (trailer)
+		reader.skip(ETHERNET_8021Q_TRAILER);
 
 	return message;
 }

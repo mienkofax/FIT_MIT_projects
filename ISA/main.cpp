@@ -156,6 +156,7 @@ int main(int argc, char * argv[])
 		} //koniec prechodu medzi filtrami
 		//if (counter == 585) break;
 		counter++;
+//		break;
 	}
 
 	// Zobrazenie statistik

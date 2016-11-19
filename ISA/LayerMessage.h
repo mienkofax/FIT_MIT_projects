@@ -54,6 +54,7 @@ struct LayerData {
 	std::vector<std::string> destinationAddress;
 	size_t dataSize;
 	size_t value1;
+	bool isVLAN = false;
 };
 
 /*
