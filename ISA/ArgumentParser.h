@@ -45,7 +45,7 @@ public:
 	 */
 	std::vector<std::string> getFilter()
 	{
-		return split(getArgument("f"), ',');
+		return split(getArgument("f"), ';');
 	}
 
 	/*

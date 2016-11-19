@@ -71,7 +71,7 @@ bool ArgumentParser::validateArguments(const int &argc, char *argv[])
 {
 	extractArguments(argc, argv);
 
-	vector<string> filterArgumets = split(getArgument("f"), ',');
+	vector<string> filterArgumets = split(getArgument("f"), ';');
 
 	if (!checkFiltersExists(filterArgumets))
 		return false;
