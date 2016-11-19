@@ -140,6 +140,10 @@ class ReservationPresenter extends BasePresenter
 			->setAttribute('class', 'form-control');
 		$form->addText('jmeno', 'Meno zákazníka')
 			->addRule(Form::FILLED, 'Zadajte meno');
+		$form->addText('rodne_cislo', 'Rodné číslo zákazníka')
+			->setRequired(TRUE)
+			->setAttribute('placeholder', 'XXXXXX/XXXX')
+			->addRule(Form::PATTERN, 'Nesprávny tvar rodného čísla', '([0-9]{6}\/[0-9]{4})');
 		$form->addText('prijmeni', 'Priezvisko zákazníka')
 			->addRule(Form::FILLED, 'Zadajte priezvisko');
 

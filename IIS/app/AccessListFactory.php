@@ -25,13 +25,16 @@ class AccessListFactory extends Permission
 		$this->addResource('Medicine');
 		$this->addResource('Reservation');
 
-		// Zoznam pravidiel pre opravnenia
-		$this->allow('guest', 'Administration', array('login', 'logout', 'register', 'default'));
+		// Zoznam opravneni pre navstevnika
+		$this->allow('guest', 'Administration', array('login', 'logout', 'default'));
 
+		// Zoznam opravneni pre clena == predavac
 		$this->allow('member', 'Medicine', array('list', 'detail', 'edit', 'edit'));
 		$this->allow('member', 'Reservation', array('list', 'detail', 'edit', 'remove'));
 		$this->allow('member', 'Office', array('list', 'detail'));
 
+		// Zoznam opravneni pre managera
+		$this->allow('manager', 'Administration', array('register'));
 		$this->allow('manager', 'Office', array('edit', 'remove'));
 		$this->allow('manager', 'Insurence', array('list', 'detail', 'edit', 'remove'));
 		$this->allow('manager', 'Supplier', array('list', 'detail', 'edit', 'remove'));

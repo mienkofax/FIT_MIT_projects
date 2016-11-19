@@ -20,8 +20,6 @@
 			<div class="col-sm-6">
 				{if $user->loggedIn}
 				Prihlásený používateľ: <a>{$user->getIdentity()->login}</a>
-				{else}
-				<a n:href="Administration:register">Vytvoriť nový účet</a>
 				{/if}
 			</div>
 
@@ -72,7 +70,6 @@
 		<div class="col-md-9">
 			{include content}
 		</div>
-
 	</div>
 
 	{block scripts}
@@ -80,41 +77,26 @@
 
 	<script src="{$basePath}/js/bootstrap.min.js"></script>
 	<script>
-	$(".custom-form")[0].reset();
-/*
-	$(document).ready(function() {
-		$('input[type=text]').addClass('form-control');
-		$('input[type=number]').addClass('form-control');
-		$('input[type=email]').addClass('form-control');
-		$('input[type=submit]').addClass('btn btn-primary');
-		$('lable').addClass('control-label');
-	})*/
+		$(".custom-form")[0].reset();
 	</script>
 	<script>
-	splitdata = $(location).attr('pathname').split('/')[2];
-	$('.detail.nav-tabs li a').click(function() {
-		data = $(this).attr("href");
-		if (typeof(Storage) !== "undefined")
-			localStorage.setItem(splitdata, data);
-	});
+		splitdata = $(location).attr('pathname').split('/')[2];
+		$('.detail.nav-tabs li a').click(function() {
+			data = $(this).attr("href");
+			if (typeof(Storage) !== "undefined")
+				localStorage.setItem(splitdata, data);
+		});
 
- 	if ($('.detail.nav-tabs').length) {
-		console.log("data");
-	data = localStorage.getItem(splitdata);
-	if (!data)
-		data = "#sectionA";
+	 	if ($('.detail.nav-tabs').length) {
+			console.log("data");
+		data = localStorage.getItem(splitdata);
+		if (!data)
+			data = "#sectionA";
 
-	$('a[href="'+data+'"]').tab('show');}
-	else
-		$('a[href="#sectionA"]').tab('show');
-
-
-// Check browser support
-
-
-</script>
-<script>
-</script>
+		$('a[href="'+data+'"]').tab('show');}
+		else
+			$('a[href="#sectionA"]').tab('show');
+	</script>
 	{/block}
 </body>
 </html>

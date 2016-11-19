@@ -36,11 +36,11 @@ class UserManager extends BaseManager
 		$default_sort = self::SORT_TYPE['asc'];
 
 		// Kontrola ci bol zadany validny slpec pre zotriedenie
-		if (self::SORT_TABLE[$column] !== null)
+		if (array_key_exists($column, self::SORT_TABLE))
 			$default_column = self::SORT_TABLE[$column];
 
 		// Kontrola ci bolo zadane v akom poradi sa ma maju vypisat
-		if (self::SORT_TYPE[$sort] !== null)
+		if (array_key_exists($sort, self::SORT_TYPE))
 			$default_sort = self::SORT_TYPE[$sort];
 
 		return $this->database->table(self::TABLE_NAME)
