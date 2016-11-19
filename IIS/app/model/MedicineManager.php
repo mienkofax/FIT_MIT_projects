@@ -36,11 +36,11 @@ class MedicineManager extends BaseManager
 		$default_sort = self::SORT_TYPE['asc'];
 
 		// Kontrola ci bol zadany validny slpec pre zotriedenie
-		if (isset(self::SORT_TABLE[$column]))
+		if (self::SORT_TABLE[$column] !== null)
 			$default_column = self::SORT_TABLE[$column];
 
 		// Kontrola ci bolo zadane v akom poradi sa ma maju vypisat
-		if (isset(self::SORT_TYPE[$sort]))
+		if (self::SORT_TYPE[$sort] !== null)
 			$default_sort = self::SORT_TYPE[$sort];
 
 		return $this->database->table(self::TABLE_NAME)
