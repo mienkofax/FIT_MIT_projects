@@ -43,25 +43,22 @@
 					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
-				<th colspan="2">Akcie s liekom</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tr n:foreach="$medicines as $medicine">
 				<td>
-					<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+					<a class="link"  n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
 				</td>
 				<td class="text-center">
 					{$medicine->date_time}
 				</td>
-				<td>
-					<a n:href="Medicine:edit $medicine->ID_leku">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
+				<td class="text-center">
+					<a class="action" n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 					</a>
-				</td>
-
-				<td>
-					<a href="{link Office:remove}/{$office->ID_pobocky}/liek/{$medicine->ID_leku}">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
+					<a class="action" href="{link Office:remove}/{$office->ID_pobocky}/liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
 					</a>
 				</td>
 			</tr>
@@ -83,25 +80,22 @@
 					<a href="{link Supplier:list}/cas/desc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link Supplier:list}/cas/asc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
-				<th colspan="2">Akcie s dodávateľom</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tr n:foreach="$suppliers as $supplier">
 				<td>
-					<a n:href="Supplier:detail $supplier->ID_dodavatele">{$supplier->nazev_dodavatele}</a>
+					<a class="link" n:href="Supplier:detail $supplier->ID_dodavatele">{$supplier->nazev_dodavatele}</a>
 				</td>
 				<td class="text-center">
 					{$supplier->date_time}
 				</td>
 				<td>
-					<a n:href="Office:remove $supplier->ID_dodavatele">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
+					<a class="action" n:href="Office:remove $supplier->ID_dodavatele">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 					</a>
-				</td>
-
-				<td>
-					<a href="{plink Office:remove}/{$office->ID_pobocky}/dodavatel/{$supplier->ID_dodavatele}">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
+					<a class="action" href="{plink Office:remove}/{$office->ID_pobocky}/dodavatel/{$supplier->ID_dodavatele}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
 					</a>
 				</td>
 			</tr>
@@ -114,12 +108,7 @@
 			<thead>
 			<tr>
 				<th>
-					Meno
-					<a href="{link User:list}/nazov/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
-					<a href="{link User:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
-				</th>
-				<th>
-					Priezvisko
+					Priezvisko a meno
 					<a href="{link User:list}/priezvisko/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link User:list}/priezvisko/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
@@ -128,28 +117,22 @@
 					<a href="{link User:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link User:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
-				<th colspan="2">Akcie s užívateľom</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tr n:foreach="$users as $userItem">
 				<td>
-					<a n:href="User:detail $userItem->ID_uzivatele">{$userItem->jmeno}</a>
-				</td>
-				<td>
-					<a n:href="User:detail $userItem->ID_uzivatele">{$userItem->prijmeni}</a>
+					<a class="link" n:href="User:detail $userItem->ID_uzivatele">{$userItem->prijmeni} {$userItem->jmeno}</a>
 				</td>
 				<td class="text-center">
 					{$userItem->date_time}
 				</td>
-				<td>
-					<a n:href="User:edit $userItem->ID_uzivatele">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
+				<td class="text-center">
+					<a class="action" n:href="User:edit $userItem->ID_uzivatele">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 					</a>
-				</td>
-
-				<td>
-					<a href="{plink Office:remove}/{$office->ID_pobocky}/uzivatel/{$userItem->ID_uzivatele}">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
+					<a class="action" href="{plink Office:remove}/{$office->ID_pobocky}/uzivatel/{$userItem->ID_uzivatele}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
 					</a>
 				</td>
 			</tr>
@@ -176,28 +159,25 @@
 					<a href="{link Reservation:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link Reservation:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
-				<th colspan="2">Akcie s rezerváciou</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tr n:foreach="$reservations as $reservation">
 				<td>
-					<a n:href="Reservation:detail $reservation->ID_rezervace">{$reservation->prijmeni} {$reservation->jmeno}</a>
+					<a class="link" n:href="Reservation:detail $reservation->ID_rezervace">{$reservation->prijmeni} {$reservation->jmeno}</a>
 				</td>
 				<td>
-					<a n:href="Reservation:detail $reservation->ID_rezervace">{$reservation->stav_rezervace}</a>
+					<a class="link" n:href="Reservation:detail $reservation->ID_rezervace">{$reservationState[$reservation->stav_rezervace]}</a>
 				</td>
 				<td class="text-center">
 					{$reservation->date_time}
 				</td>
-				<td>
-					<a n:href=":Reservation:edit $reservation->ID_rezervace">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+				<td class="text-center">
+					<a class="action" n:href=":Reservation:edit $reservation->ID_rezervace">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 					</a>
-				</td>
-
-				<td>
-					<a href="{link Office:remove}/{$office->ID_pobocky}/rezervacia/{$reservation->ID_rezervace}">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					<a class="action" href="{link Office:remove}/{$office->ID_pobocky}/rezervacia/{$reservation->ID_rezervace}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
 					</a>
 				</td>
 			</tr>

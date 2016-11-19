@@ -20,6 +20,14 @@ use Nette\Callback;
  */
 class OfficePresenter extends BasePresenter
 {
+	const
+		RESERVATION_STATE = array(
+			'prijata' => 'Prijatá',
+			'rozpracovana' => 'Rozpracovaná',
+			'pripravena' => 'Pripravená',
+			'dokoncena' => 'Dokončená'
+		);
+
 	/** @var OfficePresenter Informacie o pobockach a praca s nimi */
 	protected $officeManager;
 
@@ -70,6 +78,7 @@ class OfficePresenter extends BasePresenter
 		$this->template->users = $this->officeManager->relatedUser($id);
 		$this->template->reservations = $this->officeManager->relatedReservation($id);
 		$this->template->CountDBItem = $this->officeManager->countDBItem($id);
+		$this->template->reservationState = self::RESERVATION_STATE;
 	}
 
 	/**

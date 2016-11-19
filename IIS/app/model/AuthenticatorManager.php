@@ -16,7 +16,7 @@ class DuplicateColumnException extends AuthenticationException
 	public function __construct()
 	{
 		parent::__construct();
-		$this->message = 'Používateľské meno je už obasdené, zvoľte iné.';
+		$this->message = 'Používateľské meno je už obsadené, zvoľte iné.';
 	}
 }
 

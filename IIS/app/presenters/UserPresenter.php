@@ -14,6 +14,12 @@ use Nette\Utils\Arrayhash;
  */
 class UserPresenter extends BasePresenter
 {
+	const
+		PERMISSION = array(
+			'member' => 'Registrovaný užívateľ',
+			'manager' => 'Manažér',
+			'admin' => 'Administrátor'
+		);
 	/** @var UserManager Informacie o uzivatelovi a praca s nim */
 	protected $userManager;
 
@@ -93,15 +99,19 @@ class UserPresenter extends BasePresenter
 		$form->addHidden('ID_uzivatele');
 		$form->addText('login', 'Prihlasovacie meno')
 			->addRule(Form::FILLED, "Musí byť zadané prihlasovanie meno");
+		$form->addText('jmeno', 'Meno užívateľa')
+			->addRule(Form::FILLED, 'Zadajte meno');
+		$form->addText('prijmeni', 'Prezvisko užívateľa')
+			->addRule(Form::FILLED, 'Zadajte priezvisko');
 		$form->addPassword('heslo', 'Heslo')
 			->addRule(Form::FILLED, "Musí byť zadané heslo");
 		$form->addPassword('heslo_repeat', 'Heslo znova')
 			->addRule(Form::FILLED, "Musí byť zadané heslo")
 			->addRule(Form::EQUAL, 'Heslá sa nezhodujú', $form['heslo']);
-		$form->addText('jmeno', 'Meno užívateľa')
-			->addRule(Form::FILLED, 'Zadajte meno');
-		$form->addText('prijmeni', 'Prezvisko užívateľa')
-			->addRule(Form::FILLED, 'Zadajte priezvisko');
+		$form->addSelect('opravneni', 'Oprávnenie užívateľa', self::PERMISSION)
+			->setAttribute('class', 'form-control')
+			->setPrompt('Vyberte oprávnenie')
+			->setRequired(TRUE);
 		$form->addGroup('');
 		$form->addSubmit('submit', "Uložiť užívateľa")
 			->setAttribute('class', 'btn-primary');

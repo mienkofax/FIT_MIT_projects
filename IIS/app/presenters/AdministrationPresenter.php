@@ -41,7 +41,7 @@ class AdministrationPresenter extends BasePresenter
 	public function actionLogin()
 	{
 		if ($this->getUser()->isLoggedIn())
-			$this->redirect('Administration:');
+			$this->redirect('Administration:default');
 	}
 
 	/**

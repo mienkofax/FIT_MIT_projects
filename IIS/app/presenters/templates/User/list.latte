@@ -22,25 +22,22 @@
 					<a href="{link User:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link User:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
-				<th colspan="2">Akcie s Užívateľom</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tr n:foreach="$users as $userItem">
 				<td>
-					<a n:href="User:detail $userItem->ID_uzivatele">{$userItem->prijmeni} {$userItem->jmeno}</a>
+					<a class="link" n:href="User:detail $userItem->ID_uzivatele">{$userItem->prijmeni} {$userItem->jmeno}</a>
 				</td>
 				<td class="text-center">
 					{$userItem->date_time}
 				</td>
 				<td>
-					<a n:href="User:edit $userItem->ID_uzivatele">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+					<a class="action" n:href="User:edit $userItem->ID_uzivatele">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 					</a>
-				</td>
-
-				<td>
-					<a n:href="User:remove $userItem->ID_uzivatele">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					<a class="action" n:href="User:remove $userItem->ID_uzivatele">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
 					</a>
 				</td>
 			</tr>

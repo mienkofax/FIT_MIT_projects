@@ -1,7 +1,14 @@
 {define title}Přihlášení{/define}
 {define description}Přihlášení do uživatelského účtu.{/define}
 {block content}
-<h2>Prihlásenie</h2>
-{* Formulář pro přihlášování. *}
-{control loginForm}
-<p>Pokiaľ nemáte účet, <a n:href="Administration:register">zaregistrujte sa</a>.</p>
+<ul class="list nav nav-tabs">
+	<li><a data-toggle="tab" href="#sectionA">Prihlásenie</a></li>
+</ul>
+
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		<h2>Prihlásenie</h2>
+		{control loginForm}
+		<p>Pokiaľ nemáte účet, <a n:href="Administration:register">zaregistrujte sa</a>.</p>
+	</div>
+</div>

@@ -28,12 +28,13 @@ abstract class BasePresenter extends Presenter
 		parent::startup();
 
 		if (!$this->getUser()->isAllowed($this->getName(), $this->getAction())) {
-			$this->flashMessage('Daná sekcia je dostupná len po prihlásení.
+			$this->flashMessage('Daná sekcia alebo akcia je dostupná len po prihlásení.
 				Ak ste prihlásený požiadajte administrátora o pridelenie
 				oprávnení pre túto sekciu.');
 
-			if ($this->loginPresenter)
-				$this->redirect($this->loginPresenter);
+			if ($this->loginPresenter) {
+				$this->redirect('Administration:default');
+			}
 		}
 	}
 

@@ -27,28 +27,25 @@
 					<a href="{link Reservation:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link Reservation:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
-				<th colspan="2">Akcie s rezerváciou</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tr n:foreach="$reservations as $reservation">
 				<td>
-					<a n:href="Reservation:detail $reservation->ID_rezervace">{$reservation->prijmeni} {$reservation->jmeno}</a>
+					<a class="link" n:href="Reservation:detail $reservation->ID_rezervace">{$reservation->prijmeni} {$reservation->jmeno}</a>
 				</td>
 				<td>
-					<a n:href="Reservation:detail $reservation->ID_rezervace">{$reservation->stav_rezervace}</a>
+					<a class="link" n:href="Reservation:detail $reservation->ID_rezervace">{$reservationState[$reservation->stav_rezervace]}</a>
 				</td>
 				<td class="text-center">
 					{$reservation->date_time}
 				</td>
-				<td>
-					<a n:href=":Reservation:edit $reservation->ID_rezervace">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+				<td class="text-center">
+					<a class="action" n:href=":Reservation:edit $reservation->ID_rezervace">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 					</a>
-				</td>
-
-				<td>
-					<a href="{link Reservation:remove}/{$reservation->ID_rezervace}/rezervacia/{$reservation->ID_rezervace}">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					<a class="action" href="{link Reservation:remove}/{$reservation->ID_rezervace}/rezervacia/{$reservation->ID_rezervace}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
 					</a>
 				</td>
 			</tr>

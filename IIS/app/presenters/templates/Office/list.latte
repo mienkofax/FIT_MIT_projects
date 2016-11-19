@@ -18,29 +18,26 @@
 					<a href="{link Office:list}/nazov/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
 				<th class="text-center">
-					Dátum vytvorenia pobočky
+					Dátum vytvorenia
 					<a href="{link Office:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link Office:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
-				<th colspan="2">Akcie s pobočkou</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tr n:foreach="$offices as $office">
 				<td>
-					<a n:href="Office:detail $office->ID_pobocky">{$office->nazev_pobocky}</a>
+					<a class="link" n:href="Office:detail $office->ID_pobocky">{$office->nazev_pobocky}</a>
 				</td>
 				<td class="text-center">
 					{$office->date_time}
 				</td>
-				<td>
-					<a n:href=":Office:edit $office->ID_pobocky">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+				<td class="text-center">
+					<a class="action" n:href=":Office:edit $office->ID_pobocky">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 					</a>
-				</td>
-
-				<td>
-					<a href="{link Office:remove}/{$office->ID_pobocky}/pobocka/{$office->ID_pobocky}">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					<a class="action" href="{link Office:remove}/{$office->ID_pobocky}/pobocka/{$office->ID_pobocky}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
 					</a>
 				</td>
 			</tr>

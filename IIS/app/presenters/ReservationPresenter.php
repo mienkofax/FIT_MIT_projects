@@ -78,6 +78,7 @@ class ReservationPresenter extends BasePresenter
 	public function renderList($column, $sort)
 	{
 		$this->template->reservations = $this->reservationManager->getReservations($column, $sort);
+		$this->template->reservationState = self::RESERVATION_STATE;
 	}
 
 	/**
@@ -152,7 +153,7 @@ class ReservationPresenter extends BasePresenter
 					->setPrompt('Zvoľte liek')
 					->setRequired(TRUE)
 					->setAttribute('class', 'form-control');
-				$reservation->addText('pocet_rezervovanych', 'Počet rezervovaných')
+				$reservation->addText('pocet_rezervovanych', 'Počet kusov')
 					->setRequired(TRUE)
 					->addRule(Form::INTEGER, 'Počet kusov musí být číslo')
 					->addRule(Form::RANGE, 'Počet kusok musí byť kladné číslo', array(0, null))

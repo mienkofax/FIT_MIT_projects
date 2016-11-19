@@ -22,25 +22,22 @@
 					<a href="{link Insurence:list}/cas/desc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link Insurence:list}/cas/asc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
-				<th colspan="2">Akcie s poisťovňou</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tr n:foreach="$insurences as $insurence">
 				<td>
-					<a n:href="Insurence:detail $insurence->ID_pojistovny">{$insurence->nazev_pojistovny}</a>
+					<a class="link" n:href="Insurence:detail $insurence->ID_pojistovny">{$insurence->nazev_pojistovny}</a>
 				</td>
 				<td class="text-center">
 					{$insurence->date_time}
 				</td>
-				<td>
-					<a n:href="Insurence:edit $insurence->ID_pojistovny">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
+				<td class="text-center">
+					<a class="action" n:href="Insurence:edit $insurence->ID_pojistovny">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 					</a>
-				</td>
-
-				<td>
-					<a href="{link Insurence:remove}/{$insurence->ID_pojistovny}/poistovna/{$insurence->ID_pojistovny}">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
+					<a class="action" href="{link Insurence:remove}/{$insurence->ID_pojistovny}/poistovna/{$insurence->ID_pojistovny}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
 					</a>
 				</td>
 			</tr>

@@ -42,25 +42,22 @@
 					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
-				<th colspan="2">Akcie s liekom</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tr n:foreach="$medicinesWithPaid as $medicine">
 				<td>
-					<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+					<a class="link" n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
 				</td>
 				<td class="text-center">
 					{$medicine->date_time}
 				</td>
-				<td>
-					<a n:href="Medicine:edit $medicine->ID_leku">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
+				<td class="text-center">
+					<a class="action" n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 					</a>
-				</td>
-
-				<td>
-					<a href="{link Insurence:remove}/{$insurence->ID_pojistovny}/liek/{$medicine->ID_leku}">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
+					<a class="action" href="{link Insurence:remove}/{$insurence->ID_pojistovny}/liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
 					</a>
 				</td>
 			</tr>
@@ -82,25 +79,22 @@
 					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
-				<th colspan="2">Akcie s liekom</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tr n:foreach="$medicinesWithoutPaid as $medicine">
 				<td>
-					<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+					<a class="link" n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
 				</td>
 				<td class="text-center">
 					{$medicine->date_time}
 				</td>
 				<td>
-					<a n:href="Medicine:edit $medicine->ID_leku">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
+					<a class="action" n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 					</a>
-				</td>
-
-				<td>
-					<a href="{link Insurence:remove}/{$insurence->ID_pojistovny}/liek/{$medicine->ID_leku}">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
+					<a class="action" href="{link Insurence:remove}/{$insurence->ID_pojistovny}/liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
 					</a>
 				</td>
 			</tr>
@@ -122,25 +116,22 @@
 					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
-				<th colspan="2">Akcie s liekom</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tr n:foreach="$medicinesAdditionalCharge as $medicine">
 				<td>
-					<a n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+					<a class="link" n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
 				</td>
 				<td class="text-center">
 					{$medicine->date_time}
 				</td>
-				<td>
-					<a n:href="Medicine:edit $medicine->ID_leku">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovat
+				<td class="text-center">
+					<a class="action" n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 					</a>
-				</td>
-
-				<td>
-					<a href="{link Insurence:remove}/{$insurence->ID_pojistovny}/liek/{$medicine->ID_leku}">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstranit
+					<a class="action" href="{link Insurence:remove}/{$insurence->ID_pojistovny}/liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
 					</a>
 				</td>
 			</tr>

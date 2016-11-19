@@ -66,6 +66,7 @@ class UserManager extends BaseManager
 	public function saveUser($user)
 	{
 		unset($user['heslo_repeat']);
+		$user['heslo'] = Passwords::hash($user['heslo']);
 		if (!$user[self::COLUMN_ID]) {
 			unset($user[self::COLUMN_ID]);
 			$this->database->table(self::TABLE_NAME)->insert($user);

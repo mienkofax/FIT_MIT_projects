@@ -24,6 +24,12 @@ class MedicinePresenter extends BasePresenter
 		MEDICINE_TYPE = array(
 			'0' => 'Bez predpisu',
 			'1' => 'Na predpis'
+		),
+		RESERVATION_STATE = array(
+			'prijata' => 'Prijatá',
+			'rozpracovana' => 'Rozpracovaná',
+			'pripravena' => 'Pripravená',
+			'dokoncena' => 'Dokončená'
 		);
 
 	/** @var MedicineManager Informacie o lieku a praca s nim */
@@ -73,6 +79,7 @@ class MedicinePresenter extends BasePresenter
 		$this->template->reservations = $this->medicineManager->relatedReservation($id);
 		$this->template->offices = $this->medicineManager->relatedOffices($id);
 		$this->template->insurences = $this->medicineManager->relatedInsurences($id);
+		$this->template->reservationState = self::RESERVATION_STATE;
 	}
 
 	/**

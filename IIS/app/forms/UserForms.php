@@ -84,7 +84,7 @@ class UserForms extends Object
 	{
 		$form = $form ? $form : new Form;
 
-		$form->addText('username', 'Prihlasovacie meno')
+		$form->addText('username', 'Meno')
 			->addRule(Form::FILLED, "Musí byť zadané prihlasovanie meno");
 		$form->addPassword('password', 'Heslo')
 			->addRule(Form::FILLED, "Musí byť zadané heslo");

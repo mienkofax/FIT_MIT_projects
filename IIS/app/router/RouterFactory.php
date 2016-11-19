@@ -13,7 +13,8 @@ class RouterFactory
 	public static function createRouter()
 	{
 		$router = new RouteList;
-		$router[] = new Route('<action>', array(
+		$router[] = new Route('[url]', 'Administration:default');
+		$router[] = new Route('<presenter=Administration>/<action=default>', array(
 			'action' => array(
 				Route::FILTER_TABLE => array(
 					'administracia' => 'default',
@@ -56,8 +57,6 @@ class RouterFactory
 			'column' => null,
 			'sort' => null
 		));
-
-		$router[] = new Route('[url]', 'Administration:default');
 
 		return $router;
 	}

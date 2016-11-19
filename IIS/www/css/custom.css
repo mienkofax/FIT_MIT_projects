@@ -24,6 +24,7 @@ h4 {
 ul.menu {
 	list-style-type: none;
 	padding: 10px 0;
+	margin-top: 40px;
 }
 ul.menu li a {
 	display: block;
@@ -94,4 +95,52 @@ h4 {
 }
 .custom-form input {
 	margin: 5px 8px;
+}
+
+.glyphicon-edit {
+	font-size: 17px;
+	color: green;
+	margin-right: 5px;
+}
+.glyphicon-remove-circle {
+	font-size: 17px;
+	color: red;
+}
+
+.action:hover {
+	text-decoration: none;
+}
+.link:hover {
+	color: #77c708;
+	text-decoration: none;
+}
+
+.table-hover>tbody>tr:hover
+{
+	background: #efefef;
+}
+
+h1 {
+	margin: 0px;
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.home th {
+	text-align: center;
+}
+
+.home h3 {
+	text-align: center !important;
+}
+.home .glyphicon-ok-circle {
+	color: green;
+	font-size: 16px;
+}
+.home .glyphicon-remove-circle {
+	color: red;
+	font-size: 16px;
+}
+blockquote {
+	text-align: justify;
 }

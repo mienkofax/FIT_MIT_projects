@@ -22,25 +22,22 @@
 					<a href="{link Supplier:list}/cas/desc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link Supplier:list}/cas/asc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
-				<th colspan="2">Akcie s dodávateľom</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tr n:foreach="$suppliers as $supplier">
 				<td>
-					<a n:href="Supplier:detail $supplier->ID_dodavatele">{$supplier->nazev_dodavatele}</a>
+					<a class="link" n:href="Supplier:detail $supplier->ID_dodavatele">{$supplier->nazev_dodavatele}</a>
 				</td>
 				<td class="text-center">
 					{$supplier->date_time}
 				</td>
-				<td>
-					<a n:href="Supplier:edit $supplier->ID_dodavatele">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Editovať
+				<td class="text-center">
+					<a class="action" n:href="Supplier:edit $supplier->ID_dodavatele">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 					</a>
-				</td>
-
-				<td>
-					<a href="{link Supplier:remove}/{$supplier->ID_dodavatele}/dodavatel/{$supplier->ID_dodavatele}">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Odstrániť
+					<a class="action" href="{link Supplier:remove}/{$supplier->ID_dodavatele}/dodavatel/{$supplier->ID_dodavatele}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
 					</a>
 				</td>
 			</tr>
