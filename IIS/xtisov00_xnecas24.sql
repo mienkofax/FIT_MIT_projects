@@ -46,7 +46,7 @@ CREATE TABLE uzivatele
 	heslo VARCHAR(128) NOT NULL,
 	jmeno VARCHAR(128),
 	prijmeni VARCHAR(128),
-	opravneni ENUM('member', 'seller', 'admin') DEFAULT 'member',
+	opravneni ENUM('member', 'manager', 'admin') DEFAULT 'member',
 	date_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 	UNIQUE (login),
@@ -84,16 +84,7 @@ CREATE TABLE pojistovny
 );
 
 -- zakaznici
-CREATE TABLE zakaznici
-(
-	ID_zakaznika INTEGER NOT NULL AUTO_INCREMENT,
-	rodne_cislo VARCHAR(11) NOT NULL,
-	jmeno VARCHAR(128),
-	prijmeni VARCHAR(128),
-	date_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-	CONSTRAINT PK_zakaznici PRIMARY KEY (ID_zakaznika)
-);
 
 -- rezervace_leku
 CREATE TABLE rezervace_leku
@@ -102,7 +93,7 @@ CREATE TABLE rezervace_leku
 	stav_rezervace ENUM('prijata', 'rozpracovana', 'pripravena', 'dokoncena') DEFAULT 'prijata',
 	jmeno VARCHAR(128),
 	prijmeni VARCHAR(128),
-	-- ID_zakaznika INTEGER NOT NULL,
+	rodne_cislo VARCHAR(11) NOT NULL,
 	date_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 	CONSTRAINT PK_rezervace PRIMARY KEY (ID_rezervace)
@@ -211,21 +202,18 @@ VALUES(7, 'MEDEA', 'Ečerova 39', 'Brno', 63500, '546215061', 'lekarna@medeabrno
 ALTER TABLE pobocky AUTO_INCREMENT = 8;
 
 -- uzivatele
-INSERT INTO uzivatele
-VALUES(1, 'xpokor00', ' ', 'Jana', 'Pokorná', 'admin', CURRENT_TIMESTAMP);
-INSERT INTO uzivatele
-VALUES(2, 'xmatou05', ' ', 'Petr', 'Matoušek', 'member', CURRENT_TIMESTAMP+1);
-INSERT INTO uzivatele
-VALUES(3, 'xmlynar33', ' ', 'Jan', 'Mlynář', 'member', CURRENT_TIMESTAMP+2);
-INSERT INTO uzivatele
-VALUES(4, 'xbradac28', ' ', 'Kateřina', 'Bradáčová', 'member', CURRENT_TIMESTAMP+3);
-INSERT INTO uzivatele
-VALUES(5, 'xkubin09', ' ', 'Lucie', 'Kubínová', 'member', CURRENT_TIMESTAMP+4);
-INSERT INTO uzivatele
-VALUES(6, 'xsebes25', ' ', 'Martin', 'Šebestík', 'member', CURRENT_TIMESTAMP+5);
-INSERT INTO uzivatele
-VALUES(7, 'peto', '$2y$10$h8vmMU0yHJ4jFOpfxrZO0eIW3qgnRFXsdi4G9DKzXaHuo9OLPuPJu', '', '', 'admin', CURRENT_TIMESTAMP+6);
-ALTER TABLE uzivatele AUTO_INCREMENT = 8;
+INSERT INTO `uzivatele` (`ID_uzivatele`, `login`, `heslo`, `jmeno`, `prijmeni`, `opravneni`, `date_time`) VALUES
+(1, 'xpokor00', ' ', 'Jana', 'Pokorná', 'admin', '2016-11-18 22:56:15'),
+(2, 'xmatou05', ' ', 'Petr', 'Matoušek', 'member', '2016-11-18 22:56:16'),
+(3, 'xmlynar33', ' ', 'Jan', 'Mlynář', 'member', '2016-11-18 22:56:17'),
+(4, 'xbradac28', ' ', 'Kateřina', 'Bradáčová', 'member', '2016-11-18 22:56:18'),
+(5, 'xkubin09', ' ', 'Lucie', 'Kubínová', 'member', '2016-11-18 22:56:19'),
+(6, 'xsebes25', ' ', 'Martin', 'Šebestík', 'member', '2016-11-18 22:56:20'),
+(7, 'peto', '$2y$10$h8vmMU0yHJ4jFOpfxrZO0eIW3qgnRFXsdi4G9DKzXaHuo9OLPuPJu', 'Peter', 'Tisovčík', 'admin', '2016-11-18 22:56:21'),
+(8, 'admin', '$2y$10$5Pm3QugcZNRHtvwOIFEfI.4zhlzur3I8KdgxXVzg7HWdD/B67z6Tq', 'Peter', 'Tisovčík', 'member', '2016-11-19 11:10:54'),
+(9, 'manager', '$2y$10$hPaVmo3GpTDaU/No5ACw.eU7JnRO5rwpC5Jqcb4Vdil5UI1s7eJy.', 'Peter', 'Tisovčík', 'member', '2016-11-19 11:11:40'),
+(10, 'predavac', '$2y$10$8CfGp36gkkBGCuLw4q8F6OMQ9foS773zQUVlgFt.Anujg1QQKwVPC', 'Peter', 'Tisovčík', 'member', '2016-11-19 11:12:33');
+ALTER TABLE uzivatele AUTO_INCREMENT = 11;
 
 -- dodavatele
 INSERT INTO dodavatele
@@ -265,24 +253,6 @@ INSERT INTO leky
 VALUES(7, 'Clarinase Repetabs', 1, CURRENT_TIMESTAMP+13);
 ALTER TABLE leky AUTO_INCREMENT = 8;
 
-INSERT INTO rezervace_leku
-VALUES(1, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP);
-INSERT INTO rezervace_leku
-VALUES(2, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP+1);
-INSERT INTO rezervace_leku
-VALUES(3, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP+2);
-INSERT INTO rezervace_leku
-VALUES(4, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP+3);
-INSERT INTO rezervace_leku
-VALUES(5, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP+4);
-INSERT INTO rezervace_leku
-VALUES(6, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP+5);
-INSERT INTO rezervace_leku
-VALUES(7, 'prijata', "meno", "priezvisko", CURRENT_TIMESTAMP+6);
-INSERT INTO rezervace_leku
-VALUES(8, 'prijata', "meno", "priezvisko",  CURRENT_TIMESTAMP+7);
-ALTER TABLE rezervace_leku AUTO_INCREMENT = 9;
-
 -- pojistovny
 INSERT INTO pojistovny
 VALUES(1, 'Všeobecná zdravotní pojišťovna', 'Benešova 10', 'Brno', 65914, 'Česká republika', '952222222', 'info@vzp.cz', CURRENT_TIMESTAMP);
@@ -301,57 +271,96 @@ VALUES(7, 'Revírní bratrská pojišťovna', 'Masarykova 34', 'Brno', 60200, '�
 ALTER TABLE pojistovny AUTO_INCREMENT = 8;
 
 -- pobocka_lek
-INSERT INTO pobocka_lek
-VALUES('1', '7', 10, 1);
-INSERT INTO pobocka_lek
-VALUES('2', '5', 10, 1);
-INSERT INTO pobocka_lek
-VALUES('2', '7', 10, 1);
-INSERT INTO pobocka_lek
-VALUES('3', '4', 10, 1);
-INSERT INTO pobocka_lek
-VALUES('4', '1', 10, 1);
-INSERT INTO pobocka_lek
-VALUES('6', '2', 10, 1);
-INSERT INTO pobocka_lek
-VALUES('5', '3', 10, 1);
-INSERT INTO pobocka_lek
-VALUES('5', '1', 10, 1);
-INSERT INTO pobocka_lek
-VALUES('5', '4', 10, 1);
-INSERT INTO pobocka_lek
-VALUES('7', '2', 10, 1);
-INSERT INTO pobocka_lek
-VALUES('7', '6', 10, 1);
+INSERT INTO `pobocka_lek` (`ID_pobocky`, `ID_leku`, `pocet_na_sklade`, `pocet_prodanych`) VALUES
+(1, 7, 10, 1),
+(2, 5, 10, 1),
+(2, 7, 10, 1),
+(3, 4, 10, 1),
+(4, 1, 10, 1),
+(5, 1, 10, 1),
+(5, 3, 10, 1),
+(5, 4, 10, 1),
+(6, 2, 10, 1),
+(7, 2, 10, 1),
+(7, 6, 10, 1);
+
+INSERT INTO `rezervace_leku` (`ID_rezervace`, `stav_rezervace`, `jmeno`, `prijmeni`, `date_time`, `rodne_cislo`) VALUES
+(9, 'prijata', 'Martin', 'Bielik', '2016-11-18 20:03:18', '123456/7890'),
+(10, 'rozpracovana', 'Jana', 'Veselá', '2016-11-18 20:04:03', '123456/7890'),
+(11, 'dokoncena', 'Milan', 'Novák', '2016-11-18 20:09:01', '123456/7890');
 
 -- rezervace_leku_lek
-INSERT INTO rezervace_leku_lek
-VALUES('6', '3', 0, 1);
-INSERT INTO rezervace_leku_lek
-VALUES('1', '4', 0, 1);
-INSERT INTO rezervace_leku_lek
-VALUES('6', '5', 0, 2);
-INSERT INTO rezervace_leku_lek
-VALUES('6', '7', 0, 2);
+INSERT INTO `rezervace_leku_lek` (`ID_rezervace`, `ID_leku`, `pocet_rezervovanych`, `ID_pobocky`) VALUES
+(9, 1, 1, 1),
+(9, 2, 12, 4),
+(10, 4, 7, 4),
+(10, 5, 3, 4),
+(11, 7, 5, 2);
 
 -- pobocka_zamestnanec
-INSERT INTO pobocka_zamestnanec
-VALUES('2', '2');
-INSERT INTO pobocka_zamestnanec
-VALUES('1', '4');
-INSERT INTO pobocka_zamestnanec
-VALUES('3', '6');
-INSERT INTO pobocka_zamestnanec
-VALUES('3', '5');
+INSERT INTO `pobocka_zamestnanec` (`ID_pobocky`, `ID_uzivatele`) VALUES
+(2, 2),
+(1, 4),
+(3, 5),
+(3, 6);
 
 -- lek_pojistovny
-INSERT INTO lek_pojistovny
-VALUES('2', '4', 140, NULL, 'nehradene');
-INSERT INTO lek_pojistovny
-VALUES('1', '5', 165, NULL, 'nehradene');
-INSERT INTO lek_pojistovny
-VALUES('6', '7', 165, NULL, 'doplatok');
-INSERT INTO lek_pojistovny
-VALUES('3', '6', 165, NULL, 'hradene');
-INSERT INTO lek_pojistovny
-VALUES('2', '6', 165, NULL, 'nehradene');
+INSERT INTO `lek_pojistovny` (`ID_pojistovny`, `ID_leku`, `cena`, `doplatek`, `hradene`) VALUES
+(1, 5, 165.00, NULL, 'nehradene'),
+(2, 4, 140.00, NULL, 'nehradene'),
+(2, 6, 165.00, NULL, 'nehradene'),
+(3, 1, 450.00, 0.00, 'hradene'),
+(3, 2, 450.00, 0.00, 'nehradene'),
+(3, 3, 450.00, 100.00, 'doplatok'),
+(3, 6, 544.00, 44.50, 'doplatok'),
+(3, 7, 450.00, 0.00, 'nehradene'),
+(4, 4, 985.00, 50.50, 'doplatok'),
+(4, 5, 1250.00, 0.00, 'hradene'),
+(4, 6, 789.80, 0.00, 'nehradene'),
+(4, 7, 987.00, 123.00, 'hradene'),
+(5, 1, 780.00, 0.00, 'hradene'),
+(5, 2, 780.00, 0.00, 'nehradene'),
+(5, 3, 780.00, 500.00, 'doplatok'),
+(6, 7, 165.00, NULL, 'doplatok'),
+(7, 1, 650.00, 0.00, 'hradene'),
+(7, 2, 650.00, 0.00, 'nehradene'),
+(7, 3, 550.00, 125.00, 'doplatok');
+
+INSERT INTO `dodavatel_pobocka` (`ID_dodavatele`, `ID_pobocky`) VALUES
+(1, 1),
+(2, 1),
+(3, 1),
+(4, 1),
+(5, 1),
+(6, 1),
+(7, 1),
+(2, 2),
+(3, 2),
+(4, 2),
+(7, 2),
+(1, 3),
+(2, 3),
+(4, 3),
+(5, 3),
+(7, 3),
+(2, 4),
+(3, 4),
+(4, 4),
+(6, 4),
+(7, 4),
+(2, 5),
+(3, 5),
+(4, 5),
+(7, 5),
+(1, 6),
+(2, 6),
+(4, 6),
+(6, 6),
+(7, 6),
+(1, 7),
+(2, 7),
+(3, 7),
+(4, 7),
+(5, 7),
+(6, 7),
+(7, 7);
