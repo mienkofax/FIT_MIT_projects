@@ -148,8 +148,6 @@ int main(int argc, char * argv[])
 				if (optionMessage.source) {
 					if (find(search->second.sourceAddress.begin(), search->second.sourceAddress.end(),
 						search2->second.sourceAddress[0]) != search->second.sourceAddress.end()) {
-							//layerMessage->show();
-							statistics.showTop10();
 						if (layerMessage->extractHighestLayer(enteredFilter)
 									== layerMessage->extractLayer(item)) {
 							statistics.insert(searchKey->second.sourceAddress[0], value1, search2->second.dataSize);

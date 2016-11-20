@@ -47,9 +47,8 @@ void Statistics::showTop10()
 
 void Statistics::showFilterStatistics()
 {
-	//sort(m_data.begin(), m_data.end(), compare);
-	double value1 = 0;
-	double value2 = 0;
+	long int value1 = 0;
+	long int value2 = 0;
 
 	for (vector<mytuple>::iterator it = m_data.begin();
 		it != m_data.end(); it++) {

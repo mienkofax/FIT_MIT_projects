@@ -54,8 +54,20 @@ shared_ptr<LayerMessage> NetworkLayerMessage::create(Input &input,
 
 	// Spracovanie arp packetu
 	if (message->nextProtocol == 0x0806) {
-		message->address[MAC].dataSize -= 18;
-		message->data.erase(message->data.end()-(18), message->data.end());
+		if (message->address[MAC].value1 + 28 < message->address[MAC].value1) {
+			message->address[MAC].dataSize -= 18;
+			message->data.erase(message->data.end()-(18), message->data.end());
+		}
+		else if (message->address[MAC].value1 > 60) {
+			message->address[MAC].dataSize = 28;
+			message->data.erase(message->data.begin(), message->data.begin()+28);
+		}
+		else {
+			if (message->address[MAC].value1 == 60)
+				message->address[MAC].dataSize -= 18;
+			message->data.erase(message->data.end()-(14), message->data.end());
+		}
+
 		return message;
 	}
 

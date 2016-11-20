@@ -27,6 +27,7 @@ OTHERS=	ArgumentParser.h \
 		Option.h \
 		PcapReader.h \
 		Makefile \
+		manual.pdf \
 		README
 
 all:
@@ -36,5 +37,5 @@ clean:
 	rm -rf analyzer xtisov00.tar.gz
 
 tar: tar
-		tar -cf $(LOGIN).tar $(FILES) $(OTHERS)
-		gzip $(LOGIN).tar
+	tar -cf $(LOGIN).tar $(FILES) $(OTHERS)
+	gzip $(LOGIN).tar
