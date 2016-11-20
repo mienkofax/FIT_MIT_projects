@@ -85,10 +85,11 @@ int main(int argc, char * argv[])
 	vector<string> enteredFilter = args.getFilter();
 	Layer layer = optionMessage.extractHighestLayer(enteredFilter);
 
-//	optionMessage.show();
+	//optionMessage.show();
 
 	int value1 = 0;
-	int counter = 1;
+
+	bool extended = (enteredFilter.size() == 1) ? false : true;
 
 	string keyS, keyD;
 	while(file.tellg() < end) {
@@ -97,12 +98,11 @@ int main(int argc, char * argv[])
 		}
 		catch (exception &ex) {
 			cerr << ex.what();
-			counter++;
 			continue;
 		}
-		//layerMessage->show();
+		// layerMessage->show();
 
-		//prechod dostupnymi filtrami
+		// Prechod zadanymi filtrami
 		for (const auto &item : filterType) {
 			//kontrola si sa prehladavany typ filtra zadal
 			if (find(enteredFilter.begin(), enteredFilter.end(), item) == enteredFilter.end())
@@ -127,36 +127,56 @@ int main(int argc, char * argv[])
 				keyS = search2->second.sourceAddress[0];
 				keyD = search2->second.destinationAddress[0];
 
-				if (optionMessage.source)
+				if (optionMessage.source) {
 					statistics.insert(keyS, value1, search2->second.dataSize);
+
+					// Podmienka aby sa nezapocitala 2x velkost
+					if (keyS == keyD)
+						continue;
+				}
 
 				if (optionMessage.destination)
 					statistics.insert(keyD, value1, search2->second.dataSize);
 			}
 			else {
+				// Ukoncenie v pripade, ze sa jedna a paket a neobsahuje
+				// vsetky potrebne protokoly ktore ma
 				if (search == optionMessage.address.end()
 					|| search2 == layerMessage->address.end())
-					continue;
+					break;
 
 				if (optionMessage.source) {
-					for (const auto &add : search->second.sourceAddress) {
-						if (add == search2->second.sourceAddress[0])
-							statistics.insert(add, value1, search2->second.dataSize);
+					if (find(search->second.sourceAddress.begin(), search->second.sourceAddress.end(),
+						search2->second.sourceAddress[0]) != search->second.sourceAddress.end()) {
+							//layerMessage->show();
+							statistics.showTop10();
+						if (layerMessage->extractHighestLayer(enteredFilter)
+									== layerMessage->extractLayer(item)) {
+							statistics.insert(searchKey->second.sourceAddress[0], value1, search2->second.dataSize);
+							break;
+						}
+					}
+					else {
+						if (extended)
+							break;
 					}
 				}
 
 				if (optionMessage.destination) {
-					for (const auto &add : search->second.destinationAddress) {
-						if (add == search2->second.destinationAddress[0])
-							statistics.insert(add, value1, search2->second.dataSize);
+					if (find(search->second.destinationAddress.begin(), search->second.destinationAddress.end(),
+						search2->second.destinationAddress[0]) != search->second.destinationAddress.end()) {
+						if (layerMessage->extractHighestLayer(enteredFilter)
+								== layerMessage->extractLayer(item)) {
+							statistics.insert(searchKey->second.sourceAddress[0], value1, search2->second.dataSize);
+							break;
+						}
+					} else {
+						if (extended)
+							break;
 					}
 				}
 			}
-		//cout << "COUNT: " << dec << counter << endl;
 		} //koniec prechodu medzi filtrami
-		//if (counter == 585) break;
-		counter++;
-//		break;
 	}
 
 	// Zobrazenie statistik

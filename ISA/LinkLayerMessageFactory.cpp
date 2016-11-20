@@ -61,7 +61,10 @@ shared_ptr<LayerMessage> LinkLayerMessage::create(Input &input, const Layer&)
 		frameType = reader.readIntLittleEndian(ETHERNET_TYPE);
 	}
 
-	if (frameType == ETHERNET_PROTOCOL_8021Q) {
+	while (1) {
+		if (frameType != ETHERNET_PROTOCOL_8021Q)
+			break;
+
 		isVLAN = true;
 		readSize -= ETHERNET_VLAN_TYPE;
 		reader.skip(ETHERNET_VLAN_TYPE);
@@ -69,7 +72,9 @@ shared_ptr<LayerMessage> LinkLayerMessage::create(Input &input, const Layer&)
 		readSize -= ETHERNET_VLAN_TYPE;
 		frameType = reader.readIntLittleEndian(ETHERNET_VLAN_TYPE);
 
-		trailer = true;
+		//address.dataSize += ETHERNET_VLAN_TYPE;
+
+		//trailer = true;
 	}
 
 	if (trailer)

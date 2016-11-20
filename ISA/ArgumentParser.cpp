@@ -60,6 +60,9 @@ bool ArgumentParser::checkFilterValues(const vector<string> &filterArgumets)
 		address.sourceAddress = getFilterValue(str, item);
 		address.destinationAddress = address.sourceAddress;
 
+		if (m_layerMessage.address.count(m_layerMessage.extractProtocol(item)) >= 1)
+			return false;
+
 		m_layerMessage.address[m_layerMessage.extractProtocol(item)] = address;
 		i++;
 	}

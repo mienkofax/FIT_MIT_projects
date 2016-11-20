@@ -46,9 +46,16 @@ shared_ptr<LayerMessage> NetworkLayerMessage::create(Input &input,
 	int readSize = 0;
 	int totalLength = 0;
 
+	// Vratenie aspon dlzky packetu aj ked sa nevie rozpoznat protokol,
+	// tym padom sa vrati value 2 aspon ako dlzka packetu, padding sa nepocita
+	if (message->nextProtocol != 0x0806 && message->nextProtocol != 0x0800
+		&& message->nextProtocol !=0x86dd)
+		return message;
+
 	// Spracovanie arp packetu
 	if (message->nextProtocol == 0x0806) {
 		message->address[MAC].dataSize -= 18;
+		message->data.erase(message->data.end()-(18), message->data.end());
 		return message;
 	}
 
