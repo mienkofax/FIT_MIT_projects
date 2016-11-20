@@ -51,6 +51,7 @@ int main(int argc, char * argv[])
 	}
 	catch (exception &ex) {
 		cerr << ex.what() << endl;
+		args.show();
 		return EXIT_FAILURE;
 	}
 

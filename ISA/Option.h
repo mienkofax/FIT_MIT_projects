@@ -31,10 +31,10 @@ public:
 
 	void show()
 	{
-		std::cout << "[-" << m_shortName << " " << m_argName << "] " << m_description << std::endl;
-		std::cout << "\t parameter required: " << (m_required ? "true" : "false") << std::endl;
-		std::cout << "\t argument required: " << (m_argRequired ? "true" : "false") << std::endl;
-		std::cout << "\t entered: " << (m_entered ? "true" : "false") << std::endl;
+		std::cerr << "[-" << m_shortName << " " << m_argName << "] " << m_description << std::endl;
+		std::cerr << "\t parameter required: " << (m_required ? "true" : "false") << std::endl;
+		std::cerr << "\t argument required: " << (m_argRequired ? "true" : "false") << std::endl;
+		std::cerr << "\t entered: " << (m_entered ? "true" : "false") << std::endl;
 	}
 
 public:
