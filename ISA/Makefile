@@ -38,4 +38,3 @@ clean:
 
 tar: tar
 	tar -cf $(LOGIN).tar $(FILES) $(OTHERS)
-	gzip $(LOGIN).tar
