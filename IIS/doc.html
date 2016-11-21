@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!-- saved from url=(0067)https://www.fit.vutbr.cz/study/courses/IIS/private/projekt/doc.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2">
-
+<meta http-equiv="refresh" content="5">
 	<title>Projekt IIS</title>
 	<style type="text/css">
 		table { border-collapse: collapse; }
@@ -40,7 +40,74 @@
 </tbody></table>
 
 <h2>Implementace</h2>
-<p>Stručná dokumentace k implementaci, která popisuje, které PHP skripty implementují jednotlivé případy použití uvedené v use-case diagramu z IDS. V případě, že bylo nutno při implementaci učinit změny v návrhu, musí být v dokumentaci zdůvodněny.</p>
+
+<ul>
+	<li><strong>app</strong> Zložka obsahuje hlavnú časť aplikácie</li>
+	<ul>
+		<li><strong>config</strong> Konfiguračné súbory pre Nette</li>
+		<ul>
+			<li><i>config.local.neon</i> Lokálny konfiguračný súbor pre pripojenie do databáze</li>
+			<li><i>config.local</i> Hlavný konfiguračný súbor, nastavuje sa doba</li>
+		</ul>
+		<li><strong>forms</strong> </li>
+		<ul>
+			<li><i>UserForms.php</i> </li>
+		</ul>
+		<li><strong>model</strong> </li>
+		<ul>
+			<li><i>AuthenticatorManager.php</i> </li>
+			<li><i>BaseManager.php</i> </li>
+			<li><i>InsurenceManager.php</i> </li>
+			<li><i>MedicineManager.php</i> </li>
+			<li><i>MenuManager.php</i> </li>
+			<li><i>OfficeManager.php</i> </li>
+			<li><i>ReservationManager.php</i> </li>
+			<li>SupplierManager.php<i></i> </li>
+			<li><i>UserManager.php</i> </li>
+		</ul>
+		<li><strong>presenters</strong> </li>
+		<ul>
+			<li><strong>Administration</strong> </li>
+			<li><strong>Error</strong> </li>
+			<li><strong>Insurence</strong> </li>
+			<li><strong>Medicine</strong> </li>
+			<li><strong>Office</strong> </li>
+			<li><strong>Reservation</strong> </li>
+			<li><strong>Supplier</strong> </li>
+			<li><strong>User</strong> </li>
+			<li><i>@layout.latte</i> </li>
+			<li><i>AuthenticatorPresenter.php</i> </li>
+			<li><i>BasePresenter.php</i> </li>
+			<li><i>InsurencePresenter.php</i> </li>
+			<li><i>MedicinePresenter.php</i> </li>
+			<li><i>MenuPresenter.php</i> </li>
+			<li><i>OfficePresenter.php</i> </li>
+			<li><i>ReservationPresenter.php</i> </li>
+			<li>SupplierPresenter.php<i></i> </li>
+			<li><i>UserPresenter.php</i> </li>
+		</ul>
+		<li><strong>router</strong> </li>
+		<ul>
+			<li><i>RouterFactory.php</i> </li>
+		</ul>
+		<li><i>AccessListFactory.php</i> </li>
+		<li><i>bootstrap.php</i> </li>
+	</ul>
+	<li><strong>log</strong> </li>
+	<li><strong>temp</strong> </li>
+	<li><strong>vendor</strong> </li>
+	<li><strong>www</strong> </li>
+	<li><i>xtisov00_xnecas24.sql</i> </li>
+</ul>
+
+<ul>
+	<li><i>config</i> </li>
+	<li><i></i> </li>
+</ul>
+<p>
+
+</p>
+
 
 <h2>Instalace</h2>
 <ul>
