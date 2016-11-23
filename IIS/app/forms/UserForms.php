@@ -9,7 +9,7 @@ use Nette\Security\User;
 use Nette\Utils\ArrayHash;
 
 /**
- * Obsahuje prvky pre pre orihlasenie a registraciu uzivatela.
+ * Obsahuje prvky pre pre prihlasenie a registraciu uzivatela.
  */
 class UserForms extends Object
 {

@@ -21,9 +21,9 @@ class DuplicateColumnException extends AuthenticationException
 }
 
 /**
- * Model pre pracu s uzivatelmi. Kontroluje ci suhlasia prihlasovacie a
+ * Model pre pracu s prihlásenim Kontroluje ci suhlasia prihlasovacie a
  * registracne udaje. Ak sa jedna o registraciu vlozi noveho uzivatela
- * do databaze. Umoznuje pridavanie, editovanie a odstranovanie uzivatelov.
+ * do databaze.
  */
 class AuthenticatorManager extends BaseManager implements IAuthenticator
 {
@@ -97,64 +97,5 @@ class AuthenticatorManager extends BaseManager implements IAuthenticator
 		catch (UniqueConstraintViolationException $e) {
 			throw new DuplicateColumnException;
 		}
-	}
-
-	/**
-	 * Vyber vsetkych uzivatelov z databaze a ich pripadne zotriedenie.
-	 * @param string $column Nazov stlpca podla, ktoreho sa ma triedit
-	 * @param string $sort Typ akym sa ma urobit triedenie ASC alebo DESC
-	 * @return mixed Zoznam uzivatelov
-	 */
-	public function getUsers($column, $sort)
-	{
-		$default_column = self::SORT_TABLE['nazov'];
-		$default_sort = self::SORT_TYPE['asc'];
-
-		// Kontrola ci bol zadany validny slpec pre zotriedenie
-		if (self::SORT_TABLE[$column] !== null)
-			$default_column = self::SORT_TABLE[$column];
-
-		// Kontrola ci bolo zadane v akom poradi sa ma maju vypisat
-		if (self::SORT_TYPE[$sort] !== null)
-			$default_sort = self::SORT_TYPE[$sort];
-
-		return $this->database->table(self::TABLE_NAME)
-			->order($default_column . ' ' . $default_sort);
-	}
-
-	/**
-	 * Vyber pozadovaneho uzivatela z databaze.
-	 * @param int $id Identifikator uzivatela v databaze
-	 * @return mixed Uzivatel
-	 */
-	public function getUser($id)
-	{
-		return $this->database->table(self::TABLE_NAME)
-			->where(self::COLUMND_ID, $id)->fetch();
-	}
-
-	/**
-	 * Ulozi uzvivatela do databaze. V pripade, ze nie je nastavene ID vlozi sa novy
-	 * zaznam o uzivatelovi, inak sa edituje existujuci uzivatel.
-	 * @param mixed $user Uzivatel, ktory sa ma upravit alebo vlozit
-	 */
-	public function saveUser($user)
-	{
-		if (!$user[self::COLUMND_ID]) {
-			unset($user[self::COLUMND_ID]);
-			$this->database->table(self::TABLE_NAME)->insert($user);
-		} else
-			$this->database->table(self::TABLE_NAME)->where(self::COLUMND_ID,
-				$user[self::COLUMND_ID])->update($user);
-	}
-
-	/**
-	 * Odstrani uzivatela z databaze.
-	 * @param int $id Identifikator uzivatela v databaze
-	 */
-	public function removeUser($id)
-	{
-		$this->database->table(self::TABLE_NAME)
-			->where(self::COLUMND_ID, $id)->delete();
 	}
 }

@@ -11,7 +11,7 @@ use Nette\Databse\DriverException;
 /**
  * Model pre pracu s jednotlivymi poistovnami. Umoznuje, editovanie a
  * vypis poistovni. Vypis poistovni moze byt ako detail jednej poistovne
- * alebo zoznam poistovni.
+ * alebo zoznam poistovni. Obsahuje metody pre výpis liekov k danej pobocke.
  */
 class InsurenceManager extends BaseManager
 {
