@@ -8,9 +8,9 @@ use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
 
 /**
- * Model pre pracu s jednotlivymi pobockami. Umoznuje vytvorenie, editovanie a
- * vypis pobočiek. Vypis pobociek moze byt ako detail jednej pobocky alebo
- * zoznam pobociek.
+ * Model pre pracu s jednotlivymi pobockami. Umoznuje editovat a vyberat
+ * udaje z db, bud pre jednu alebo viacero pobociek. Obsahuje metody
+ * pre ziskanie dostupnych liekov a zamestnancov na danej pobocke.
  */
 class OfficeManager extends BaseManager
 {

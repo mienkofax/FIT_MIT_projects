@@ -16,7 +16,8 @@ use Nette\Forms\Controls\SubmitButton;
 use Nette\Callback;
 
 /*
- * Spracovanie vykreslenia formularov.
+ * Spracovanie vykreslenia zoznamu liekov, detail lieku a formlara pre
+ * pridanie alebo editovanie lieku.
  */
 class MedicinePresenter extends BasePresenter
 {

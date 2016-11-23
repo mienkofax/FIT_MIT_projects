@@ -10,7 +10,8 @@ use Nette\Database\UniqueConstraintViolationException;
 use Nette\Utils\Arrayhash;
 
 /*
- * Spracovanie vykreslenia formularov.
+ * Spracovanie vykreslenia zoznamu uzivatelov, detilu uzivatela a formulara
+ * pre pridanie alebo editovanie uzivatela.
  */
 class UserPresenter extends BasePresenter
 {

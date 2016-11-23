@@ -9,9 +9,9 @@ use Nette\Utils\ArrayHash;
 use Nette\Databse\DriverException;
 
 /**
- * Model pre pracu s jednotlivymi rezervaciami. Umoznuje vytvorenie, editovanie a
- * vypis rezervacii. Vypis rezervacii moze byt ako detail jednej rezervacii alebo
- * zoznam rezervacii.
+ * Model pre pracu s jednotlivymi rezervaciami. Umoznuje editovat a vyberat
+ * udaje z db, bud pre jednu alebo viacero rezervacii. Obsahuje metody
+ * pre ziskanie dostupnych liekov a pobociek, kde je dana rezervacia uskutocnena. 
  */
 class ReservationManager extends BaseManager
 {

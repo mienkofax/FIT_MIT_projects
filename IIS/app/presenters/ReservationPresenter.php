@@ -15,7 +15,8 @@ use Nette\Callback;
 use Nette\Forms\Container;
 
 /**
- * Spracovanie vykreslenie formularov.
+ * Spracovanie vykreslenie zoznamu rezervacii, detail rezervacie a formulara
+ * pre pridanie alebo editovanie rezervácie.
  */
 class ReservationPresenter extends BasePresenter
 {

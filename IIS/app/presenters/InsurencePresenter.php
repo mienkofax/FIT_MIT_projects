@@ -14,7 +14,8 @@ use Nette\Forms\Controls\SubmitButton;
 use Nette\Callback;
 
 /*
- * Spracovanie vykreslenia formularov.
+ * Spracovanie vykreslenia zoznamu poistovni, detailu postovne a
+ * formulara pre pridane alebo editovanie poisťovne.
  */
 class InsurencePresenter extends BasePresenter
 {

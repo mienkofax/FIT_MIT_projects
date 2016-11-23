@@ -12,7 +12,8 @@ use Nette\Utils\Arrayhash;
 use Nette\Forms\Container;
 
 /*
- * Spracovanie vykreslenia formularov.
+ * Spracovanie vykreslenia zoznamu dodavatelov, detailu dodavatela a formulara
+ * pre pridanie alebo editovanie dodavatela.
  */
 class SupplierPresenter extends BasePresenter
 {

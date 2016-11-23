@@ -16,7 +16,8 @@ use Nette\Forms\Controls\SubmitButton;
 use Nette\Callback;
 
 /**
- * Spracovanie vykreslenie formularov.
+ * Spracovanie vykreslenie zoznamu pobociek, detailu pobocky a formulara
+ * pre pridanie alebo editovane pobocky.
  */
 class OfficePresenter extends BasePresenter
 {
