@@ -32,6 +32,7 @@ class RouterFactory
 						'naskladnit' => 'placed',
 						'odstranit' => 'remove',
 						'detail' => 'detail',
+						'predat' => 'sell', 
 						'pridat' => 'add'
 					),
 					Route::FILTER_STRICT => true

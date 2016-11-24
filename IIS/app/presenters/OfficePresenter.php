@@ -124,33 +124,28 @@ class OfficePresenter extends BasePresenter
 	public function createComponentPlacedForm()
 	{
 		$userOfficeID = $this->getUser()->getIdentity()->getData()['ID_uzivatele'];
+		$officeID = $this->officeManager->getUserOffice($userOfficeID);
+
 		$form = new Form;
 		$form->addGroup('');
 		// Pre bezneho uzivatela
-		if ($this->getUser()->getIdentity()->getRoles()[0] != 'member') {
+		if ($this->getUser()->getIdentity()->getRoles()[0] == 'member') {
 		$form->addHidden('ID_pobocky')
-			->setDefaultValue($this->officeManager->getUserOffice($userOfficeID));
+			->setDefaultValue($officeID);
 		$form->addSelect('ID_pobocky2', 'Pobočka', $this->officeManager->getOfficesToSelectBox())
 			->setRequired(TRUE)
 			->setPrompt('Zvoľte pobočku')
 			->setDisabled(TRUE)
-			->setDefaultValue($this->officeManager->getUserOffice($userOfficeID))
+			->setDefaultValue($officeID)
 			->setAttribute('class', 'form-control');
-		} else {
-			//TODO dorobit
-			$form->addSelect('ID_pobocky', 'Pobočka', $this->officeManager->getOfficesToSelectBox())
-				->setRequired(TRUE)
-				->setPrompt('Zvoľte pobočku')
-				->setDefaultValue($this->officeManager->getUserOffice($userOfficeID))
-				->setAttribute('class', 'form-control');
 		}
 
 		$form->addGroup('Lieky');
 		$removeEvent = [$this, 'removeElementClicked'];
 		$medicines = $form->addDynamic(
 			'medicines',
-			function (Container $medicine) use ($removeEvent, $userOfficeID) {
-				$med = $medicine->addSelect('ID_leku', 'Lieky', $this->officeManager->getRelatedOfficesToSelectBox($userOfficeID))
+			function (Container $medicine) use ($removeEvent, $userOfficeID, $officeID) {
+				$med = $medicine->addSelect('ID_leku', 'Lieky', $this->officeManager->getRelatedMedicinesToSelectBox($officeID))
 					->setRequired(TRUE)
 					->setPrompt('Zvoľte liek')
 					->setAttribute('class', 'form-control');
@@ -178,6 +173,76 @@ class OfficePresenter extends BasePresenter
 			->onClick[] = [$this, 'submitElementPlacedClicked'];
 
 		return $this->bootstrapFormRender($form);
+	}
+
+	public function createComponentSellForm()
+	{
+		$userOfficeID = $this->getUser()->getIdentity()->getData()['ID_uzivatele'];
+		$officeID = $this->officeManager->getUserOffice($userOfficeID);
+
+		$form = new Form;
+		$form->addGroup('');
+		// Pre bezneho uzivatela
+		if ($this->getUser()->getIdentity()->getRoles()[0] == 'member') {
+		$form->addHidden('ID_pobocky')
+			->setDefaultValue($officeID);
+		$form->addSelect('ID_pobocky2', 'Pobočka', $this->officeManager->getOfficesToSelectBox())
+			->setRequired(TRUE)
+			->setPrompt('Zvoľte pobočku')
+			->setDisabled(TRUE)
+			->setDefaultValue($officeID)
+			->setAttribute('class', 'form-control');
+		}
+
+		$form->addGroup('Lieky');
+		$removeEvent = [$this, 'removeElementClicked'];
+		$medicines = $form->addDynamic(
+			'medicines',
+			function (Container $medicine) use ($removeEvent, $userOfficeID, $officeID) {
+				$med = $medicine->addSelect('ID_leku', 'Lieky', $this->officeManager->getRelatedMedicinesToSelectBox($officeID))
+					->setRequired(TRUE)
+					->setPrompt('Zvoľte liek')
+					->setAttribute('class', 'form-control');
+				$medicine->addText('pocet_na_sklade', 'Počet predaných kusov')
+					->setDefaultValue('0')
+					->setRequired(FALSE)
+					->addRule(Form::FLOAT, 'Počet musí byť číslo')
+					->addRule(Form::RANGE, 'Počet kusov musí byť kladné číslo', array(0, null));
+
+				$removeBtn = $medicine->addSubmit('remove', 'Odstrániť liek')
+					->setAttribute('class', 'btn-danger')
+					->setValidationScope(false);
+				$removeBtn->onClick[] = $removeEvent;
+			}, 1
+		);
+
+		$medicines->addSubmit('add', 'Pridať liek pre predaj')
+			->setAttribute('class', 'btn-success')
+			->setValidationScope(false)
+			->onClick[] = [$this, 'addElementClicked'];
+
+		$form->addGroup('');
+		$form->addSubmit('submit', 'Predať')
+			->setAttribute('class', 'btn-primary')
+			->onClick[] = [$this, 'submitElementSellClicked'];
+
+		return $this->bootstrapFormRender($form);
+	}
+
+	/**
+	 * Spracovanie hodnot z formulara. Ulozenie do databaze a informovanie o
+	 * uspesnom ulozeni.
+	 * @param SubmitButton $button
+	 */
+	public function submitElementSellClicked(SubmitButton $button)
+	{
+		if (!$this->officeManager->sellToOffice($button->getForm()->getValues(true))){
+			$this->flashMessage('Na sklade nie je dostatočný počet kusov.');
+			return;
+		}
+
+		$this->flashMessage('Počet kusov bol upravený.');
+		$this->redirect('Office:detail', $button->getForm()->getValues(true)['ID_pobocky']);
 	}
 
 	/**

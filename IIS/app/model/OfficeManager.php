@@ -6,6 +6,7 @@ use App\Model\BaseManager;
 use Nette\Database\Table\IRow;
 use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
+use Nette\OutOfRangeException;
 
 /**
  * Model pre pracu s jednotlivymi pobockami. Umoznuje vytvorenie, editovanie a
@@ -128,9 +129,17 @@ class OfficeManager extends BaseManager
 		$this->database->beginTransaction();
 		try {
 			foreach ($medicines as $key => $item) {
+				$tmp = $this->database->table('pobocka_lek')
+					->where('ID_pobocky = ? AND ID_leku = ?', $primaryKey, $item['ID_leku'])
+					->select('pocet_na_sklade');
+
+				$numb;
+				foreach ($tmp as $key => $value)
+					$numb = $value['pocet_na_sklade'];
+
 				$this->database->table('pobocka_lek')
 					->where('ID_pobocky = ? AND ID_leku = ?', $primaryKey, $item['ID_leku'])
-					->update( array ('pocet_na_sklade' => $this->defaultNumberZero($item['pocet_na_sklade'])) );
+					->update( array ('pocet_na_sklade' => $numb + $this->defaultNumberZero($item['pocet_na_sklade'])) );
 			}
 		}
 		catch (Nette\Databse\DriverException $ex) {
@@ -138,6 +147,40 @@ class OfficeManager extends BaseManager
 			throw $ex;
 		}
 		$this->database->commit();
+	}
+
+	public function sellToOffice($office)
+	{
+		$primaryKey = $office['ID_pobocky'];
+
+		$medicines = $office['medicines'];
+		unset($office['medicines']);
+
+		$this->database->beginTransaction();
+		try {
+			foreach ($medicines as $key => $item) {
+				$tmp = $this->database->table('pobocka_lek')
+					->where('ID_pobocky = ? AND ID_leku = ?', $primaryKey, $item['ID_leku'])
+					->select('pocet_na_sklade');
+
+				$numb;
+				foreach ($tmp as $key => $value)
+					$numb = $value['pocet_na_sklade'];
+
+				if ($numb - $this->defaultNumberZero($item['pocet_na_sklade']) < 0)
+					return false;
+
+				$this->database->table('pobocka_lek')
+					->where('ID_pobocky = ? AND ID_leku = ?', $primaryKey, $item['ID_leku'])
+					->update( array ('pocet_na_sklade' => $numb - $this->defaultNumberZero($item['pocet_na_sklade'])) );
+			}
+		}
+		catch (Nette\Databse\DriverException $ex) {
+			$this->database->rollback();
+			throw $ex;
+		}
+		$this->database->commit();
+		return true;
 	}
 
 	/**
@@ -237,16 +280,17 @@ class OfficeManager extends BaseManager
 		return $result;
 	}
 
-	public function getRelatedOfficesToSelectBox($id) {
-		$data = $this->database->table('pobocka_lek')->where('ID_pobocky', $id)->select('ID_pobocky');
+	public function getRelatedMedicinesToSelectBox($id) {
+
+		$data = $this->database->table('pobocka_lek')->where('ID_pobocky', $id)->select('ID_leku');
 		$result = [];
 		$result2 = [];
 
 		foreach ($data as $key => $value)
-			$result = $value->ID_pobocky;
+			$result = $value->ID_leku;
 
-		foreach ($this->database->table('pobocky')->where('ID_pobocky', $result) as $key => $value)
-			$result2[$value->ID_pobocky] = $value->nazev_pobocky;
+		foreach ($this->database->table('leky')->where('ID_leku', $result) as $key => $value)
+			$result2[$value->ID_leku] = $value->nazev_leku;
 
 		return $result2;
 	}
@@ -322,6 +366,6 @@ class OfficeManager extends BaseManager
 
 	public function getUserOffice($id)
 	{
-		return $this->database->table('pobocka_zamestnanec')->select('ID_pobocky')->fetch()->toArray()['ID_pobocky'];
+		return $this->database->table('pobocka_zamestnanec')->select('ID_pobocky')->where('ID_uzivatele', $id)->fetch()->toArray()['ID_pobocky'];
 	}
 }
