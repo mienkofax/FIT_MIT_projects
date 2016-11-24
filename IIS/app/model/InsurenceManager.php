@@ -9,9 +9,9 @@ use Nette\Utils\ArrayHash;
 use Nette\Databse\DriverException;
 
 /**
- * Model pre pracu s jednotlivymi poistovnami. Umoznuje editovat a vyberat
- * udaje z db, bud pre jednu alebo pre viacero poistovni. Obsahuje metody
- * pre ziskanie dostupnych liekov k danej pobocke, ich typ a zoznam poistovni.
+ * Model pre pracu s jednotlivymi poistovnami. Umoznuje, editovanie a
+ * vypis poistovni. Vypis poistovni moze byt ako detail jednej poistovne
+ * alebo zoznam poistovni. Obsahuje metody pre výpis liekov k danej pobocke.
  */
 class InsurenceManager extends BaseManager
 {

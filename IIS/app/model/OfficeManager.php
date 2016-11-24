@@ -8,9 +8,9 @@ use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
 
 /**
- * Model pre pracu s jednotlivymi pobockami. Umoznuje editovat a vyberat
- * udaje z db, bud pre jednu alebo viacero pobociek. Obsahuje metody
- * pre ziskanie dostupnych liekov a zamestnancov na danej pobocke.
+ * Model pre pracu s jednotlivymi pobockami. Umoznuje vytvorenie, editovanie a
+ * vypis pobočiek. Vypis pobociek moze byt ako detail jednej pobocky alebo
+ * zoznam pobociek.
  */
 class OfficeManager extends BaseManager
 {
@@ -117,6 +117,29 @@ class OfficeManager extends BaseManager
 		$this->database->commit();
 	}
 
+
+	public function placedToOffice($office)
+	{
+		$primaryKey = $office['ID_pobocky'];
+
+		$medicines = $office['medicines'];
+		unset($office['medicines']);
+
+		$this->database->beginTransaction();
+		try {
+			foreach ($medicines as $key => $item) {
+				$this->database->table('pobocka_lek')
+					->where('ID_pobocky = ? AND ID_leku = ?', $primaryKey, $item['ID_leku'])
+					->update( array ('pocet_na_sklade' => $this->defaultNumberZero($item['pocet_na_sklade'])) );
+			}
+		}
+		catch (Nette\Databse\DriverException $ex) {
+			$this->database->rollback();
+			throw $ex;
+		}
+		$this->database->commit();
+	}
+
 	/**
 	 * Odstrani pobocku z databaze.
 	 * @param int $id Identifikator pobocky v databaze
@@ -136,12 +159,7 @@ class OfficeManager extends BaseManager
 	 */
 	public function relatedMedicines($id)
 	{
-		$dat = $this->database->table(self::TABLE_NAME)->get($id);
-
-		$pole = array();
-		foreach ($dat->related('pobocka_lek.ID_pobocky') as $med)
-			$pole[] = $med->ID_leku;
-		return $this->database->table('leky')->where('ID_leku', $pole);
+		return $this->database->query('SELECT ID_leku, nazev_leku, date_time, pocet_na_sklade FROM leky NATURAL JOIN pobocka_lek WHERE ID_pobocky = ?', $id);
 	}
 
 	/**
@@ -219,6 +237,20 @@ class OfficeManager extends BaseManager
 		return $result;
 	}
 
+	public function getRelatedOfficesToSelectBox($id) {
+		$data = $this->database->table('pobocka_lek')->where('ID_pobocky', $id)->select('ID_pobocky');
+		$result = [];
+		$result2 = [];
+
+		foreach ($data as $key => $value)
+			$result = $value->ID_pobocky;
+
+		foreach ($this->database->table('pobocky')->where('ID_pobocky', $result) as $key => $value)
+			$result2[$value->ID_pobocky] = $value->nazev_pobocky;
+
+		return $result2;
+	}
+
 	/**
 	 * Vyberie z databaze dodavatelov, ktori boli priradeni k danej pobocke.
 	 * Pouzivate sa pri editacii pobocky, aby sa nacitali udaje o dodavateloch,
@@ -286,5 +318,10 @@ class OfficeManager extends BaseManager
 		$this->database->table('rezervace_leku_lek')
 			->where('ID_rezervace', $idReservation)
 			->where('ID_pobocky', $idOffice)->delete();
+	}
+
+	public function getUserOffice($id)
+	{
+		return $this->database->table('pobocka_zamestnanec')->select('ID_pobocky')->fetch()->toArray()['ID_pobocky'];
 	}
 }

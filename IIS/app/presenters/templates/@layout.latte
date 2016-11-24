@@ -51,13 +51,19 @@
 			<ul class="menu menu-bg">
 				<li><a n:href="Administration:default">Domov</a></li>
 				{if $user->isInRole('member') or $user->isInRole('manager') or $user->isInRole('admin')}
-				<li><a n:href="Reservation:list">Rezervácia liekov <span class="badge">{$count['rezervacie']}</span></a></li>
-				<li><a n:href="Office:list">Správa pobočiek <span class="badge">{$count['pobocky']}</span></a></li>
-				<li><a n:href="Medicine:list">Správa liekov <span class="badge">{$count['lieky']}</span></a></li>
+
 				{if $user->isInRole('manager') or $user->isInRole('admin')}
 				<li><a n:href="Insurence:list">Správa poisťovní <span class="badge">{$count['pojistovny']}</span></a></li>
 				<li><a n:href="Supplier:list">Správa dodávateľov <span class="badge">{$count['dodavatelia']}</span></a></li>
 				<li><a n:href="User:list">Správa užívateľov <span class="badge">{$count['uzivatelia']}</span></a></li>
+				{/if}
+				<li><a n:href="Reservation:list">Rezervácia liekov <span class="badge">{$count['rezervacie']}</span></a></li>
+				<li><a n:href="Office:list">Správa pobočiek <span class="badge">{$count['pobocky']}</span></a></li>
+				<li><a n:href="Medicine:list">Správa liekov <span class="badge">{$count['lieky']}</span></a></li>
+				<li>&nbsp;</li>
+				{if $user ->isInRole('admin')}
+				<li><a n:href="Office:placed">Naskladniť lieky </span></a></li>
+				<li><a n:href="Office:placed">Vydať lieky </span></a></li>
 				{/if}
 
 				{if $user->isInRole('admin')}

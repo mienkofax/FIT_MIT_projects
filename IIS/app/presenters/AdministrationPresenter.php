@@ -8,8 +8,7 @@ use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 
 /**
- * Spracovanie vykreslenia sekcie prihlasenia. Vykreslenie formularov pre
- * prihlásenie/registrovanie.
+ * Spracovanie vykreslenia sekcie prihlasenia. Vykreslenie formularov.
  */
 class AdministrationPresenter extends BasePresenter
 {

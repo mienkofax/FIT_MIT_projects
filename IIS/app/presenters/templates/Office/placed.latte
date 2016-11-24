@@ -1,0 +1,33 @@
+{define title}Naskladniť{/define}
+{define description}Naskladniť liekn na pobočiek.{/define}
+{block content}
+<ul class="list nav nav-tabs">
+	<li><a data-toggle="tab" href="#sectionA">Naskladniť lieky na pobočku</a></li>
+</ul>
+
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		<h2>Naskladniť lieky na pobočku</h2>
+		{control placedForm}
+		{/block}
+	</div>
+</div>
+
+{block scripts}
+{include parent}
+<script type="text/javascript" src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+<script type="text/javascript">
+	tinymce.init({
+		selector: "textarea[name=content]",
+		plugins: [
+			"advlist autolink lists link image charmap print preview anchor",
+			"searchreplace visualblocks code fullscreen",
+			"insertdatetime media table contextmenu paste"
+		],
+		toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+		entities: "160,nbsp",
+		entity_encoding: "named",
+		entity_encoding: "raw"
+});
+</script>
+{/block}

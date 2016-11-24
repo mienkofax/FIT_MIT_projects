@@ -9,9 +9,10 @@ use Nette\Utils\ArrayHash;
 use Nette\Database\DriverException;
 
 /**
- * Model pre pracu s jednotlivymi datavatelmi. Umoznuje editovat a vyberat
- * udaje z db, bud pre jedneho alebo pre viacero dodavatelov. Obsahuje metody
- * pre ziskanie dostupnych pobociek, ktore sa zasobuju.
+ * Model pre pracu s jednotlivymi datavatelmi. Umoznuje, editovanie a
+ * vypis dadavatelov. Vypis dodavatelov moze byt ako detail jedneho dodavatela
+ * alebo zoznam dodavatelov. Pri ukladani dodavatelov sa ukladaju aj udaje o
+ * pobockach na, ktore sa dodava.
  */
 class SupplierManager extends BaseManager
 {

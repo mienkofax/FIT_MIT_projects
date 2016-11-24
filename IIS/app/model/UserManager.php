@@ -9,8 +9,9 @@ use Nette\Security\Identity;
 use Nette\Security\Passwords;
 
 /**
- * Model pre pracu s uzivatelmi. Pridavanie, editovanie a odstranenie
- * uzivatelov z databaze.
+ * Model pre pracu s uzivatelmi. Kontroluje ci suhlasia prihlasovacie a
+ * registracne udaje. Ak sa jedna o registraciu vlozi noveho uzivatela
+ * do databaze. Umoznuje pridavanie, editovanie a odstranovanie uzivatelov.
  */
 class UserManager extends BaseManager
 {

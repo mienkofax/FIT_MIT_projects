@@ -14,10 +14,10 @@ use Nette\Utils\Arrayhash;
 use Nette\Forms\Container;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\Callback;
+use Nette\Forms\Constrols\MySelectBox;
 
 /**
- * Spracovanie vykreslenie zoznamu pobociek, detailu pobocky a formulara
- * pre pridanie alebo editovane pobocky.
+ * Spracovanie vykreslenie formularov.
  */
 class OfficePresenter extends BasePresenter
 {
@@ -121,6 +121,77 @@ class OfficePresenter extends BasePresenter
 		}
 	}
 
+	public function createComponentPlacedForm()
+	{
+		$userOfficeID = $this->getUser()->getIdentity()->getData()['ID_uzivatele'];
+		$form = new Form;
+		$form->addGroup('');
+		// Pre bezneho uzivatela
+		if ($this->getUser()->getIdentity()->getRoles()[0] != 'member') {
+		$form->addHidden('ID_pobocky')
+			->setDefaultValue($this->officeManager->getUserOffice($userOfficeID));
+		$form->addSelect('ID_pobocky2', 'Pobočka', $this->officeManager->getOfficesToSelectBox())
+			->setRequired(TRUE)
+			->setPrompt('Zvoľte pobočku')
+			->setDisabled(TRUE)
+			->setDefaultValue($this->officeManager->getUserOffice($userOfficeID))
+			->setAttribute('class', 'form-control');
+		} else {
+			//TODO dorobit
+			$form->addSelect('ID_pobocky', 'Pobočka', $this->officeManager->getOfficesToSelectBox())
+				->setRequired(TRUE)
+				->setPrompt('Zvoľte pobočku')
+				->setDefaultValue($this->officeManager->getUserOffice($userOfficeID))
+				->setAttribute('class', 'form-control');
+		}
+
+		$form->addGroup('Lieky');
+		$removeEvent = [$this, 'removeElementClicked'];
+		$medicines = $form->addDynamic(
+			'medicines',
+			function (Container $medicine) use ($removeEvent, $userOfficeID) {
+				$med = $medicine->addSelect('ID_leku', 'Lieky', $this->officeManager->getRelatedOfficesToSelectBox($userOfficeID))
+					->setRequired(TRUE)
+					->setPrompt('Zvoľte liek')
+					->setAttribute('class', 'form-control');
+				$medicine->addText('pocet_na_sklade', 'Počet pridaných kusov')
+					->setDefaultValue('0')
+					->setRequired(FALSE)
+					->addRule(Form::FLOAT, 'Počet musí byť číslo')
+					->addRule(Form::RANGE, 'Počet kusov musí byť kladné číslo', array(0, null));
+
+				$removeBtn = $medicine->addSubmit('remove', 'Odstrániť liek')
+					->setAttribute('class', 'btn-danger')
+					->setValidationScope(false);
+				$removeBtn->onClick[] = $removeEvent;
+			}, 1
+		);
+
+		$medicines->addSubmit('add', 'Pridať liek pre naskladnenie')
+			->setAttribute('class', 'btn-success')
+			->setValidationScope(false)
+			->onClick[] = [$this, 'addElementClicked'];
+
+		$form->addGroup('');
+		$form->addSubmit('submit', 'Naskladniť')
+			->setAttribute('class', 'btn-primary')
+			->onClick[] = [$this, 'submitElementPlacedClicked'];
+
+		return $this->bootstrapFormRender($form);
+	}
+
+	/**
+	 * Spracovanie hodnot z formulara. Ulozenie do databaze a informovanie o
+	 * uspesnom ulozeni.
+	 * @param SubmitButton $button
+	 */
+	public function submitElementPlacedClicked(SubmitButton $button)
+	{
+		$this->officeManager->placedToOffice($button->getForm()->getValues(true));
+		$this->flashMessage('Počet kusov bol upravený.');
+		$this->redirect('Office:detail', $button->getForm()->getValues(true)['ID_pobocky']);
+	}
+
 	/**
 	 * Uprava pobocky na zaklade zadaneho ID. V pripade, ze nie je zadane
 	 * ID pobocky vykresli sa formular na vytvorenie novej pobocky.
@@ -221,7 +292,7 @@ class OfficePresenter extends BasePresenter
 	public function submitElementClicked(SubmitButton $button)
 	{
 		$this->officeManager->saveOffice($button->getForm()->getValues(true));
-		$this->flashMessage('Pobočka bola uložená');
+		$this->flashMessage('Počet kusov bol upravený.');
 		$this->redirect('Office:list');
 	}
 }

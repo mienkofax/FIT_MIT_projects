@@ -29,6 +29,7 @@ class RouterFactory
 			'action' => array(
 					Route::FILTER_TABLE => array(
 						'editor' => 'edit',
+						'naskladnit' => 'placed',
 						'odstranit' => 'remove',
 						'detail' => 'detail',
 						'pridat' => 'add'

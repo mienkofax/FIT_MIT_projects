@@ -42,9 +42,9 @@
 <h2>Implementace</h2>
 
 <ul>
-	<li><strong>app</strong> Zlo¾ka obsahuje hlavnú èas» aplikácie</li>
+	<li><strong>app</strong> <br>Zlo¾ka obsahuje hlavnú èas» aplikácie</li>
 	<ul>
-		<li><strong>config</strong> Konfiguraèné súbory pre Nette</li>
+		<li><strong>config</strong> <br>Konfiguraèné súbory pre Nette</li>
 		<ul>
 			<li><i>config.local.neon</i> Lokálny konfiguraèný súbor pre pripojenie do databáze</li>
 			<li><i>config.local</i> Hlavný konfiguraèný súbor, nastavuje sa doba</li>
@@ -53,28 +53,28 @@
 		<ul>
 			<li><i>UserForms.php</i> </li> Vytvorenie formulárov pre prihlásenie, registrovanie a odhlásenie.
 		</ul>
-		<li><strong>model</strong> </li> Modely pre prácu s jednotlivými dátami v databáze. Vyberá príslu¹né dáta pre daný presenter.
+		<li><strong>model</strong> <br> Modely pre prácu s jednotlivými dátami v databáze. Vyberá príslu¹né dáta pre daný presenter.</li>
 		<ul>
-			<li><i>AuthenticatorManager.php</i> </li> Model pre prácu s prihlásenim. Kontroluje èi súhlasia prihlasovacie a registraèné údaje
-			<li><i>BaseManager.php</i> </li> Rozhranie pre modely, sprístupòuje prcu s databázou a overuje oprávnenia.
-			<li><i>InsurenceManager.php</i> </li> Model pre prácu s jednotliými pois»ovòami. Umo¾òuje editova» a vybera» údaje z databáze. Vyberá sa buï pre jednu alebo pre viacero pois»ovní. Obsahuje metódy pre získanie dostupných liekov k dane poboèke, ich typ a zoznam pois»ovní.
-			<li><i>MedicineManager.php</i> </li> Model pre prácu s jednotlivými liekmi, Umo¾òuje editova» a vzbera» údae z databáze. Vyberá. Obsahuje metody pre získanie dostupných  poboèiek, rezervácií, pois»ovní k danému lieku.
-			<li><i>MenuManager.php</i> </li> Model pre zistenie poètu záznamov pre jednotlivé tabuµky.
-			<li><i>OfficeManager.php</i> </li> Model pre prácu s jednotlivými poboèkami. Umo¾òuje editova» a vybera» údaje z databáze, buï pre jednu alebo viacej poboèiek. Obsahuje metódy pre získaniedostupných liekov a zamestnancov na danej poboèke.
-			<li><i>ReservationManager.php</i> </li> Model pre prácu s jednotlivými rezerváciami. Umo¾òuje editova» a vybera» údaje z databáze, buï pre jednu alebo vacero rezervácií. Obsahuje metódy pre získanie dostupných liekov a poboèiek, kde je daná rezervácia uskutoènená.
-			<li><i>SupplierManager.php</i> </li> Model pre prácu s jednotlivými dodávateµmi. Umo¾òuje editova» a vybera» údaje z databáze, buï pre jedného alebo pre viacero dodávateµov. Obsahuje metody pre získanie dostupných poboèiek, ktoré zásobuje.
-			<li><i>UserManager.php</i> </li> Model pre prácu s u¾ívateµmi. Pridanie, editova a odstraòovanie u¾ívateµov z databáze.
+			<li><i>AuthenticatorManager.php</i> - Model pre prácu s prihlásenim. Kontroluje èi súhlasia prihlasovacie a registraèné údaje</li>
+			<li><i>BaseManager.php</i> - Rozhranie pre modely, sprístupòuje prcu s databázou a overuje oprávnenia. </li>
+			<li><i>InsurenceManager.php</i> - Model pre prácu s jednotliými pois»ovòami. Umo¾òuje editova» a vybera» údaje z databáze. Vyberá sa buï pre jednu alebo pre viacero pois»ovní. Obsahuje metódy pre získanie dostupných liekov k dane poboèke, ich typ a zoznam pois»ovní.</li>
+			<li><i>MedicineManager.php</i> - Model pre prácu s jednotlivými liekmi, Umo¾òuje editova» a vzbera» údae z databáze. Vyberá. Obsahuje metody pre získanie dostupných  poboèiek, rezervácií, pois»ovní k danému lieku.</li>
+			<li><i>MenuManager.php</i> - Model pre zistenie poètu záznamov pre jednotlivé tabuµky.</li>
+			<li><i>OfficeManager.php</i> - Model pre prácu s jednotlivými poboèkami. Umo¾òuje editova» a vybera» údaje z databáze, buï pre jednu alebo viacej poboèiek. Obsahuje metódy pre získaniedostupných liekov a zamestnancov na danej poboèke.</li>
+			<li><i>ReservationManager.php</i> - Model pre prácu s jednotlivými rezerváciami. Umo¾òuje editova» a vybera» údaje z databáze, buï pre jednu alebo vacero rezervácií. Obsahuje metódy pre získanie dostupných liekov a poboèiek, kde je daná rezervácia uskutoènená.</li>
+			<li><i>SupplierManager.php</i> - Model pre prácu s jednotlivými dodávateµmi. Umo¾òuje editova» a vybera» údaje z databáze, buï pre jedného alebo pre viacero dodávateµov. Obsahuje metody pre získanie dostupných poboèiek, ktoré zásobuje.</li>
+			<li><i>UserManager.php</i> - Model pre prácu s u¾ívateµmi. Pridanie, editova a odstraòovanie u¾ívateµov z databáze.
 		</ul>
 		<li><strong>presenters</strong> </li> Obsahuje prezentery, ktoré riadia zobrazovanie jednotlivých stránok. Pou¾ívajú modely pre získanie potrebných informácií.
 		<ul>
 			<li><strong>Administration</strong> </li> Adresár so ¹ablónou, ktorý obsahuje domovskú stránku.
-			<li><strong>Error</strong> </li> Adresár zo ¹ablonami pre chyby.
-			<li><strong>Insurence</strong> </li> Adresár so ¹ablonami, ktorý obsahuje ¹ablóny pre zoznam pois»ovní, detail pois»ovne a pridávanie/editovanie poboèky.
-			<li><strong>Medicine</strong> </li> Adresár so ¹ablonami, ktorý obsahuje ¹ablóny pre zoznam liekov, detail lieku a pridani/editovanie lieku.
-			<li><strong>Office</strong> </li>
-			<li><strong>Reservation</strong> </li>
-			<li><strong>Supplier</strong> </li>
-			<li><strong>User</strong> </li>
+			<li><strong>Error</strong> </li> Adresár zo ¹ablónami pre chyby.
+			<li><strong>Insurence</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam pois»ovní, detail pois»ovne a pridávanie/editovanie poboèky.
+			<li><strong>Medicine</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam liekov, detail lieku a pridani/editovanie lieku.
+			<li><strong>Office</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam poboèiek, detial poboèiek a pridanie/editovanie poboèiek.
+			<li><strong>Reservation</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam rezervácii, detail rezervácii a pridanie/editovanie rezervovanie.
+			<li><strong>Supplier</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam dodávateµov, detail dodávateµov a pridanie/editovanie dodávateµov.
+			<li><strong>User</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam u¾ívateµov, detail u¾ívateµov a pridanie/editovanie u¾ívateµov.
 			<li><i>@layout.latte</i> </li>
 			<li><i>AuthenticatorPresenter.php</i> </li> Spracovanie vykreslenia prihlásenia. Vykreslenie formulátor.
 			<li><i>BasePresenter.php</i> </li> Rozhranie pre spracovanie vykreslenia urèitého mdelu.
@@ -89,14 +89,14 @@
 		<ul>
 			<li><i>RouterFactory.php</i> </li>
 		</ul>
-		<li><i>AccessListFactory.php</i> </li> Prístupové práva u¾ívateµov pre jednotlivé zdroje. Definícia pravidiel.
+		<li><i>AccessListFactory.php</i> - Prístupové práva u¾ívateµov pre jednotlivé zdroje. Definícia pravidiel.</li>
 		<li><i>bootstrap.php</i> </li>
 	</ul>
-	<li><strong>log</strong> </li>
-	<li><strong>temp</strong> </li>
-	<li><strong>vendor</strong> </li>
-	<li><strong>www</strong> </li>
-	<li><i>xtisov00_xnecas24.sql</i> </li> SQL script databáze s uká¾kovými dátami.
+	<li><strong>log</strong> - Logovací adresár</li>
+	<li><strong>temp</strong> - Adresár s doèasnými súbormi</li>
+	<li><strong>vendor</strong> - Adresár s kni¾nicami, mo¾né stiahnu» pomocou composer-u.</li>
+	<li><strong>www</strong> - Adresár obsahujúci css a js èast spoloènú pre v¹etky èasti.</li>
+	<li><i>xtisov00_xnecas24.sql</i> - SQL script databáze s uká¾kovými dátami.</li>
 </ul>
 <p>
 

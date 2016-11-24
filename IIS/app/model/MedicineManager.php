@@ -8,9 +8,9 @@ use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
 
 /**
- * Model pre pracu s jednotlivymi liekmi. Umoznuje editovat a vyberat
- * udaje z db, bud pre jeden alebo viacero liekov. Obsahuje metody
- * pre ziskanie dostupnych pobociek, rezervacii, poistovni k danemu lieku.
+ * Model pre pracu s jednotlivymi liekmi. Umoznuje vytvorenie, editovanie a
+ * vypis liekov. Vypis liekov moze byt ako detail jedneho lieku alebo
+ * zoznam liekov.
  */
 class MedicineManager extends BaseManager
 {

@@ -43,6 +43,7 @@
 					<a href="{link Medicine:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link Medicine:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
+				<th>Počet na sklade</th>
 				<th></th>
 			</tr>
 			</thead>
@@ -52,6 +53,9 @@
 				</td>
 				<td class="text-center">
 					{$medicine->date_time}
+				</td>
+				<td class="text-center">
+					{$medicine->pocet_na_sklade}
 				</td>
 				<td class="text-center">
 					<a class="action" n:href="Medicine:edit $medicine->ID_leku">
