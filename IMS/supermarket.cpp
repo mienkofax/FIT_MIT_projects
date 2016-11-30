@@ -40,9 +40,9 @@ const short RETURNABLE_BOTTLES_WAIT_TIME = 4 minutes; // Doba stravena u automat
 const short CHEMISTS_WAIT_TIME = 2 minutes; // Doba stravena v sekcii drogerie
 const short DAIRY_WAIT_TIME = 4 minutes; // Doba stravena v sekcii mliecne vyrobky
 const short FRUITS_VEGETABLES_WAIT_TIME = 30 seconds; // Doba stravena v sekcii s ovocim a zeleninou
-const short DELICATESSEN_WAIT_TIME = 40 seconds; // Doba stravena v sekcii lahodky
+const short DELICATESSEN_WAIT_TIME = 4000 seconds; // Doba stravena v sekcii lahodky
 
-const short DELICATESSEN_TIMEOUT = 4 minutes; // Doba, za ktoru zakaznik opusti frontu, musi byt vacsia ako DELICATESSEN_WAIT_TIME
+const short DELICATESSEN_TIMEOUT = 60 minutes; // Doba, za ktoru zakaznik opusti frontu, musi byt vacsia ako DELICATESSEN_WAIT_TIME
 
 Facility FacilityCashes[CASH_COUNT]; // Pokladne
 Facility FacilityCashesInDelicatessen[CASH_COUNT_IN_DELICATESSEN]; // Pokladne v lahodkach
@@ -88,7 +88,7 @@ class Shopper : public Process {
 private:
 	int percents;
 	int oldPercents;
-	size_t m_index = 0;
+	int m_index = 0;
 
 	void Behavior() override
 	{
@@ -203,23 +203,26 @@ private:
 				}
 			}
 
-			Event *timeout = new Timeout(this, DELICATESSEN_TIMEOUT);
-/*			if (m_index != -1) {
-				Seize(FacilityCashesInDelicatessen[m_index]);
-				delete timeout;
-			}
-			else {
+			//Event *timeout = new Timeout(this, DELICATESSEN_TIMEOUT);
+			if (m_index == -1) {
+			//	delete timeout;
 				QueueDelicatessen.Insert(this);
 				Passivate();
-				delete timeout;
+				std::cout << "data" << std::endl;
 				goto REPEAT;
-			}*/
-				Seize(FacilityCashesInDelicatessen[0]);
-			//	QueueDelicatessen.Insert(this);
-			
-delete timeout;
+			}
+			else
+				Seize(FacilityCashesInDelicatessen[m_index]);	
+
+			//delete timeout;
 			Wait(Exponential(DELICATESSEN_WAIT_TIME));
-			Release(FacilityCashesInDelicatessen[0]);
+			Release(FacilityCashesInDelicatessen[m_index]);
+			if (QueueDelicatessen.Length() > 0) {
+				(QueueDelicatessen.GetFirst())->Activate();
+				std::cout << "activate\n";
+				Leave(kosiky, 1);
+			}
+
 			goto LOOP;
 		}
 
@@ -347,7 +350,7 @@ class Ev : public Process {
 			arriveState++;
 		}
 
-	std::cout << "isNight" << m_isNight << ", " <<Time/3600 << "\n";
+	//std::cout << "isNight" << m_isNight << ", " <<Time/3600 << "\n";
 
 	}
 
