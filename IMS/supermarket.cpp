@@ -1,64 +1,100 @@
+/**
+ * @file supermarket.cpp
+ * @author Nečasová Klára <xnecas24@stud.fit.vutbr.cz>
+ * @author Peter Tisovčík <xtisov00@stud.fit.vutbr.cz>
+ * @date 30.11.2016
+ */
+
 #include <iostream>
 #include "simlib.h"
+
+using std::string;
+using std::to_string;
+using std::cout;
+using std::endl;
 
 #define seconds        * 1
 #define minutes        * 60
 #define hours          minutes * 60
 #define percentages    + 0;
 
-const double SIMULATION_TIME = 72 hours; // Doba behu simulacie
-const long ARRIVAL_CUSTOMER[] = {50 seconds, 80 seconds, 100 seconds}; // Prichod zakaznikov
-const long PAY_TIME_SHOPPING = 2 minutes; // Cas straveny pri plateni nakupu
-const bool ENABLE_REALLOCATION = true;
-const short CASH_COUNT = 3; // Pocet pokladni
-const short CASH_COUNT_IN_DELICATESSEN = 3; // Pocet pokladni v lahodkach
-const short MAX_PEOPLE_IN_CASH_QUEUE = 10;
-const short MIN_PEOPLE_IN_CASH_QUEUE = 3;
+const double SIMULATION_TIME = 68 hours + 20 minutes; // Doba behu simulacie
+const long ARRIVAL_CUSTOMER[] = {50 seconds, 40 seconds, 30 seconds}; // Prichod zakaznikov
+const double PAY_TIME_SHOPPING = 2 minutes; // Cas straveny pri plateni nakupu
+const bool ENABLE_REALLOCATION = false; // Povolenie zmeny kapacity pokladni na zaklade vytazenia
+const short CASH_COUNT = 4; // Pocet pokladni
+const short CASH_COUNT_IN_DELICATESSEN = 4; // Pocet pokladni v lahodkach
+const short MAX_PEOPLE_IN_CASH_QUEUE = 8; // Maximalny pocet zakaznikov vo fronte, pri prekroceni tejto hodnoty sa otvori nova pokladna (len pri ENABLE_REALLOCATION = true)
+const short MIN_PEOPLE_IN_CASH_QUEUE = 3; // Minimalny pocet zakaznikov vo fronte, pri prekroceni tejto hodnoty sa zatvori poklad (len pri ENABLE_REALLOCATION = true
 
 // Premenne pre realokaciu  v pokladniach
-const short CASH_SELLER = 2;
-const short CASH_SELLER_IN_DELICATESSEN = 2;
+const short CASH_SELLER = 2; // Pocet aktivnych pokladni (len pri ENABLE_REALLOCATION = false)
+const short CASH_SELLER_IN_DELICATESSEN = 1; // Pocet aktivnych pokladni v lahodkach (Len pri ENABLE_REALLOCATION = false)
 
+// Percentualne vyjadrenie prichodu do jednotlivych sekcii v obchode
+const double COUNT_OF_PERCENT = 100 percentages; // Pocet percent
+const double PASTRY_PERCENTAGE = 8 percentages; // Pecivo
+const double DRINKS_PERCENTAGE = 3 percentages; // Napoje
+const double ALCOHOL_PERCENTAGE = 3 percentages; // Alkoholicke napoje
+const double CHEMISTS_PERCENTAGE = 3 percentages; // Drogeria
+const double DAIRY_PRODUCTS_PERCENTAGE = 5 percentages; // Mliecne vyrobky
+const double FRUITS_VEGETABLES_PERCENTAGE = 5 percentages; // Ovocie a zelenina
+const double DELICATESSEN_PERCENTAGE = 5 percentages; // Lahodky
 
-const short COUNT_OF_PERCENT = 100 percentages; // Pocet percent
-const short PASTRY_PERCENTAGE = 6 percentages; // Pecivo
-const short DRINKS_PERCENTAGE = 6 percentages; // Napoje
-const short ALCOHOL_PERCENTAGE = 6 percentages; // Alkoholicke napoje
-const short CHEMISTS_PERCENTAGE = 6 percentages; // Drogeria
-const short DAIRY_PRODUCTS_PERCENTAGE = 6 percentages; // Mliecne vyrobky
-const short FRUITS_VEGETABLES_PERCENTAGE = 6 percentages; // Ovocie a zelenina
-const short DELICATESSEN_PERCENTAGE = 6 percentages; // Lahodky
+// Percentualne vyjadrenie vyuzitia obsluznych liniek
+const double BREAD_SLICER_PERCENTAGE = 1 percentages; // Krajac chleba
+const double WINE_TAPS_PERCENTAGE = 1 percentages; // Vycap vina
+const double RETURNABLE_BOTTLES_PERCENTAGE = 2 percentages; // Automat na vratenie flias
+const double TAKE_BASKET_PERCENTAGE = 75 percentages; // Zabratie kosika
 
-const short BREAD_SLICER_PERCENTAGE = 2 percentages; // Krajac chleba
-const short WINE_TAPS_PERCENTAGE = 1 percentages; // Vycap vina
-const short RETURNABLE_BOTTLES_PERCENTAGE = 2 percentages; // Automat na vratenie flias
-
+// Doba stravena v obsluznych linkach 
 const short BREAD_WAIT_TIME = 20 seconds; // Doba krajania chleba
-const short PASTRY_WAIT_TIME = 1 minutes; // Doba stravena v sekcii pecivo
 const short WINE_TAPS_WAIT_TIME = 30 seconds; // Doba capovania sudoveho vina
 const short RETURNABLE_BOTTLES_WAIT_TIME = 4 minutes; // Doba stravena u automatu na vracanie flias
+
+// Doba stravena v jednotlivych sekciach
+const short PASTRY_WAIT_TIME = 1 minutes; // Doba stravena v sekcii pecivo
+const short DAIRY_WAIT_TIME = 3 minutes; // Doba stravena v sekcii mliecne vyrobky
 const short CHEMISTS_WAIT_TIME = 2 minutes; // Doba stravena v sekcii drogerie
-const short DAIRY_WAIT_TIME = 4 minutes; // Doba stravena v sekcii mliecne vyrobky
-const short FRUITS_VEGETABLES_WAIT_TIME = 30 seconds; // Doba stravena v sekcii s ovocim a zeleninou
-const short DELICATESSEN_WAIT_TIME = 4000 seconds; // Doba stravena v sekcii lahodky
+const short FRUITS_VEGETABLES_WAIT_TIME = 60 seconds; // Doba stravena v sekcii s ovocim a zeleninou
+const short DELICATESSEN_WAIT_TIME = 120 seconds; // Doba stravena v sekcii lahodky
 
-const short DELICATESSEN_TIMEOUT = 60 minutes; // Doba, za ktoru zakaznik opusti frontu, musi byt vacsia ako DELICATESSEN_WAIT_TIME
+const short DELICATESSEN_TIMEOUT = 5 minutes; // Doba, za ktoru zakaznik opusti frontu, musi byt vacsia ako DELICATESSEN_WAIT_TIME
 
+// Doba dennych rezimov
+const double MOD_MORNING = 2 hours;
+const double MOD_NOON = 7 hours;
+const double MOD_AFTERNOON = 4 hours;
+const double MOD_NIGHT = 11 hours;
+
+// Obsluzne zariadenia
 Facility FacilityCashes[CASH_COUNT]; // Pokladne
 Facility FacilityCashesInDelicatessen[CASH_COUNT_IN_DELICATESSEN]; // Pokladne v lahodkach
 Facility FacilityBreadSlicer("Krajac chleba");
 Facility FacilityWineTaps("Vycapne zariadenie na sudove vina");
-Facility FacilityReturnableBottles("Automat na vracanie fias");
+Facility FacilityReturnableBottles("Automat na vratenie flias");
+Store StoreBaskets("Sklad kosikov", 150);
 
+// Spolocna fronta pre pokladne pri lahodkach 
 Queue QueueDelicatessen("Fronta lahodok");
-Store kosiky(150);
 
 // Pole oznacujuce aktivne pokladne
 bool ACTIVE_CASH[CASH_COUNT] = {false}; // Aktivne pokladne pri plateni
-bool ACTIVE_CASH_IN_DELICATESSEN[CASH_COUNT_IN_DELICATESSEN] = {false}; // Pokladne v lahodkach
+bool ACTIVE_CASH_IN_DELICATESSEN[CASH_COUNT_IN_DELICATESSEN] = {false}; // Aktivne pokladne v lahodkach
 
-size_t activeCashCount = CASH_SELLER_IN_DELICATESSEN; // Pocet aktivnych pokladni
-int arriveState = 0;
+size_t activeCashCount = CASH_SELLER_IN_DELICATESSEN; // Pocet aktivnych pokladni v lahodkach
+int arriveState = 0; // Denni rezim prevadzky
+bool interrupt = false; // Prerusenie pri ukoncni otvaracej doby, aby zakaznici zaplaili pri pokladni a opustili obchod
+
+/*
+ * Denne rezimy
+ */
+enum {
+	MORNING,
+	NOON,
+	AFTERNOON,
+	NIGHT,
+};
 
 /*
  * Timeout po, ktorom zakaznik opusta frontu pri lahodkach.
@@ -75,106 +111,129 @@ public:
 
 	void Behavior() override
 	{
-//		m_process->Out();
-//		delete m_process;
-//		Cancel();
+		m_process->Out();
+		delete m_process;
+		Cancel();
 	}
 };
 
 /*
- *
+ * Zakaznik, ktory vykonava nakup. Moze s urcitou pravdepodobnostou
+ * pri vstupe zobrat kosik. S urcitou pravdepodobnostou vstupuje do
+ * jednotlivych sekcii a ak sa v sekcii nachadza obsluzna linka, s urcitou
+ * pravdepodobnostou ju vyuzije.
  */
 class Shopper : public Process {
 private:
-	int percents;
-	int oldPercents;
+	int m_percents;
 	int m_index = 0;
+	bool m_close = false;
+	bool m_basket = false;
 
 	void Behavior() override
 	{
-	Enter(kosiky, 1);
-//	std::cout << "take " << Time << std::endl;	
+		// Zabratie kosika pri vstupe do obchodu
+		if (Random()*COUNT_OF_PERCENT <= TAKE_BASKET_PERCENTAGE) {
+			Enter(StoreBaskets, 1);
+			m_basket = true;
+		}
 	
 	LOOP:
-		percents = Random()*COUNT_OF_PERCENT;
-		oldPercents = percents;
-		// Sekcia peciva
-		if (percents <= PASTRY_PERCENTAGE) {
-			//std::cout << "pecivo: " << oldPercents << ", ";
+		m_percents = Random()*COUNT_OF_PERCENT;
 
+		// Sekcia peciva
+		if (m_percents <= PASTRY_PERCENTAGE && !interrupt) {
 			if (Random()*COUNT_OF_PERCENT <= BREAD_SLICER_PERCENTAGE) {
 				Seize(FacilityBreadSlicer);
 				Wait(Exponential(BREAD_WAIT_TIME));
 				Release(FacilityBreadSlicer);
 			}
-			goto LOOP;
+
+			if (!interrupt)
+				goto LOOP;
 		}
 		
 		// Sekcia napoje
-		percents -= PASTRY_PERCENTAGE;
-		if (percents <= DRINKS_PERCENTAGE) {
+		m_percents -= PASTRY_PERCENTAGE;
+		if (m_percents <= DRINKS_PERCENTAGE && !interrupt) {
 			Wait(Exponential(PASTRY_WAIT_TIME));
-			//std::cout << "napoje: " << oldPercents << ", ";
-			goto LOOP;
+
+			if (!interrupt)
+				goto LOOP;
 		}
 
 		// Sekcia alkoholicke napoje
-		percents -= DRINKS_PERCENTAGE;
-		if (percents <= ALCOHOL_PERCENTAGE) {
-			//std::cout << "alkohol: " << oldPercents << ", ";
-
+		m_percents -= DRINKS_PERCENTAGE;
+		if (m_percents <= ALCOHOL_PERCENTAGE && !interrupt) {
 			if (Random()*COUNT_OF_PERCENT <= WINE_TAPS_PERCENTAGE) {
 				Seize(FacilityWineTaps);
 				Wait(Exponential(WINE_TAPS_WAIT_TIME));
 				Release(FacilityWineTaps);
 			}
 
+			// Obsluzna linka na vratenie flias
 			if (Random()*COUNT_OF_PERCENT <= RETURNABLE_BOTTLES_PERCENTAGE) {
 				Seize(FacilityReturnableBottles);
 				Wait(Exponential(RETURNABLE_BOTTLES_WAIT_TIME));
 				Release(FacilityReturnableBottles);
 			}
-			goto LOOP;
+
+			if (!interrupt)
+				goto LOOP;
 		}
 
 		// Sekcia drogeria
-		percents -= ALCOHOL_PERCENTAGE;
-		if (percents <= CHEMISTS_PERCENTAGE) {
-			//std::cout << "drogeria: " << oldPercents << ", ";
+		m_percents -= ALCOHOL_PERCENTAGE;
+		if (m_percents <= CHEMISTS_PERCENTAGE && !interrupt) {
 			Wait(Exponential(CHEMISTS_WAIT_TIME));
-			goto LOOP;
+
+			if (!interrupt)
+				goto LOOP;
 		}
 
 		// Sekcia mliecne vyrobky
-		percents -= CHEMISTS_PERCENTAGE;
-		if (percents <= DAIRY_PRODUCTS_PERCENTAGE) {
-			//std::cout << "mliecne: " << oldPercents << ", ";
+		m_percents -= CHEMISTS_PERCENTAGE;
+		if (m_percents <= DAIRY_PRODUCTS_PERCENTAGE && !interrupt) {
 			Wait(Exponential(DAIRY_WAIT_TIME));
-			goto LOOP;
+
+			if (!interrupt)
+				goto LOOP;
 		}
 
 		// Sekcia ovocie a zelenina
-		percents -= DAIRY_PRODUCTS_PERCENTAGE;
-		if (percents <= FRUITS_VEGETABLES_PERCENTAGE) {
-			//std::cout << "ovocie: " << oldPercents << ", ";
+		m_percents -= DAIRY_PRODUCTS_PERCENTAGE;
+		if (m_percents <= FRUITS_VEGETABLES_PERCENTAGE && !interrupt) {
 			Wait(Exponential(FRUITS_VEGETABLES_WAIT_TIME));
-			goto LOOP;
+
+			if (!interrupt)
+				goto LOOP;
 		}
 
 		// Sekcia s lahodkami
-		percents -= FRUITS_VEGETABLES_PERCENTAGE;
-		bool close = false;
-		if (percents <= DELICATESSEN_PERCENTAGE) {
+		m_percents -= FRUITS_VEGETABLES_PERCENTAGE;
+		if (m_percents <= DELICATESSEN_PERCENTAGE && !interrupt) {
 		REPEAT:
+
+			/*
+			 * Realokacia pokladni ak je vo fronte nadbytok alebo nedostatok
+			 * zakaznikov. Plati len pri ENABLE_REALLOCATION = true;
+			 */
 			for (size_t i = 1; i < CASH_COUNT_IN_DELICATESSEN; i++) {
+				// Ak je vo fronte nedostatok ludi, pokladna sa uzavrie
 				if (QueueDelicatessen.Length() <= MIN_PEOPLE_IN_CASH_QUEUE
 					&& ACTIVE_CASH_IN_DELICATESSEN[i]) {
 						m_index = i;
-						close = true;
+						m_close = true;
 					}
 
+				// Ak je vo fronte nadbytok ludi, poklad sa otvori
 				if (QueueDelicatessen.Length() >= MAX_PEOPLE_IN_CASH_QUEUE
 						&& !ACTIVE_CASH_IN_DELICATESSEN[i]) {
+					/*
+					 * Otvorenie novej pokladne len v pripade, ze 
+					 * pocet otvorenych pokladni krat maximalny pocet zakaznikov
+					 * vo fronte je vacsi ako aktualna dlzka spolocnej fronty.
+					 */
 					if (activeCashCount * MAX_PEOPLE_IN_CASH_QUEUE > QueueDelicatessen.Length())
 						continue;
 
@@ -183,50 +242,69 @@ private:
 					break;
 				}
 
-				if (i == CASH_COUNT_IN_DELICATESSEN -1 && close) {
+				// Zatvorenie pokladne
+				if (i == (CASH_COUNT_IN_DELICATESSEN - 1) && m_close) {
 					ACTIVE_CASH_IN_DELICATESSEN[m_index] = false;
 					activeCashCount--;
 				}
 			}
 
+//			ACTIVE_CASH_IN_DELICATESSEN[0] = true;
+
+			/*
+			 * Vyber volnej pokladne v lahodkach.
+			 */
 			m_index = -1;
 			for (size_t i = 0; i < CASH_COUNT_IN_DELICATESSEN; i++) {
+				/*
+				 * A nie je povolena realokacia pokladni, tak je mozne pristupit
+				 * len k pokladniam, ktore obsluhuju predavaci.
+				 */
 				if (i >= CASH_SELLER_IN_DELICATESSEN && !ENABLE_REALLOCATION)
 					break;
 
+				// Zakaznik moze pristupit len k aktivnym pokladniam
 				if (!ACTIVE_CASH_IN_DELICATESSEN[i])
 					continue;
 
+				// Zakaznik moze pristupit len k pokladnei, ktora je volna
 				if (!FacilityCashesInDelicatessen[i].Busy()) {
 					m_index = i;
 					break;
 				}
 			}
 
-			//Event *timeout = new Timeout(this, DELICATESSEN_TIMEOUT);
+			// Maximalna doba, po ktoru zakaznik caka vo fronte
+			Event *timeout = new Timeout(this, DELICATESSEN_TIMEOUT);
+
+			/*
+			 * Pokial nie je ziadna pokladna volna, tak je zakaznik umiestneny
+			 * do fronty. Inak obsadi obsluznu linku a po obsluzeni ju uvolni.
+			 */
 			if (m_index == -1) {
-			//	delete timeout;
+				delete timeout;
 				QueueDelicatessen.Insert(this);
-				Passivate();
-				std::cout << "data" << std::endl;
-				goto REPEAT;
+				Passivate(); // Proces je presureny
+				goto REPEAT; // Po aktivacii proces sa pokracuje na tomto mieste
 			}
 			else
 				Seize(FacilityCashesInDelicatessen[m_index]);	
 
-			//delete timeout;
+			delete timeout;
 			Wait(Exponential(DELICATESSEN_WAIT_TIME));
 			Release(FacilityCashesInDelicatessen[m_index]);
+
+			/*
+			 * Spustenie procesu sa naplanuje na aktualny cas a pokracuje
+			 * v mieste, kde bol preruseny(Passivate()).
+			 */
 			if (QueueDelicatessen.Length() > 0) {
 				(QueueDelicatessen.GetFirst())->Activate();
-				std::cout << "activate\n";
-				Leave(kosiky, 1);
 			}
 
-			goto LOOP;
+			if (!interrupt)
+				goto LOOP;
 		}
-
-		//std::cout << "koniec: " << oldPercents << "\n";
 
 		/*
 		 * Obsadenie pokladne podla dlzky fronty. Obsadi sa pokladna, ktora
@@ -256,13 +334,9 @@ private:
 		Seize(FacilityCashes[index]);
 		Wait(Exponential(PAY_TIME_SHOPPING));
 		Release(FacilityCashes[index]);
-		Leave(kosiky, 1);
 
-	}
-
-	void gotoSection()
-	{
-		Behavior();
+		if (m_basket)
+			Leave(StoreBaskets, 1);
 	}
 
 public:
@@ -275,87 +349,58 @@ public:
 /*
  * Generator pre prichod zakaznikov.
  */
-class Generator : public Event {
+class GenShopperArrival : public Event {
 	void Behavior()
 	{
-//		if (arriveState == 4) {
-//			std::cout << "sleep" << Time << std::endl;
-//			Activate(Time + 11 hours);
-//			arriveState = 0;
-//			return;
-//		}
-//else {
+		if (arriveState == NIGHT) {
+			/*
+			 * Nastavenie uspania po dobu nocneho rezimu a nastavenie
+			 * casu prebudenia na celu hodinu.
+			 */
+			Activate(Time + MOD_NIGHT - long(Time)%(1 hours));
+			return;
+		}
 
-		new Shopper; // Vytvorenie noveho zakaznika
-		Activate(Time + Exponential(ARRIVAL_CUSTOMER[arriveState]));}
-//}
+		// Vytvorenie noveho zakaznika
+		new Shopper;
+
+		// Nastavenie vygenerovania dalsieho zakazika, znovu zavolanie udalosti
+		Activate(Time + Exponential(ARRIVAL_CUSTOMER[arriveState]));
+	}
 
 public:
-	Generator()
+	GenShopperArrival()
 	{
 		Activate();
 	}
 };
 
-class Gen2 : public Process {
+/*
+ * Riadenie denneho rezimu obchodu.
+ */
+class GenDailyMode : public Process {
 	void Behavior()
 	{
-		//std::cout << Time << std::endl;
-		arriveState = 4;
-		//Activate(Time + 2 hours);
-		//std::cout << Time << std::endl;
+	RET:
+		interrupt = false;
+		arriveState = MORNING;
+		Wait(MOD_MORNING);
 
-	//	Wait(7 hours);
-	//	std::cout << Time << std::endl;
+		arriveState = NOON;
+		Wait(MOD_NOON);
 
-	//	Wait(4 hours);
-	//	std::cout << Time << std::endl;
+		arriveState = AFTERNOON;
+		Wait(MOD_AFTERNOON);
 
-	//	Wait(11 hours);
-	//	std::cout << Time << std::endl;
+		arriveState = NIGHT;
+		interrupt = true;
+		Wait(MOD_NIGHT);
 		
-		
-
+		goto RET;
 	}
 
 public:
-	Gen2()
-	{
-		Activate();
-	}
-};
-
-class Ev : public Process {
-	bool m_isNight = false;
-	void Behavior()
-	{
-		if (m_isNight) {
-			m_isNight = false;
-			arriveState = 0;
-			Activate(Time + 11 hours);
-		}
-		else {
-			switch (arriveState) {
-				case 0:
-					Activate(Time + 2 hours);
-					break;
-				case 1:
-					Activate(Time + 7 hours);
-					break;
-				case 2:
-					Activate(Time + 4 hours);
-					m_isNight = true;
-					break;
-			}
-			arriveState++;
-		}
-
-	//std::cout << "isNight" << m_isNight << ", " <<Time/3600 << "\n";
-
-	}
-
-public:
-	Ev()
+	GenDailyMode()
 	{
 		Activate();
 	}
@@ -363,7 +408,6 @@ public:
 
 int main()
 {
-//DebugON ();
 	// Alokacia pokladni podla poctu predavaciek a zakaznikov
 	for (size_t i = 0; i < CASH_SELLER; i++)
 		ACTIVE_CASH[i] = true;
@@ -373,23 +417,23 @@ int main()
 
 	// Nastavenie zdielanej fronty vsetkym obsluznym zariadeniam
 	for (size_t i = 0; i < CASH_COUNT_IN_DELICATESSEN; i++) {
-		FacilityCashesInDelicatessen[i].SetQueue(QueueDelicatessen);
+		//FacilityCashesInDelicatessen[i].SetQueue(QueueDelicatessen);
 
 		if (i < CASH_SELLER_IN_DELICATESSEN)
 			ACTIVE_CASH_IN_DELICATESSEN[i] = true;
 	}
 
 	for (size_t i = 0; i < CASH_COUNT; i++)
-		FacilityCashes[i].SetName("Pokladna");
+		FacilityCashes[i].SetName("Pokladna ");
 
 	RandomSeed(time(NULL)); // inicializacia generatora 
 	Init(0, SIMULATION_TIME); // start simulacie
 
-	new Generator(); // Aktivacia generatora
-//	new Gen2();
-	new Ev();
+	new GenShopperArrival(); // Aktivacia generatora prichodu zakaznikov
+	new GenDailyMode(); // Aktivacia casovaca pre dennu dobu
+
 	Run();
-	DebugOFF();
+
 	// Vypis pokladni
 	for (size_t i = 0; i < CASH_COUNT; i++)
 		FacilityCashes[i].Output();
@@ -399,7 +443,6 @@ int main()
 		FacilityCashesInDelicatessen[i].Output();
 
 	QueueDelicatessen.Output();
-
-	kosiky.Output();
+	StoreBaskets.Output();
 }
 
