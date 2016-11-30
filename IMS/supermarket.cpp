@@ -137,6 +137,10 @@ private:
 			Enter(StoreBaskets, 1);
 			m_basket = true;
 		}
+
+		// Prioritna obluha zakaznika, ktory ma malo poloziek a chce byt obsluseny skor
+		if (Random()*COUNT_OF_PERCENT <= 1)
+			Priority = 1;
 	
 	LOOP:
 		m_percents = Random()*COUNT_OF_PERCENT;
@@ -350,7 +354,7 @@ public:
  * Generator pre prichod zakaznikov.
  */
 class GenShopperArrival : public Event {
-	void Behavior()
+	void Behavior() override
 	{
 		if (arriveState == NIGHT) {
 			/*
@@ -379,7 +383,7 @@ public:
  * Riadenie denneho rezimu obchodu.
  */
 class GenDailyMode : public Process {
-	void Behavior()
+	void Behavior() override
 	{
 	RET:
 		interrupt = false;
