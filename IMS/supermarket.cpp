@@ -6,8 +6,8 @@
 #define hours          minutes * 60
 #define percentages    + 0;
 
-const long SIMULATION_TIME = 48000 hours; // Doba behu simulacie
-const long ARRIVAL_CUSTOMER[] = {30 seconds, 50 seconds, 100 seconds}; // Prichod zakaznikov
+const double SIMULATION_TIME = 72 hours; // Doba behu simulacie
+const long ARRIVAL_CUSTOMER[] = {50 seconds, 80 seconds, 100 seconds}; // Prichod zakaznikov
 const long PAY_TIME_SHOPPING = 2 minutes; // Cas straveny pri plateni nakupu
 const bool ENABLE_REALLOCATION = true;
 const short CASH_COUNT = 3; // Pocet pokladni
@@ -29,16 +29,16 @@ const short DAIRY_PRODUCTS_PERCENTAGE = 6 percentages; // Mliecne vyrobky
 const short FRUITS_VEGETABLES_PERCENTAGE = 6 percentages; // Ovocie a zelenina
 const short DELICATESSEN_PERCENTAGE = 6 percentages; // Lahodky
 
-const short BREAD_SLICER_PERCENTAGE = 8 percentages; // Krajac chleba
-const short WINE_TAPS_PERCENTAGE = 8 percentages; // Vycap vina
-const short RETURNABLE_BOTTLES_PERCENTAGE = 8 percentages; // Automat na vratenie flias
+const short BREAD_SLICER_PERCENTAGE = 2 percentages; // Krajac chleba
+const short WINE_TAPS_PERCENTAGE = 1 percentages; // Vycap vina
+const short RETURNABLE_BOTTLES_PERCENTAGE = 2 percentages; // Automat na vratenie flias
 
-const short BREAD_WAIT_TIME = 40 seconds; // Doba krajania chleba
-const short PASTRY_WAIT_TIME = 2 minutes; // Doba stravena v sekcii pecivo
-const short WINE_TAPS_WAIT_TIME = 60 seconds; // Doba capovania sudoveho vina
-const short RETURNABLE_BOTTLES_WAIT_TIME = 5 minutes; // Doba stravena u automatu na vracanie flias
+const short BREAD_WAIT_TIME = 20 seconds; // Doba krajania chleba
+const short PASTRY_WAIT_TIME = 1 minutes; // Doba stravena v sekcii pecivo
+const short WINE_TAPS_WAIT_TIME = 30 seconds; // Doba capovania sudoveho vina
+const short RETURNABLE_BOTTLES_WAIT_TIME = 4 minutes; // Doba stravena u automatu na vracanie flias
 const short CHEMISTS_WAIT_TIME = 2 minutes; // Doba stravena v sekcii drogerie
-const short DAIRY_WAIT_TIME = 5 minutes; // Doba stravena v sekcii mliecne vyrobky
+const short DAIRY_WAIT_TIME = 4 minutes; // Doba stravena v sekcii mliecne vyrobky
 const short FRUITS_VEGETABLES_WAIT_TIME = 30 seconds; // Doba stravena v sekcii s ovocim a zeleninou
 const short DELICATESSEN_WAIT_TIME = 40 seconds; // Doba stravena v sekcii lahodky
 
@@ -51,14 +51,14 @@ Facility FacilityWineTaps("Vycapne zariadenie na sudove vina");
 Facility FacilityReturnableBottles("Automat na vracanie fias");
 
 Queue QueueDelicatessen("Fronta lahodok");
-Store kosiky("Nakupne kosiky", 150);
+Store kosiky(150);
 
 // Pole oznacujuce aktivne pokladne
 bool ACTIVE_CASH[CASH_COUNT] = {false}; // Aktivne pokladne pri plateni
 bool ACTIVE_CASH_IN_DELICATESSEN[CASH_COUNT_IN_DELICATESSEN] = {false}; // Pokladne v lahodkach
 
 size_t activeCashCount = CASH_SELLER_IN_DELICATESSEN; // Pocet aktivnych pokladni
-size_t arriveState = 0;
+int arriveState = 0;
 
 /*
  * Timeout po, ktorom zakaznik opusta frontu pri lahodkach.
@@ -75,9 +75,9 @@ public:
 
 	void Behavior() override
 	{
-		m_process->Out();
-		delete m_process;
-		Cancel();
+//		m_process->Out();
+//		delete m_process;
+//		Cancel();
 	}
 };
 
@@ -92,7 +92,8 @@ private:
 
 	void Behavior() override
 	{
-	Enter(kosiky, 1);		
+	Enter(kosiky, 1);
+//	std::cout << "take " << Time << std::endl;	
 	
 	LOOP:
 		percents = Random()*COUNT_OF_PERCENT;
@@ -203,7 +204,7 @@ private:
 			}
 
 			Event *timeout = new Timeout(this, DELICATESSEN_TIMEOUT);
-			if (m_index != -1) {
+/*			if (m_index != -1) {
 				Seize(FacilityCashesInDelicatessen[m_index]);
 				delete timeout;
 			}
@@ -212,10 +213,13 @@ private:
 				Passivate();
 				delete timeout;
 				goto REPEAT;
-			}
-
+			}*/
+				Seize(FacilityCashesInDelicatessen[0]);
+			//	QueueDelicatessen.Insert(this);
+			
+delete timeout;
 			Wait(Exponential(DELICATESSEN_WAIT_TIME));
-			Release(FacilityCashesInDelicatessen[m_index]);
+			Release(FacilityCashesInDelicatessen[0]);
 			goto LOOP;
 		}
 
@@ -249,8 +253,8 @@ private:
 		Seize(FacilityCashes[index]);
 		Wait(Exponential(PAY_TIME_SHOPPING));
 		Release(FacilityCashes[index]);
-
 		Leave(kosiky, 1);
+
 	}
 
 	void gotoSection()
@@ -271,12 +275,17 @@ public:
 class Generator : public Event {
 	void Behavior()
 	{
-	//		std::cout << arriveState << "\n";
-		if (arriveState != 3) {
-			new Shopper; // Vytvorenie noveho zakaznika
-			Activate(Time + Exponential(ARRIVAL_CUSTOMER[arriveState]));
-		}
-	}
+//		if (arriveState == 4) {
+//			std::cout << "sleep" << Time << std::endl;
+//			Activate(Time + 11 hours);
+//			arriveState = 0;
+//			return;
+//		}
+//else {
+
+		new Shopper; // Vytvorenie noveho zakaznika
+		Activate(Time + Exponential(ARRIVAL_CUSTOMER[arriveState]));}
+//}
 
 public:
 	Generator()
@@ -288,19 +297,22 @@ public:
 class Gen2 : public Process {
 	void Behavior()
 	{
-	LOOP:
-		arriveState = 0;
-		Wait(2 hours);
+		//std::cout << Time << std::endl;
+		arriveState = 4;
+		//Activate(Time + 2 hours);
+		//std::cout << Time << std::endl;
 
-		arriveState = 1;
-		Wait(7 hours);
+	//	Wait(7 hours);
+	//	std::cout << Time << std::endl;
 
-		arriveState = 2;
-		Wait(4 hours);
+	//	Wait(4 hours);
+	//	std::cout << Time << std::endl;
 
-		arriveState = 2;
-		Wait(11 hours);
-		goto LOOP;
+	//	Wait(11 hours);
+	//	std::cout << Time << std::endl;
+		
+		
+
 	}
 
 public:
@@ -310,8 +322,45 @@ public:
 	}
 };
 
+class Ev : public Process {
+	bool m_isNight = false;
+	void Behavior()
+	{
+		if (m_isNight) {
+			m_isNight = false;
+			arriveState = 0;
+			Activate(Time + 11 hours);
+		}
+		else {
+			switch (arriveState) {
+				case 0:
+					Activate(Time + 2 hours);
+					break;
+				case 1:
+					Activate(Time + 7 hours);
+					break;
+				case 2:
+					Activate(Time + 4 hours);
+					m_isNight = true;
+					break;
+			}
+			arriveState++;
+		}
+
+	std::cout << "isNight" << m_isNight << ", " <<Time/3600 << "\n";
+
+	}
+
+public:
+	Ev()
+	{
+		Activate();
+	}
+};
+
 int main()
 {
+//DebugON ();
 	// Alokacia pokladni podla poctu predavaciek a zakaznikov
 	for (size_t i = 0; i < CASH_SELLER; i++)
 		ACTIVE_CASH[i] = true;
@@ -327,13 +376,17 @@ int main()
 			ACTIVE_CASH_IN_DELICATESSEN[i] = true;
 	}
 
+	for (size_t i = 0; i < CASH_COUNT; i++)
+		FacilityCashes[i].SetName("Pokladna");
+
 	RandomSeed(time(NULL)); // inicializacia generatora 
 	Init(0, SIMULATION_TIME); // start simulacie
 
 	new Generator(); // Aktivacia generatora
-	new Gen2();
+//	new Gen2();
+	new Ev();
 	Run();
-
+	DebugOFF();
 	// Vypis pokladni
 	for (size_t i = 0; i < CASH_COUNT; i++)
 		FacilityCashes[i].Output();
@@ -346,3 +399,4 @@ int main()
 
 	kosiky.Output();
 }
+
