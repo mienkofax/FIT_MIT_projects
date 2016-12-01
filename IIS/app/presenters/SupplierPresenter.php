@@ -118,6 +118,7 @@ class SupplierPresenter extends BasePresenter
 			->setRequired(FALSE);
 		$form->addText('PSC', 'PSČ')
 			->setRequired(FALSE)
+			->setAttribute('placeholder', '12345')
 			->addRule(Form::PATTERN, 'PSČ musí mať 5 číslic', '([0-9]\s*){5}');
 		$form->addText('telefonni_cislo', 'Telefónne číslo')
 			->setRequired(FALSE)

@@ -13,6 +13,8 @@ class RouterFactory
 	public static function createRouter()
 	{
 		$router = new RouteList;
+		$router[] = new Route('search/<list>/<search>', 'Search:list');
+		$router[] = new Route('search', 'Search:search');
 		$router[] = new Route('[url]', 'Administration:default');
 		$router[] = new Route('<presenter=Administration>/<action=default>', array(
 			'action' => array(
@@ -32,7 +34,7 @@ class RouterFactory
 						'naskladnit' => 'placed',
 						'odstranit' => 'remove',
 						'detail' => 'detail',
-						'predat' => 'sell', 
+						'predat' => 'sell',
 						'pridat' => 'add'
 					),
 					Route::FILTER_STRICT => true

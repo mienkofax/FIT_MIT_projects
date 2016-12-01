@@ -35,10 +35,13 @@ class MedicinePresenter extends BasePresenter
 	/** @var MedicineManager Informacie o lieku a praca s nim */
 	protected $medicineManager;
 
+	/** @var InsurenceMnager Informacie o poistovni a praca s nou */
 	protected $insurenceManager;
 
+	/** @var OfficeManager Informacie o pobocke a praca s nou */
 	protected $officeManager;
 
+	/** @var reservationManager Informacie o rezervacii a praca s nou*/
 	protected $reservationManager;
 
 	public function __construct(MedicineManager $medicineManager)
@@ -177,9 +180,11 @@ class MedicinePresenter extends BasePresenter
 					->setAttribute('class', 'form-control');
 				$insurence->addText('cena', 'Cena lieku')
 					->setRequired(FALSE)
+					->setDefaultValue('0')
 					->addRule(Form::FLOAT, 'Cena musí byť číslo');
 				$insurence->addText('doplatek', 'Doplatok na liek')
 					->setRequired(FALSE)
+					->setDefaultValue('0')
 					->addRule(Form::FLOAT, 'Doplatok musí byť číslo');
 				$insurence->addSelect('hradene', 'Typ lieku', array('hradene' => 'Hradený', 'nehradene' => 'Nehradený', 'doplatok' => 'Liek s doplatkom'))
 					->setPrompt('Zvoľte typ lieku')

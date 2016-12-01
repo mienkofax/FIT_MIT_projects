@@ -65,6 +65,8 @@
 				<li><a n:href="Office:sell">Vydať lieky </span></a></li>
 				<li>&nbsp;</li>
 				{/if}
+				<li>&nbsp;</li>
+				<li><a n:href="Search:search">Vyhľadať liek </span></a></li>
 
 				{if $user->isInRole('admin')}
 				{/if}
@@ -77,12 +79,6 @@
 			{include content}
 		</div>
 	</div>
-
-	<footer>
-		<div class="container">
-			Projekt do predmetu IIS.
-		</div>
-	</footer>
 
 	{block scripts}
 	<script src="https://nette.github.io/resources/js/netteForms.min.js"></script>

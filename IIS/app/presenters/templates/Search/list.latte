@@ -1,0 +1,43 @@
+{define title}Vyhľadávanie{/define}
+{define description}Vyhľadané lieky.{/define}
+{block content}
+<ul class="list nav nav-tabs">
+	<li><a data-toggle="tab" href="#sectionA">Zoznam nájdených liekov</a></li>
+</ul>
+
+<div class="tab-content content">
+	<div id="sectionA" class="tab-pane fade in active">
+		<h2>Zoznam nájdených liekov</h2>
+
+		<table class="table table-hover">
+			<thead>
+			<tr>
+				<th>
+					Názov lieku
+				</th>
+				<th class="text-center">
+					Dátum vytvorenia
+				</th>
+				<th></th>
+			</tr>
+			</thead>
+			<tr n:foreach="$medicines as $medicine">
+				<td>
+					<a class="link" n:href="Medicine:detail $medicine->ID_leku">{$medicine->nazev_leku}</a>
+				</td>
+				<td class="text-center">
+					{$medicine->date_time}
+				</td>
+				<td class="text-center">
+					<a class="action"  n:href="Medicine:edit $medicine->ID_leku">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+					</a>
+					<a class="action" href="{link Medicine:remove}/{$medicine->ID_leku}/liek/{$medicine->ID_leku}">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+					</a>
+				</td>
+			</tr>
+		</table>
+
+	</div>
+</div>

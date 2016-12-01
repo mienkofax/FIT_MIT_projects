@@ -74,9 +74,11 @@ class UserManager extends BaseManager
 			unset($user[self::COLUMN_ID]);
 			$primaryKey = $this->database->table(self::TABLE_NAME)->insert($user);
 
-			if ($office)
-				$this->database->table('pobocka_zamestnanec')
-					->insert(array('ID_pobocky' => $office, 'ID_uzivatele' => $primaryKey));
+			if ($office) {
+				foreach ($office as $key => $item)
+					$this->database->table('pobocka_zamestnanec')
+						->insert(array('ID_pobocky' => $item, 'ID_uzivatele' => $primaryKey));
+			}
 
 		} else {
 			$this->database->table(self::TABLE_NAME)->where(self::COLUMN_ID,
@@ -86,9 +88,11 @@ class UserManager extends BaseManager
 			$this->database->table('pobocka_zamestnanec')
 				->where('ID_uzivatele', $primaryKey)->delete();
 
-			if ($office)
-				$this->database->table('pobocka_zamestnanec')
-					->insert(array('ID_pobocky' => $office, 'ID_uzivatele' => $primaryKey));
+			if ($office) {
+				foreach ($office as $key => $item)
+					$this->database->table('pobocka_zamestnanec')
+						->insert(array('ID_pobocky' => $item, 'ID_uzivatele' => $primaryKey));
+			}
 		}
 	}
 
@@ -132,15 +136,15 @@ class UserManager extends BaseManager
 
 		$data = $this->database->table('pobocka_zamestnanec')->where('ID_uzivatele', $id);
 		$result = [];
-		$office = null;
+		$result2 = [];
+		$office = [];
 
 		foreach ($data as $key => $value)
-			$office = $value['ID_pobocky'];
-
-		if (!$office)
-			return null;
+			$office[] = $value['ID_pobocky'];
 
 		foreach ($this->database->table('pobocky')->where('ID_pobocky', $office) as $key => $value)
-			return $value->ID_pobocky;
+			$result2[] = $value->ID_pobocky;
+
+		return $result2;
 	}
 }

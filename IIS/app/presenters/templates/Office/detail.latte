@@ -13,9 +13,7 @@
 	<div id="sectionA" class="tab-pane fade in active">
 	<h2>Detail pobočky</h2>
 		<h4>Základné informácie</h4>
-		<p><strong>Počet zamestnancov:</strong> {$CountDBItem['user']}</p>
-		<p><strong>Počet dodávateľov:</strong> {$CountDBItem['supplier']}</p>
-		<p><strong>Počet liekov:</strong> {$CountDBItem['medicine']}</p>
+		<p><strong>Názov pobočky:</strong> {$office->nazev_pobocky}</p>
 
 		<h4>Adresa</h4>
 		<p>{$office->ulice}, {$office->PSC} {$office->mesto}</p>
@@ -25,6 +23,11 @@
 			<strong>Telefón:</strong> {$office->telefonni_cislo}<br>
 			<strong>E-mail:</strong> {$office->email}
 		</p>
+
+		<h4>Doplňujúce informácie</h4>
+		<p><strong>Počet zamestnancov:</strong> {$CountDBItem['user']}</p>
+		<p><strong>Počet dodávateľov:</strong> {$CountDBItem['supplier']}</p>
+		<p><strong>Počet liekov:</strong> {$CountDBItem['medicine']}</p>
 	</div>
 	<div id="sectionB" class="tab-pane fade">
 		<h2>Zoznam liekov</h2>

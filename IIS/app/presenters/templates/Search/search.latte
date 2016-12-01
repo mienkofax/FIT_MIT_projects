@@ -1,17 +1,18 @@
-{define title}Naskladniť{/define}
-{define description}Naskladniť liekn na pobočiek.{/define}
+{define title}Editor{/define}
+{define description}Editor užívateľov.{/define}
 {block content}
 <ul class="list nav nav-tabs">
-	<li><a data-toggle="tab" href="#sectionA">Naskladniť liek na pobočku</a></li>
+	<li><a data-toggle="tab" href="#sectionA">Hľadanie</a></li>
 </ul>
 
 <div class="tab-content content">
 	<div id="sectionA" class="tab-pane fade in active">
-		<h2>Naskladniť lieky na pobočku</h2>
-		{control placedForm}
-		{/block}
+		<h2>Hľadanie</h2>
+		{* Formulár pre editáciu. *}
+		{control searchForm}
 	</div>
 </div>
+{/block}
 
 {block scripts}
 {include parent}

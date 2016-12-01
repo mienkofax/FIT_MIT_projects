@@ -6,7 +6,7 @@ application:
 		*: App\*Module\Presenters\*Presenter
 
 session:
-	expiration: 14 days
+	expiration: 1 days
 
 services:
 	- App\Model\OfficeManager
@@ -16,6 +16,7 @@ services:
 	- App\Model\UserManager
 	- App\Model\MedicineManager
 	- App\Model\ReservationManager
+	- App\Model\SearchManager
 	- App\Forms\UserForms
 	router: App\RouterFactory::createRouter
 	autenticator: App\Model\AuthenticatorManager
@@ -25,7 +26,7 @@ services:
 
 forms:
 	messages:
-		REQUIRED: 'Povinne pole.'
+		REQUIRED: 'Povinné pole.'
 
 di:
 	debugger: true

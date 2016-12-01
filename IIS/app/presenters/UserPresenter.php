@@ -21,9 +21,11 @@ class UserPresenter extends BasePresenter
 			'manager' => 'Manažér',
 			'admin' => 'Administrátor'
 		);
+
 	/** @var UserManager Informacie o uzivatelovi a praca s nim */
 	protected $userManager;
 
+	/** @var OfficeManager Informacie o pobocke a praca s nou */
 	protected $officeManager;
 
 	public function __construct(UserManager $userManager)
@@ -105,12 +107,13 @@ class UserPresenter extends BasePresenter
 	 */
 	public function createComponentEditForm()
 	{
+		$userOfficeID = $this->getUser()->getIdentity()->getData()['ID_uzivatele'];
+		$officeID = $this->officeManager->getUserOffice($userOfficeID);
+
 		$form = new Form;
 		$form->addGroup('');
 		$form->addHidden('ID_uzivatele');
-		$form->addSelect('ID_pobocky', 'Pobočka', $this->officeManager->getOfficesToSelectBox())
-			->setRequired(FALSE)
-			->setPrompt('Zvoľte pobočku')
+		$form->addMultiSelect('ID_pobocky', 'Pobočky', $this->officeManager->getOfficesToSelectBox())
 			->setAttribute('class', 'form-control');
 		$form->addText('login', 'Prihlasovacie meno')
 			->addRule(Form::FILLED, "Musí byť zadané prihlasovanie meno");

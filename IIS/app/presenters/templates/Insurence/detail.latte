@@ -13,9 +13,7 @@
 		<h2>Detail poisťovne</h2>
 
 		<h4>Základné informácie</h4>
-		<p><strong>Počet hradených liekov:</strong> {$CountDBItem['hradene']}</p>
-		<p><strong>Počet nehradených liekov:</strong> {$CountDBItem['nehradene']}</p>
-		<p><strong>Počet liekov s doplatkom:</strong> {$CountDBItem['doplatok']}</p>
+		<p><strong>Názov poisťovne:</strong> {$insurence->nazev_pojistovny}</p>
 
 		<h4>Adresa</h4>
 		<p>{$insurence->ulice}, {$insurence->PSC} {$insurence->mesto}</p>
@@ -25,6 +23,11 @@
 			<strong>Telefón:</strong> {$insurence->telefonni_cislo}<br>
 			<strong>E-mail:</strong> {$insurence->email}
 		</p>
+
+		<h4>Dopňujúce informácie</h4>
+		<p><strong>Počet hradených liekov:</strong> {$CountDBItem['hradene']}</p>
+		<p><strong>Počet nehradených liekov:</strong> {$CountDBItem['nehradene']}</p>
+		<p><strong>Počet liekov s doplatkom:</strong> {$CountDBItem['doplatok']}</p>
 	</div>
 	<div id="sectionB" class="tab-pane fade in active">
 		<h2>Hradené lieky</h2>

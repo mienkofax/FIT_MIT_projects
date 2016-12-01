@@ -24,9 +24,11 @@ class AccessListFactory extends Permission
 		$this->addResource('User');
 		$this->addResource('Medicine');
 		$this->addResource('Reservation');
+		$this->addResource('Search');
 
 		// Zoznam opravneni pre navstevnika
 		$this->allow('guest', 'Administration', array('login', 'logout', 'default'));
+		$this->allow('guest', 'Search', 'search');
 
 		// Zoznam opravneni pre clena == predavac
 		$this->allow('member', 'Medicine', array('list', 'detail', 'edit', 'edit'));

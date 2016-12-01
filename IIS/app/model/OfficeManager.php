@@ -280,6 +280,20 @@ class OfficeManager extends BaseManager
 		return $result;
 	}
 
+	/**
+	 * Zoznam vsetkych pobociek pre formular.
+	 * @return mixed Zoznam vsetkych pobociek.
+	 */
+	public function getOfficesToSelectBox2($id) {
+		$data = $this->database->table('pobocky')->where('ID_pobocky', $id)->fetchAll();
+		$result = [];
+
+		foreach ($data as $key => $value)
+			$result[$value->ID_pobocky] = $value->nazev_pobocky;
+
+		return $result;
+	}
+
 	public function getRelatedMedicinesToSelectBox($id) {
 
 		$data = $this->database->table('pobocka_lek')->where('ID_pobocky', $id)->select('ID_leku');

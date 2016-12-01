@@ -32,11 +32,13 @@ class OfficePresenter extends BasePresenter
 	/** @var OfficePresenter Informacie o pobockach a praca s nimi */
 	protected $officeManager;
 
-	/***/
+	/** @var supplierManager Informacie o dodavatelovi a praca s nim */
 	protected $supplierManager;
 
+	/** @var MedicineManager Informacie o liekoch a praca s nimi */
 	protected $medicineManager;
 
+	/** @var UserManager Informacie o uzivateloch a praca s nimi */
 	protected $userManager;
 
 	public function __construct(OfficeManager $officeManager)
@@ -130,13 +132,13 @@ class OfficePresenter extends BasePresenter
 		$form->addGroup('');
 		// Pre bezneho uzivatela
 		if ($this->getUser()->getIdentity()->getRoles()[0] == 'member') {
-		$form->addHidden('ID_pobocky')
-			->setDefaultValue($officeID);
-		$form->addSelect('ID_pobocky2', 'Pobočka', $this->officeManager->getOfficesToSelectBox())
+		//$form->addHidden('ID_pobocky')
+		//	->setDefaultValue($officeID);
+		$form->addSelect('ID_pobocky', 'Pobočka', $this->officeManager->getOfficesToSelectBox2($officeID))
 			->setRequired(TRUE)
 			->setPrompt('Zvoľte pobočku')
-			->setDisabled(TRUE)
-			->setDefaultValue($officeID)
+			//->setDisabled(TRUE)
+			//->setDefaultValue($officeID)
 			->setAttribute('class', 'form-control');
 		}
 
@@ -184,13 +186,13 @@ class OfficePresenter extends BasePresenter
 		$form->addGroup('');
 		// Pre bezneho uzivatela
 		if ($this->getUser()->getIdentity()->getRoles()[0] == 'member') {
-		$form->addHidden('ID_pobocky')
-			->setDefaultValue($officeID);
-		$form->addSelect('ID_pobocky2', 'Pobočka', $this->officeManager->getOfficesToSelectBox())
+		//$form->addHidden('ID_pobocky')
+		//	->setDefaultValue($officeID);
+		$form->addSelect('ID_pobocky', 'Pobočka', $this->officeManager->getOfficesToSelectBox2($officeID))
 			->setRequired(TRUE)
 			->setPrompt('Zvoľte pobočku')
-			->setDisabled(TRUE)
-			->setDefaultValue($officeID)
+			//->setDisabled(TRUE)
+			//->setDefaultValue($officeID)
 			->setAttribute('class', 'form-control');
 		}
 
@@ -299,6 +301,7 @@ class OfficePresenter extends BasePresenter
 			->setRequired(FALSE);
 		$form->addText('PSC', 'PSČ')
 			->setRequired(FALSE)
+			->setAttribute('placeholder', '12345')
 			->addRule(Form::PATTERN, 'PSČ musí mať 5 číslic', '([0-9]\s*){5}');
 		$form->addText('telefonni_cislo', 'Telefónne číslo')
 			->setRequired(FALSE)
