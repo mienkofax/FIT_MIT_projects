@@ -31,7 +31,7 @@ class AccessListFactory extends Permission
 		// Zoznam opravneni pre clena == predavac
 		$this->allow('member', 'Medicine', array('list', 'detail', 'edit', 'edit'));
 		$this->allow('member', 'Reservation', array('list', 'detail', 'edit', 'remove'));
-		$this->allow('member', 'Office', array('list', 'detail'));
+		$this->allow('member', 'Office', array('list', 'detail', 'placed', 'sell'));
 
 		// Zoznam opravneni pre managera
 		$this->allow('manager', 'Office', array('edit', 'remove'));

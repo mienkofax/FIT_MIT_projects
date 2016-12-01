@@ -1,7 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!-- saved from url=(0067)https://www.fit.vutbr.cz/study/courses/IIS/private/projekt/doc.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2">
-<meta http-equiv="refresh" content="5">
 	<title>Projekt IIS</title>
 	<style type="text/css">
 		table { border-collapse: collapse; }
@@ -20,11 +19,11 @@
 	<dt>Autoři</dt>
 	<dd>Klára Nečasová <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
 		<a href="mailto:xnecas24@stud.fit.vutbr.cz">xnecas24@stud.fit.vutbr.cz</a> -
-		správa uživatelů a uživatelské rozhraní
+		správa užívateľov, pobočiek, lekární, dodávateľov, rezervácií, liekov, predaj a naskladnenie liekov, prihlásenie a odhlásenie
 	</dd>
 	<dd>Peter Tisovcik <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
 		<a href="mailto:xtisov00@stud.fit.vutbr.cz">xtisov00@stud.fit.vutbr.cz</a> -
-		databázový subsystém
+		databázový subsystém, sql príkazy a návrh šablón
 	</dd>
 	<dt>URL aplikace</dt>
 	<dd><a href="http://iis.mienkofax.eu/">http://www.iis.mienkofax.eu/</a></dd>
@@ -36,7 +35,7 @@
 <tbody><tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
 <tr><td>admin</td><td>admin</td><td>Administrátor</td></tr>
 <tr><td>manager</td><td>manager</td><td>Manažér</td></tr>
-<tr><td>member</td><td>member</td><td>Predavač</td></tr>
+<tr><td>predavac</td><td>predavac</td><td>Predavač</td></tr>
 </tbody></table>
 
 <h2>Implementace</h2>
@@ -51,31 +50,31 @@
 		</ul>
 		<li><strong>forms</strong> </li>
 		<ul>
-			<li><i>UserForms.php</i> </li> Vytvorenie formulárov pre prihlásenie, registrovanie a odhlásenie.
+			<li><i>UserForms.php</i> - Vytvorenie formulárov pre prihlásenie, registrovanie a odhlásenie.</li>
 		</ul>
 		<li><strong>model</strong> <br> Modely pre prácu s jednotlivými dátami v databáze. Vyberá príslušné dáta pre daný presenter.</li>
 		<ul>
 			<li><i>AuthenticatorManager.php</i> - Model pre prácu s prihlásenim. Kontroluje či súhlasia prihlasovacie a registračné údaje</li>
-			<li><i>BaseManager.php</i> - Rozhranie pre modely, sprístupňuje prcu s databázou a overuje oprávnenia. </li>
-			<li><i>InsurenceManager.php</i> - Model pre prácu s jednotliými poisťovňami. Umožňuje editovať a vyberať údaje z databáze. Vyberá sa buď pre jednu alebo pre viacero poisťovní. Obsahuje metódy pre získanie dostupných liekov k dane pobočke, ich typ a zoznam poisťovní.</li>
-			<li><i>MedicineManager.php</i> - Model pre prácu s jednotlivými liekmi, Umožňuje editovať a vzberať údae z databáze. Vyberá. Obsahuje metody pre získanie dostupných  pobočiek, rezervácií, poisťovní k danému lieku.</li>
+			<li><i>BaseManager.php</i> - Rozhranie pre modely, sprístupňuje prácu s databázou a overuje oprávnenia. </li>
+			<li><i>InsurenceManager.php</i> - Model pre prácu s jednotlivými poisťovňami. Umožňuje editovať a vyberať údaje z databáze. Vyberá sa buď pre jednu alebo pre viacero poisťovní. Obsahuje metódy pre získanie dostupných liekov k danej pobočke, ich typ a zoznam poisťovní.</li>
+			<li><i>MedicineManager.php</i> - Model pre prácu s jednotlivými liekmi, Umožňuje editovať a vyberať údaje z databáze. Obsahuje metody pre získanie dostupných  pobočiek, rezervácií, poisťovní k danému lieku.</li>
 			<li><i>MenuManager.php</i> - Model pre zistenie počtu záznamov pre jednotlivé tabuľky.</li>
-			<li><i>OfficeManager.php</i> - Model pre prácu s jednotlivými pobočkami. Umožňuje editovať a vyberať údaje z databáze, buď pre jednu alebo viacej pobočiek. Obsahuje metódy pre získaniedostupných liekov a zamestnancov na danej pobočke.</li>
+			<li><i>OfficeManager.php</i> - Model pre prácu s jednotlivými pobočkami. Umožňuje editovať a vyberať údaje z databáze, buď pre jednu alebo viacej pobočiek. Obsahuje metódy pre získanie dostupných liekov a zamestnancov na danej pobočke.</li>
 			<li><i>ReservationManager.php</i> - Model pre prácu s jednotlivými rezerváciami. Umožňuje editovať a vyberať údaje z databáze, buď pre jednu alebo vacero rezervácií. Obsahuje metódy pre získanie dostupných liekov a pobočiek, kde je daná rezervácia uskutočnená.</li>
 			<li><i>SupplierManager.php</i> - Model pre prácu s jednotlivými dodávateľmi. Umožňuje editovať a vyberať údaje z databáze, buď pre jedného alebo pre viacero dodávateľov. Obsahuje metody pre získanie dostupných pobočiek, ktoré zásobuje.</li>
 			<li><i>UserManager.php</i> - Model pre prácu s užívateľmi. Pridanie, editova a odstraňovanie užívateľov z databáze.
 		</ul>
 		<li><strong>presenters</strong> </li> Obsahuje prezentery, ktoré riadia zobrazovanie jednotlivých stránok. Používajú modely pre získanie potrebných informácií.
 		<ul>
-			<li><strong>Administration</strong> </li> Adresár so šablónou, ktorý obsahuje domovskú stránku.
+			<li><strong>Administration</strong> </li> Adresár so šablónou, ktorý obsahuje domovskú stránku a prihlásenie.
 			<li><strong>Error</strong> </li> Adresár zo šablónami pre chyby.
 			<li><strong>Insurence</strong> </li> Adresár so šablónami, ktorý obsahuje šablóny pre zoznam poisťovní, detail poisťovne a pridávanie/editovanie pobočky.
-			<li><strong>Medicine</strong> </li> Adresár so šablónami, ktorý obsahuje šablóny pre zoznam liekov, detail lieku a pridani/editovanie lieku.
+			<li><strong>Medicine</strong> </li> Adresár so šablónami, ktorý obsahuje šablóny pre zoznam liekov, detail lieku a pridanie/editovanie lieku.
 			<li><strong>Office</strong> </li> Adresár so šablónami, ktorý obsahuje šablóny pre zoznam pobočiek, detial pobočiek a pridanie/editovanie pobočiek.
 			<li><strong>Reservation</strong> </li> Adresár so šablónami, ktorý obsahuje šablóny pre zoznam rezervácii, detail rezervácii a pridanie/editovanie rezervovanie.
 			<li><strong>Supplier</strong> </li> Adresár so šablónami, ktorý obsahuje šablóny pre zoznam dodávateľov, detail dodávateľov a pridanie/editovanie dodávateľov.
 			<li><strong>User</strong> </li> Adresár so šablónami, ktorý obsahuje šablóny pre zoznam užívateľov, detail užívateľov a pridanie/editovanie užívateľov.
-			<li><i>@layout.latte</i> </li>
+			<li><i>@layout.latte</i> </li> Hlavný šablónovací súbor, do ktorého sa vkladajú šablóny, Obsahuje hlavičku, pätičku, menu a hlavnú kostru webu.
 			<li><i>AuthenticatorPresenter.php</i> </li> Spracovanie vykreslenia prihlásenia. Vykreslenie formulátor.
 			<li><i>BasePresenter.php</i> </li> Rozhranie pre spracovanie vykreslenia určitého mdelu.
 			<li><i>InsurencePresenter.php</i> </li> Spracovanie vykreslenia zoznamu poisťovní, detailu poisťovne a formulára pre pridanie alebo editovanie poisťovne.
@@ -87,15 +86,15 @@
 		</ul>
 		<li><strong>router</strong> </li>
 		<ul>
-			<li><i>RouterFactory.php</i> </li>
+			<li><i>RouterFactory.php</i> </li> Obsahuje preklad medzi URL adresami a akciami v jednotlivych prezenteroch. Preklad je riadený definovanými pravidlami.
 		</ul>
 		<li><i>AccessListFactory.php</i> - Prístupové práva užívateľov pre jednotlivé zdroje. Definícia pravidiel.</li>
-		<li><i>bootstrap.php</i> </li>
+		<li><i>bootstrap.php</i> </li> - Iniciaizačný súbor Nette.
 	</ul>
-	<li><strong>log</strong> - Logovací adresár</li>
-	<li><strong>temp</strong> - Adresár s dočasnými súbormi</li>
+	<li><strong>log</strong> - Logovací adresár.</li>
+	<li><strong>temp</strong> - Adresár s dočasnými súbormi.</li>
 	<li><strong>vendor</strong> - Adresár s knižnicami, možné stiahnuť pomocou composer-u.</li>
-	<li><strong>www</strong> - Adresár obsahujúci css a js čast spoločnú pre všetky časti.</li>
+	<li><strong>www</strong> - Adresár obsahujúci css a js čast spoločnú pre všetky časti, obsahuje bootstrap.</li>
 	<li><i>xtisov00_xnecas24.sql</i> - SQL script databáze s ukážkovými dátami.</li>
 </ul>
 <p>
@@ -107,7 +106,7 @@
 <ul>
 <li>Skopírovať obsah archívu do adresára, kde má byť umiestnený web.</li>
 <li>Nastavenie práva ostatným pre zápis do adresára <strong>temp</strong> a <strong>log</strong>.</li>
-<li>Nastavenie prihlasovacích údajov pre databázu v súbore app/config/config.local.neon .</li>
+<li>Nastavenie prihlasovacích údajov pre databázu v súbore app/config/config.local.neon.</li>
 <li>Požiadavky na server: PHP 5.6 alebo vyššie (plne kompatibilné s PHP 7.0), MySQL server s poporou PDO.</li>
 <li>Prihlásiť sa do databáze typicky pomocou PHPMyAdmin a importovať obsah súboru xtisov00_xnecas24.sql</li>
 </ul>

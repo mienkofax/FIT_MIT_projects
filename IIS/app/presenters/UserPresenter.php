@@ -4,6 +4,7 @@ namespace App\Presenters;
 
 use App\Model\UserManager;
 use App\Presenters\BasePresenter;
+use App\Model\OfficeManager;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Database\UniqueConstraintViolationException;
@@ -23,10 +24,17 @@ class UserPresenter extends BasePresenter
 	/** @var UserManager Informacie o uzivatelovi a praca s nim */
 	protected $userManager;
 
+	protected $officeManager;
+
 	public function __construct(UserManager $userManager)
 	{
 		parent::__construct();
 		$this->userManager = $userManager;
+	}
+
+	public function injectOfficeManager(OfficeManager $officeManager)
+	{
+		$this->officeManager = $officeManager;
 	}
 
 	/**
@@ -43,6 +51,7 @@ class UserPresenter extends BasePresenter
 			throw new BadRequestException();
 
 		$this->template->userData = $user;
+		$this->template->permission = self::PERMISSION;
 	}
 
 	/**
@@ -53,6 +62,7 @@ class UserPresenter extends BasePresenter
 	public function renderList($column, $sort)
 	{
 		$this->template->users = $this->userManager->getUsers($column, $sort);
+		$this->template->permission = self::PERMISSION;
 	}
 
 	/**
@@ -78,8 +88,9 @@ class UserPresenter extends BasePresenter
 			return;
 		}
 
-		if ($user = $this->userManager->getUser($id)) {
+		if ($user = $this->userManager->getUser($id)->toArray()) {
 			$this->template->isEditForm = true;
+			$user['ID_pobocky'] = $this->userManager->getRelatedOffice($id) ;
 			$this['editForm']->setDefaults($user);
 		}
 		else {
@@ -97,6 +108,10 @@ class UserPresenter extends BasePresenter
 		$form = new Form;
 		$form->addGroup('');
 		$form->addHidden('ID_uzivatele');
+		$form->addSelect('ID_pobocky', 'Pobočka', $this->officeManager->getOfficesToSelectBox())
+			->setRequired(FALSE)
+			->setPrompt('Zvoľte pobočku')
+			->setAttribute('class', 'form-control');
 		$form->addText('login', 'Prihlasovacie meno')
 			->addRule(Form::FILLED, "Musí byť zadané prihlasovanie meno");
 		$form->addText('jmeno', 'Meno užívateľa')

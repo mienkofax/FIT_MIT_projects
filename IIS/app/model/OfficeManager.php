@@ -366,6 +366,14 @@ class OfficeManager extends BaseManager
 
 	public function getUserOffice($id)
 	{
-		return $this->database->table('pobocka_zamestnanec')->select('ID_pobocky')->where('ID_uzivatele', $id)->fetch()->toArray()['ID_pobocky'];
+		$data = $this->database->table('pobocka_zamestnanec')
+			->select('ID_pobocky')
+			->where('ID_uzivatele', $id);
+		$result = [];
+
+		foreach ($data as $key => $value)
+			$result[] = $value['ID_pobocky'];
+
+		return $result;
 	}
 }

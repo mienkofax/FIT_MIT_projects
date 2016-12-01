@@ -18,7 +18,10 @@
 					<a href="{link User:list}/priezvisko/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
 				<th class="text-center">
-					Dátum registrovania
+					Lgoin
+				</th>
+				<th class="text-center">
+					Dátum registrácie
 					<a href="{link User:list}/cas/asc"><span class="glyphicon glyphicon-chevron-up sort-icon" aria-hidden="true"></span></a>
 					<a href="{link User:list}/cas/desc"><span class="glyphicon glyphicon-chevron-down sort-icon" aria-hidden="true"></span></a>
 				</th>
@@ -28,6 +31,9 @@
 			<tr n:foreach="$users as $userItem">
 				<td>
 					<a class="link" n:href="User:detail $userItem->ID_uzivatele">{$userItem->prijmeni} {$userItem->jmeno}</a>
+				</td>
+				<td class="text-center">
+					{$userItem->login}
 				</td>
 				<td class="text-center">
 					{$userItem->date_time}

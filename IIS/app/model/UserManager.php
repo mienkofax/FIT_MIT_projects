@@ -65,14 +65,31 @@ class UserManager extends BaseManager
 	 */
 	public function saveUser($user)
 	{
+		$office = $user['ID_pobocky'];
 		unset($user['heslo_repeat']);
+		unset($user['ID_pobocky']);
+
 		$user['heslo'] = Passwords::hash($user['heslo']);
 		if (!$user[self::COLUMN_ID]) {
 			unset($user[self::COLUMN_ID]);
-			$this->database->table(self::TABLE_NAME)->insert($user);
-		} else
+			$primaryKey = $this->database->table(self::TABLE_NAME)->insert($user);
+
+			if ($office)
+				$this->database->table('pobocka_zamestnanec')
+					->insert(array('ID_pobocky' => $office, 'ID_uzivatele' => $primaryKey));
+
+		} else {
 			$this->database->table(self::TABLE_NAME)->where(self::COLUMN_ID,
 				$user[self::COLUMN_ID])->update($user);
+
+			$primaryKey = $user['ID_uzivatele'];
+			$this->database->table('pobocka_zamestnanec')
+				->where('ID_uzivatele', $primaryKey)->delete();
+
+			if ($office)
+				$this->database->table('pobocka_zamestnanec')
+					->insert(array('ID_pobocky' => $office, 'ID_uzivatele' => $primaryKey));
+		}
 	}
 
 	/**
@@ -109,5 +126,21 @@ class UserManager extends BaseManager
 		$this->database->table('pobocka_zamestnanec')
 			->where('ID_pobocky', $idOffice)
 			->where('ID_uzivatele', $idUser)->delete();
+	}
+
+	public function getRelatedOffice($id) {
+
+		$data = $this->database->table('pobocka_zamestnanec')->where('ID_uzivatele', $id);
+		$result = [];
+		$office = null;
+
+		foreach ($data as $key => $value)
+			$office = $value['ID_pobocky'];
+
+		if (!$office)
+			return null;
+
+		foreach ($this->database->table('pobocky')->where('ID_pobocky', $office) as $key => $value)
+			return $value->ID_pobocky;
 	}
 }

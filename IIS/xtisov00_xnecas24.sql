@@ -210,9 +210,9 @@ INSERT INTO `uzivatele` (`ID_uzivatele`, `login`, `heslo`, `jmeno`, `prijmeni`, 
 (5, 'xkubin09', ' ', 'Lucie', 'Kubínová', 'member', '2016-11-18 22:56:19'),
 (6, 'xsebes25', ' ', 'Martin', 'Šebestík', 'member', '2016-11-18 22:56:20'),
 (7, 'peto', '$2y$10$h8vmMU0yHJ4jFOpfxrZO0eIW3qgnRFXsdi4G9DKzXaHuo9OLPuPJu', 'Peter', 'Tisovčík', 'admin', '2016-11-18 22:56:21'),
-(8, 'admin', '$2y$10$5Pm3QugcZNRHtvwOIFEfI.4zhlzur3I8KdgxXVzg7HWdD/B67z6Tq', 'Peter', 'Tisovčík', 'member', '2016-11-19 11:10:54'),
-(9, 'manager', '$2y$10$hPaVmo3GpTDaU/No5ACw.eU7JnRO5rwpC5Jqcb4Vdil5UI1s7eJy.', 'Peter', 'Tisovčík', 'member', '2016-11-19 11:11:40'),
-(10, 'predavac', '$2y$10$8CfGp36gkkBGCuLw4q8F6OMQ9foS773zQUVlgFt.Anujg1QQKwVPC', 'Peter', 'Tisovčík', 'member', '2016-11-19 11:12:33');
+(8, 'admin', '$2y$10$5Pm3QugcZNRHtvwOIFEfI.4zhlzur3I8KdgxXVzg7HWdD/B67z6Tq', 'Peter', 'Tisovčík', 'admin', '2016-11-19 11:10:54'),
+(9, 'manager', '$2y$10$hPaVmo3GpTDaU/No5ACw.eU7JnRO5rwpC5Jqcb4Vdil5UI1s7eJy.', 'Peter', 'Tisovčík', 'manager', '2016-11-19 11:11:40'),
+(10, 'predavac', '$2y$10$SalCmUIWa.BwAxMcZ1YfNe4gCkCMU7XjsOqpJica8hW2XKrz2elda', 'Peter', 'Tisovčík', 'member', '2016-11-19 11:12:33');
 ALTER TABLE uzivatele AUTO_INCREMENT = 11;
 
 -- dodavatele

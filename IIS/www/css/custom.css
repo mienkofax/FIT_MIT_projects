@@ -144,3 +144,10 @@ h1 {
 blockquote {
 	text-align: justify;
 }
+footer {
+	background: #0e76bc;
+	text-align: center;
+	padding: 15px;
+	color: #fff;
+	border-top: 5px solid #8dc63f;
+}
