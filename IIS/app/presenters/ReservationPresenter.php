@@ -22,8 +22,6 @@ class ReservationPresenter extends BasePresenter
 	const
 		RESERVATION_STATE = array(
 			'prijata' => 'Prijatá',
-			'rozpracovana' => 'Rozpracovaná',
-			'pripravena' => 'Pripravená',
 			'dokoncena' => 'Dokončená'
 		);
 
@@ -117,6 +115,7 @@ class ReservationPresenter extends BasePresenter
 		if ($office = $this->reservationManager->getReservation($id)->toArray()) {
 			$office['reservations'] = $this->reservationManager->getReservationEditValues($id);
 			$this->template->isEditForm = true;
+			$office['stav_rezervace_old'] = $office['stav_rezervace'];
 			$this['editForm']->setDefaults($office);
 		}
 		else {
@@ -134,6 +133,7 @@ class ReservationPresenter extends BasePresenter
 		$form = new Form;
 		$form->addGroup('');
 		$form->addHidden('ID_rezervace');
+		$form->addHidden('stav_rezervace_old');
 		$form->addSelect('stav_rezervace', 'Stav rezervácie lieku', self::RESERVATION_STATE)
 			->setPrompt('Zvoľte stav rezervácie lieku')
 			->setRequired(TRUE)
@@ -195,8 +195,15 @@ class ReservationPresenter extends BasePresenter
 	*/
 	public function submitElementClicked(SubmitButton $button)
 	{
-		$this->reservationManager->saveReservation($button->getForm()->getValues(true));
-		$this->flashMessage('Rezervácia bola uložená');
+		$retVal = $this->reservationManager->saveReservation($button->getForm()->getValues(true));
+
+		if ($retVal ==  1)
+			$this->flashMessage('Na danej pobočke nie je daný liek.');
+		else if ($retVal == 2)
+			$this->flashMessage('Na pobočke je málo liekov.');
+		else
+			$this->flashMessage('Rezervácia bola uložená');
+
 		$this->redirect('Reservation:list');
 	}
 }

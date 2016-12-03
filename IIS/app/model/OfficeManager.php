@@ -285,7 +285,7 @@ class OfficeManager extends BaseManager
 	 * @return mixed Zoznam vsetkych pobociek.
 	 */
 	public function getOfficesToSelectBox2($id) {
-		$data = $this->database->table('pobocky')->where('ID_pobocky', $id)->fetchAll();
+		$data = $this->database->table('pobocky')->fetchAll();
 		$result = [];
 
 		foreach ($data as $key => $value)

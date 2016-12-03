@@ -70,6 +70,9 @@ class ReservationManager extends BaseManager
 		$reservations = $item['reservations'];
 		unset($item['reservations']);
 		$primaryKey;
+		$res = $item;
+		$old = $item['stav_rezervace_old'];
+		unset($item['stav_rezervace_old']);
 
 		$this->database->beginTransaction();
 		try {
@@ -89,11 +92,33 @@ class ReservationManager extends BaseManager
 
 			// Ulozenie novych spojeni v tabulke M:N
 			foreach ($reservations as $key => $item) {
+				$tmp = $this->database->table('pobocka_lek')
+					->where('ID_pobocky = ? AND ID_leku = ?', $item['ID_pobocky'], $item['ID_leku'])
+					->select('pocet_na_sklade');
+
+				$numb = null;
+				foreach ($tmp as $key => $value)
+					$numb = $value['pocet_na_sklade'];
+
+
+				if ($numb == null)
+					return 1;
+
+				if ($res['stav_rezervace'] == 'dokoncena' && $res['stav_rezervace_old'] != 'dokoncena') {
+					if ($numb - $this->defaultNumberZero($item['pocet_rezervovanych']) < 0)
+						return 2;
+
+						$this->database->table('pobocka_lek')
+							->where('ID_pobocky = ? AND ID_leku = ?', $item['ID_pobocky'], $item['ID_leku'])
+							->update( array ('pocet_na_sklade' => $numb - $this->defaultNumberZero($item['pocet_rezervovanych'])) );
+				}
+
 				$this->database->table('rezervace_leku_lek')->insert(
 					array('ID_rezervace' => $primaryKey,
 					'ID_leku' => $item['ID_leku'],
 					'pocet_rezervovanych' => $item['pocet_rezervovanych'],
 					'ID_pobocky' => $item['ID_pobocky']));
+
 			}
 
 		}
@@ -102,6 +127,8 @@ class ReservationManager extends BaseManager
 			throw $ex;
 		}
 		$this->database->commit();
+
+		return 0;
 	}
 
 	/**
