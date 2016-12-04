@@ -16,64 +16,74 @@ using std::endl;
 #define seconds        * 1
 #define minutes        * 60
 #define hours          minutes * 60
-#define percentages    + 0;
+#define percentages    + 0
 
-const double SIMULATION_TIME = 68 hours + 20 minutes; // Doba behu simulacie
-const long ARRIVAL_CUSTOMER[] = {50 seconds, 40 seconds, 30 seconds}; // Prichod zakaznikov
-const double PAY_TIME_SHOPPING = 2 minutes; // Cas straveny pri plateni nakupu
+const double SIMULATION_TIME = 10 hours; // Doba behu simulacie
+const long ARRIVAL_CUSTOMER[] = {27 seconds, 24 seconds, 30 seconds}; // Prichod zakaznikov
+const double PAY_TIME_SHOPPING = 47 seconds; // Cas straveny pri plateni nakupu
 const bool ENABLE_REALLOCATION = false; // Povolenie zmeny kapacity pokladni na zaklade vytazenia
-const short CASH_COUNT = 4; // Pocet pokladni
+const short CASH_COUNT = 2; // Pocet pokladni
 const short CASH_COUNT_IN_DELICATESSEN = 4; // Pocet pokladni v lahodkach
 const short WINE_TAPS_COUNT = 12; // Pocet vycapov
 const short MAX_PEOPLE_IN_CASH_QUEUE = 8; // Maximalny pocet zakaznikov vo fronte, pri prekroceni tejto hodnoty sa otvori nova pokladna (len pri ENABLE_REALLOCATION = true)
-const short MIN_PEOPLE_IN_CASH_QUEUE = 3; // Minimalny pocet zakaznikov vo fronte, pri prekroceni tejto hodnoty sa zatvori poklad (len pri ENABLE_REALLOCATION = true
+const short MIN_PEOPLE_IN_CASH_QUEUE = 2; // Minimalny pocet zakaznikov vo fronte, pri prekroceni tejto hodnoty sa zatvori poklad (len pri ENABLE_REALLOCATION = true
 
 // Premenne pre realokaciu  v pokladniach
-const short CASH_SELLER = 2; // Pocet aktivnych pokladni (len pri ENABLE_REALLOCATION = false)
+const short CASH_SELLER = 4; // Pocet aktivnych pokladni (len pri ENABLE_REALLOCATION = false)
 const short CASH_SELLER_IN_DELICATESSEN = 1; // Pocet aktivnych pokladni v lahodkach (Len pri ENABLE_REALLOCATION = false)
 
 // Percentualne vyjadrenie prichodu do jednotlivych sekcii v obchode
 const double COUNT_OF_PERCENT = 100 percentages; // Pocet percent
-const double PASTRY_SECTION_PERCENTAGE = 8 percentages; // Pecivo
-const double DRINKS_SECTION_PERCENTAGE = 3 percentages; // Napoje
-const double ALCOHOL_SECTION_PERCENTAGE = 3 percentages; // Alkoholicke napoje
-const double CHEMISTS_SECTION_PERCENTAGE = 3 percentages; // Drogeria
-const double DAIRY_PRODUCTS_SECTION_PERCENTAGE = 5 percentages; // Mliecne vyrobky
-const double FRUITS_VEGETABLES_SECTION_PERCENTAGE = 5 percentages; // Ovocie a zelenina
-const double DELICATESSEN_SECTION_PERCENTAGE = 5 percentages; // Lahodky
+const double PASTRY_SECTION_PERCENTAGE = 39 percentages; // Pecivo
+const double DRINKS_SECTION_PERCENTAGE = 9 percentages; // Napoje
+const double ALCOHOL_SECTION_PERCENTAGE = 2 percentages; // Alkoholicke napoje
+const double DAIRY_PRODUCTS_SECTION_PERCENTAGE = 28 percentages; // Mliecne vyrobky
+const double FRUITS_VEGETABLES_SECTION_PERCENTAGE = 7 percentages; // Ovocie a zelenina
+const double DELICATESSEN_SECTION_PERCENTAGE = 15 percentages; // Lahodky
 
 // Percentualne vyjadrenie nakupu v jednotlivych sekciach
-const double PASTRY_PERCENTAGE = 12 percentages; // Pecivo
-const double ALCOHOL_PERCENTAGE = 8 percentages; // Vyber alkoholu
+const double ALCOHOL_PERCENTAGE = 57 percentages; // Vyber alkoholu
+const double DELICATESSEN_PERCENTAGE = 58 percentages; // Vyber lahodky bez vahy a obsluhy
 
 // Percentualne vyjadrenie vyuzitia obsluznych liniek
-const double BREAD_SLICER_PERCENTAGE = 1 percentages; // Krajac chleba
-const double WINE_TAPS_PERCENTAGE = 1 percentages; // Vycap vina
-const double RETURNABLE_BOTTLES_PERCENTAGE = 2 percentages; // Automat na vratenie flias
-const double TAKE_BASKET_PERCENTAGE = 75 percentages; // Zabratie kosika
+const double BREAD_SLICER_PERCENTAGE = 11 percentages; // Krajac chleba
+const double WINE_TAPS_PERCENTAGE = 17 percentages; // Vycap vina
+const double RETURNABLE_BOTTLES_PERCENTAGE = 26 percentages; // Automat na vratenie flias
+const double TAKE_BASKET_PERCENTAGE = 39.6 percentages; // Zabratie kosika
 
 // Doba stravena v obsluznych linkach 
-const short BREAD_WAIT_TIME = 20 seconds; // Doba krajania chleba
+const short BREAD_WAIT_TIME = 30 seconds; // Doba krajania chleba
 const short WINE_TAPS_WAIT_TIME = 30 seconds; // Doba capovania sudoveho vina
-const short RETURNABLE_BOTTLES_WAIT_TIME = 4 minutes; // Doba stravena u automatu na vracanie flias
-const short INTERRUPT_WAIT_TIME = 40 seconds; // Doba vyriesenia problemu na pokladne
+const short RETURNABLE_BOTTLES_WAIT_TIME = 80 seconds; // Doba stravena u automatu na vracanie flias
+const short INTERRUPT_WAIT_TIME_MIN = 10 seconds; // Doba vyriesenia problemu na pokladne
+const short INTERRUPT_WAIT_TIME_MAX = 20 seconds; // Doba vyriesenia problemu na pokladne
+const short DELICATESSEN_WAIT_TIME = 50 seconds; // Doba stravena v sekcii lahodky, pri vahach
 
 // Doba stravena v jednotlivych sekciach
-const short PASTRY_WAIT_TIME = 1 minutes; // Doba stravena v sekcii pecivo
-const short DRINKS_WAIT_TIME = 1 minutes; // Doba stravena v sekci napoje
-const short DAIRY_WAIT_TIME = 3 minutes; // Doba stravena v sekcii mliecne vyrobky
-const short CHEMISTS_WAIT_TIME = 2 minutes; // Doba stravena v sekcii drogerie
-const short FRUITS_VEGETABLES_WAIT_TIME = 60 seconds; // Doba stravena v sekcii s ovocim a zeleninou
-const short DELICATESSEN_WAIT_TIME = 120 seconds; // Doba stravena v sekcii lahodky
-const short ALCOHOL_WAIT_TIME = 30 seconds; // Doba stravena v sekcii alkohol
+const short PASTRY_WAIT_TIME_MIN = 100 seconds; // Doba stravena v sekcii pecivo
+const short PASTRY_WAIT_TIME_MAX = 160 seconds; // Doba stravena v sekcii pecivo
+const short DRINKS_WAIT_TIME_MIN = 10 seconds; // Doba stravena v sekci napoje
+const short DRINKS_WAIT_TIME_MAX = 30 seconds; // Doba stravena v sekci napoje
+const short DAIRY_WAIT_TIME_MIN = 180; // Doba stravena v sekcii mliecne vyrobky
+const short DAIRY_WAIT_TIME_MAX = 320; // Doba stravena v sekcii mliecne vyrobky
+const short FRUITS_VEGETABLES_WAIT_TIME_MIN = 120 seconds; // Doba stravena v sekcii s ovocim a zeleninou
+const short FRUITS_VEGETABLES_WAIT_TIME_MAX = 160 seconds; // Doba stravena v sekcii s ovocim a zeleninou
+const short DELICATESSEN_WAIT_TIME_MIN = 20 seconds; // Doba stravena v sekcii lahodky
+const short DELICATESSEN_WAIT_TIME_MAX = 60 seconds; // Doba stravena v sekcii lahodky
+const short ALCOHOL_WAIT_TIME_MIN = 40 seconds; // Doba stravena v sekcii alkohol
+const short ALCOHOL_WAIT_TIME_MAX = 80 seconds; // Doba stravena v sekcii alkohol
 
 const short DELICATESSEN_TIMEOUT = 5 minutes; // Doba, za ktoru zakaznik opusti frontu, musi byt vacsia ako DELICATESSEN_WAIT_TIME
 
-const short SELLER_MANAGER_COMMING_TME = 30 seconds; // Doba, za ktoru pride veduci
+const short SELLER_MANAGER_COMMING_TIME_MIN = 20 seconds; // Doba, za ktoru pride veduci
+const short SELLER_MANAGER_COMMING_TIME_MAX = 30 seconds; // Doba, za ktoru pride veduci
+
+//
+const short EXIT_SECTION_PERCENTAGE = 30 percentages; // Opustenie sekcie a smer pokladne
 
 // Doba dennych rezimov
-const double MOD_MORNING = 2 hours;
-const double MOD_NOON = 7 hours;
+const double MOD_MORNING = 5 hours;
+const double MOD_NOON = 4 hours;
 const double MOD_AFTERNOON = 4 hours;
 const double MOD_NIGHT = 11 hours;
 
@@ -87,9 +97,10 @@ Store StoreBaskets("Sklad kosikov", 150);
 
 // Spolocna fronta pre pokladne pri lahodkach 
 Queue QueueDelicatessen("Fronta lahodok");
+Histogram hisTimeInSHO("Doba stravena v systeme", 0, 30, 20);
 
 // Pole oznacujuce aktivne pokladne
-bool ACTIVE_CASH[CASH_COUNT] = {false}; // Aktivne pokladne pri plateni
+bool ACTIVE_CASH[CASH_COUNT]; // Aktivne pokladne pri plateni
 bool ACTIVE_CASH_IN_DELICATESSEN[CASH_COUNT_IN_DELICATESSEN] = {false}; // Aktivne pokladne v lahodkach
 
 size_t activeCashCount = CASH_SELLER_IN_DELICATESSEN; // Pocet aktivnych pokladni v lahodkach
@@ -121,7 +132,7 @@ public:
 
 	void Behavior() override
 	{
-		m_process->Out();
+		 m_process->Out();
 		delete m_process;
 		Cancel();
 	}
@@ -139,23 +150,34 @@ private:
 	int m_index = 0;
 	bool m_close = false;
 	bool m_basket = false;
+	bool m_exitSection = false;
+	double m_time;
+
+	bool exitSection()
+	{
+		return Random()*COUNT_OF_PERCENT <= EXIT_SECTION_PERCENTAGE;
+	}
 
 	void Behavior() override
 	{
+		m_time = Time;
+
 		// Zabratie kosika pri vstupe do obchodu
 		if (Random()*COUNT_OF_PERCENT <= TAKE_BASKET_PERCENTAGE) {
 			Enter(StoreBaskets, 1);
 			m_basket = true;
 		}
-	
+
 	LOOP:
 		m_percents = Random()*COUNT_OF_PERCENT;
+		m_exitSection = exitSection();
+
+		double last = m_percents;
 
 		// Sekcia peciva
-		if (m_percents <= PASTRY_SECTION_PERCENTAGE && !interrupt) {
+		if (m_percents <= PASTRY_SECTION_PERCENTAGE && !interrupt && !m_exitSection) {
 			// Vyber peciva
-			if (Random()*COUNT_OF_PERCENT <= PASTRY_PERCENTAGE)
-				Wait(Exponential(PASTRY_WAIT_TIME));
+			Wait(Uniform(PASTRY_WAIT_TIME_MIN, PASTRY_WAIT_TIME_MAX));
 
 			// Krajanie chleba
 			if (Random()*COUNT_OF_PERCENT <= BREAD_SLICER_PERCENTAGE) {
@@ -164,14 +186,16 @@ private:
 				Release(FacilityBreadSlicer);
 			}
 
+			exitSection();
+
 			if (!interrupt)
 				goto LOOP;
 		}
 		
 		// Sekcia napoje
 		m_percents -= PASTRY_SECTION_PERCENTAGE;
-		if (m_percents <= DRINKS_SECTION_PERCENTAGE && !interrupt) {
-			Wait(Exponential(DRINKS_WAIT_TIME));
+		if (m_percents <= DRINKS_SECTION_PERCENTAGE && !interrupt && !m_exitSection) {
+			Wait(Uniform(DRINKS_WAIT_TIME_MIN, DRINKS_WAIT_TIME_MAX));
 
 			if (!interrupt)
 				goto LOOP;
@@ -179,44 +203,40 @@ private:
 
 		// Sekcia alkoholicke napoje
 		m_percents -= DRINKS_SECTION_PERCENTAGE;
-		if (m_percents <= ALCOHOL_SECTION_PERCENTAGE && !interrupt) {
+		if (m_percents <= ALCOHOL_SECTION_PERCENTAGE && !interrupt && !m_exitSection) {
+			m_percents = Random()*COUNT_OF_PERCENT;
+
 			// Vyber nejakeho alkohoolu
-			if (Random()*COUNT_OF_PERCENT <= ALCOHOL_PERCENTAGE)
-				Wait(ALCOHOL_WAIT_TIME);
+			if (m_percents <= ALCOHOL_PERCENTAGE) {
+				Wait(Uniform(ALCOHOL_WAIT_TIME_MIN, ALCOHOL_WAIT_TIME_MAX));
+				goto LOOP;
+			}
 
 			//Obsuzna linka na vycap vina
-			if (Random()*COUNT_OF_PERCENT <= WINE_TAPS_PERCENTAGE) {
-				m_index = Uniform(0, WINE_TAPS_COUNT);
+			m_percents -= ALCOHOL_PERCENTAGE;
+			if (m_percents <= WINE_TAPS_PERCENTAGE) {
+				m_index = Uniform(0, WINE_TAPS_COUNT); //TODO overit generovanie niform 
 
 				Seize(FacilityWineTaps[m_index]);
 				Wait(Exponential(WINE_TAPS_WAIT_TIME));
 				Release(FacilityWineTaps[m_index]);
+				goto LOOP;
 			}
 
 			// Obsluzna linka na vratenie flias
-			if (Random()*COUNT_OF_PERCENT <= RETURNABLE_BOTTLES_PERCENTAGE) {
+			m_percents -= WINE_TAPS_PERCENTAGE;
+			if (m_percents <= RETURNABLE_BOTTLES_PERCENTAGE) {
 				Seize(FacilityReturnableBottles);
 				Wait(Exponential(RETURNABLE_BOTTLES_WAIT_TIME));
 				Release(FacilityReturnableBottles);
+				goto LOOP;
 			}
-
-			if (!interrupt)
-				goto LOOP;
-		}
-
-		// Sekcia drogeria
-		m_percents -= ALCOHOL_SECTION_PERCENTAGE;
-		if (m_percents <= CHEMISTS_SECTION_PERCENTAGE && !interrupt) {
-			Wait(Exponential(CHEMISTS_WAIT_TIME));
-
-			if (!interrupt)
-				goto LOOP;
 		}
 
 		// Sekcia mliecne vyrobky
-		m_percents -= CHEMISTS_SECTION_PERCENTAGE;
-		if (m_percents <= DAIRY_PRODUCTS_SECTION_PERCENTAGE && !interrupt) {
-			Wait(Exponential(DAIRY_WAIT_TIME));
+		m_percents -= ALCOHOL_SECTION_PERCENTAGE;
+		if (m_percents <= DAIRY_PRODUCTS_SECTION_PERCENTAGE && !interrupt && !m_exitSection) {
+			Wait(Uniform(DAIRY_WAIT_TIME_MIN, DAIRY_WAIT_TIME_MAX));
 
 			if (!interrupt)
 				goto LOOP;
@@ -224,8 +244,8 @@ private:
 
 		// Sekcia ovocie a zelenina
 		m_percents -= DAIRY_PRODUCTS_SECTION_PERCENTAGE;
-		if (m_percents <= FRUITS_VEGETABLES_SECTION_PERCENTAGE && !interrupt) {
-			Wait(Exponential(FRUITS_VEGETABLES_WAIT_TIME));
+		if (m_percents <= FRUITS_VEGETABLES_SECTION_PERCENTAGE && !interrupt && !m_exitSection) {
+			Wait(Uniform(FRUITS_VEGETABLES_WAIT_TIME_MIN, FRUITS_VEGETABLES_WAIT_TIME_MAX));
 
 			if (!interrupt)
 				goto LOOP;
@@ -233,7 +253,13 @@ private:
 
 		// Sekcia s lahodkami
 		m_percents -= FRUITS_VEGETABLES_SECTION_PERCENTAGE;
-		if (m_percents <= DELICATESSEN_SECTION_PERCENTAGE && !interrupt) {
+		if (m_percents <= DELICATESSEN_SECTION_PERCENTAGE && !interrupt && !m_exitSection) {
+
+			if (Random()*COUNT_OF_PERCENT <= DELICATESSEN_PERCENTAGE) {
+				Wait(Uniform(DELICATESSEN_WAIT_TIME_MIN, DELICATESSEN_WAIT_TIME_MAX));
+				goto LOOP;
+			}
+
 		REPEAT:
 			/*
 			 * Realokacia pokladni ak je vo fronte nadbytok alebo nedostatok
@@ -362,6 +388,11 @@ private:
 
 		if (m_basket)
 			Leave(StoreBaskets, 1);
+
+		if (Time-m_time < 5)
+			cout << last << endl;
+
+		hisTimeInSHO(Time-m_time);
 	}
 
 public:
@@ -450,9 +481,9 @@ class SellerManager : public Process {
 			m_index = Uniform(0, CASH_SELLER_IN_DELICATESSEN);
 		}
 
-		Wait(Exponential(SELLER_MANAGER_COMMING_TME));
+		Wait(Uniform(SELLER_MANAGER_COMMING_TIME_MIN, SELLER_MANAGER_COMMING_TIME_MAX));
 		Seize(FacilityCashes[m_index], 1);
-		Wait(Exponential(INTERRUPT_WAIT_TIME));
+		Wait(Uniform(INTERRUPT_WAIT_TIME_MIN, INTERRUPT_WAIT_TIME_MAX));
 		Release(FacilityCashes[m_index]);
 	}
 
@@ -483,7 +514,7 @@ public:
 int main()
 {
 	// Alokacia pokladni podla poctu predavaciek a zakaznikov
-	for (size_t i = 0; i < CASH_SELLER; i++)
+	for (size_t i = 0; i < CASH_COUNT; i++)
 		ACTIVE_CASH[i] = true;
 
 	for (size_t i = 0; i < CASH_SELLER_IN_DELICATESSEN; i++)
@@ -522,5 +553,7 @@ int main()
 
 	QueueDelicatessen.Output();
 	StoreBaskets.Output();
+
+	hisTimeInSHO.Output();
 }
 
