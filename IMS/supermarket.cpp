@@ -18,9 +18,9 @@ using std::endl;
 #define hours          minutes * 60
 #define percentages    + 0
 
-const double SIMULATION_TIME = 10 hours; // Doba behu simulacie
+const double SIMULATION_TIME = ; // Doba behu simulacie
 const long ARRIVAL_CUSTOMER[] = {27 seconds, 24 seconds, 30 seconds}; // Prichod zakaznikov
-const double PAY_TIME_SHOPPING = 47 seconds; // Cas straveny pri plateni nakupu
+const double PAY_TIME_SHOPPING = 50 seconds; // Cas straveny pri plateni nakupu
 const bool ENABLE_REALLOCATION = false; // Povolenie zmeny kapacity pokladni na zaklade vytazenia
 const short CASH_COUNT = 2; // Pocet pokladni
 const short CASH_COUNT_IN_DELICATESSEN = 4; // Pocet pokladni v lahodkach
@@ -79,7 +79,7 @@ const short SELLER_MANAGER_COMMING_TIME_MIN = 20 seconds; // Doba, za ktoru prid
 const short SELLER_MANAGER_COMMING_TIME_MAX = 30 seconds; // Doba, za ktoru pride veduci
 
 //
-const short EXIT_SECTION_PERCENTAGE = 30 percentages; // Opustenie sekcie a smer pokladne
+const short EXIT_SECTION_PERCENTAGE = 20 percentages; // Opustenie sekcie a smer pokladne
 
 // Doba dennych rezimov
 const double MOD_MORNING = 5 hours;
@@ -146,7 +146,7 @@ public:
  */
 class Shopper : public Process {
 private:
-	int m_percents;
+	double m_percents;
 	int m_index = 0;
 	bool m_close = false;
 	bool m_basket = false;
@@ -158,9 +158,16 @@ private:
 		return Random()*COUNT_OF_PERCENT <= EXIT_SECTION_PERCENTAGE;
 	}
 
+	double customNormal(double mi, double sigma, double min = 0)
+	{
+		double time = Normal(mi, sigma);
+		return (time <= min) ? min : time;
+	}
+
 	void Behavior() override
 	{
 		m_time = Time;
+		double tmp = Time;
 
 		// Zabratie kosika pri vstupe do obchodu
 		if (Random()*COUNT_OF_PERCENT <= TAKE_BASKET_PERCENTAGE) {
@@ -215,7 +222,7 @@ private:
 			//Obsuzna linka na vycap vina
 			m_percents -= ALCOHOL_PERCENTAGE;
 			if (m_percents <= WINE_TAPS_PERCENTAGE) {
-				m_index = Uniform(0, WINE_TAPS_COUNT); //TODO overit generovanie niform 
+				m_index = Uniform(0, WINE_TAPS_COUNT);
 
 				Seize(FacilityWineTaps[m_index]);
 				Wait(Exponential(WINE_TAPS_WAIT_TIME));
@@ -296,7 +303,7 @@ private:
 				}
 			}
 
-//			ACTIVE_CASH_IN_DELICATESSEN[0] = true;
+			ACTIVE_CASH_IN_DELICATESSEN[0] = true;
 
 			/*
 			 * Vyber volnej pokladne v lahodkach.
@@ -383,16 +390,13 @@ private:
 		}
 	
 		Seize(FacilityCashes[index]);
-		Wait(Exponential(PAY_TIME_SHOPPING));
+		Wait(customNormal(PAY_TIME_SHOPPING, 15, 10));
 		Release(FacilityCashes[index]);
 
 		if (m_basket)
 			Leave(StoreBaskets, 1);
 
-		if (Time-m_time < 5)
-			cout << last << endl;
-
-		hisTimeInSHO(Time-m_time);
+		hisTimeInSHO(Time - m_time);
 	}
 
 public:
