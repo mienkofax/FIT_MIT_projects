@@ -286,7 +286,7 @@ INSERT INTO `pobocka_lek` (`ID_pobocky`, `ID_leku`, `pocet_na_sklade`, `pocet_pr
 
 INSERT INTO `rezervace_leku` (`ID_rezervace`, `stav_rezervace`, `jmeno`, `prijmeni`, `date_time`, `rodne_cislo`) VALUES
 (9, 'prijata', 'Martin', 'Bielik', '2016-11-18 20:03:18', '123456/7890'),
-(10, 'rozpracovana', 'Jana', 'Veselá', '2016-11-18 20:04:03', '123456/7890'),
+(10, 'prijata', 'Jana', 'Veselá', '2016-11-18 20:04:03', '123456/7890'),
 (11, 'dokoncena', 'Milan', 'Novák', '2016-11-18 20:09:01', '123456/7890');
 
 -- rezervace_leku_lek
