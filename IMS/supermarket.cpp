@@ -19,11 +19,11 @@ using std::endl;
 #define days           hours * 24
 #define percentages    + 0
 
-const double SIMULATION_TIME = 30 days - 11 hours; // Doba behu simulacie
-const long ARRIVAL_CUSTOMER[] = {27 seconds, 24 seconds, 30 seconds}; // Prichod zakaznikov
+const double SIMULATION_TIME = 30 days - 9 hours; // Doba behu simulacie
+const long ARRIVAL_CUSTOMER[] = {27 seconds*3, 24 seconds*3, 30 seconds*3}; // Prichod zakaznikov
 const double PAY_TIME_SHOPPING = 50 seconds; // Cas straveny pri plateni nakupu
-const bool ENABLE_REALLOCATION = false; // Povolenie zmeny kapacity pokladni na zaklade vytazenia
-const bool ENABLE_REALLOCATION2 = false; // Povolenie zmeny kapacity vah na zaklade vytazenia
+const bool ENABLE_REALLOCATION = true; // Povolenie zmeny kapacity pokladni na zaklade vytazenia
+const bool ENABLE_REALLOCATION2 = true; // Povolenie zmeny kapacity vah na zaklade vytazenia
 const short CASH_COUNT = 4; // Pocet pokladni
 const short CASH_COUNT_IN_DELICATESSEN = 4; // Pocet pokladni v lahodkach
 const short WINE_TAPS_COUNT = 9; // Pocet vycapov
@@ -48,7 +48,7 @@ const double ALCOHOL_PERCENTAGE = 57 percentages; // Vyber alkoholu
 const double DELICATESSEN_PERCENTAGE = 58 percentages; // Vyber lahodky bez vahy a obsluhy
 
 // Percentualne vyjadrenie vyuzitia obsluznych liniek
-const double BREAD_SLICER_PERCENTAGE = 4 percentages; // Krajac chleba
+const double BREAD_SLICER_PERCENTAGE = 11 percentages; // Krajac chleba
 const double WINE_TAPS_PERCENTAGE = 17 percentages; // Vycap vina
 const double RETURNABLE_BOTTLES_PERCENTAGE = 26 percentages; // Automat na vratenie flias
 const double TAKE_BASKET_PERCENTAGE = 39.6 percentages; // Zabratie kosika
@@ -99,15 +99,16 @@ Store StoreBaskets("Sklad kosikov", 135);
 
 // Spolocna fronta pre pokladne pri lahodkach 
 Queue QueueDelicatessen("Fronta lahodok");
-Histogram hisMorning("Doba stravena v systeme: 07:00-12:00", 0, 30, 10);
-Histogram hisNoon("Doba stravena v systeme: 12:00-16:00", 0, 30, 10);
-Histogram hisAfternoon("Doba stravena v systeme: 16:00-20:00", 0, 30, 10);
+Histogram hisMorning("Doba stravena v systeme: 07:00-12:00", 0, 180, 15);
+Histogram hisNoon("Doba stravena v systeme: 12:00-16:00", 0, 180, 15);
+Histogram hisAfternoon("Doba stravena v systeme: 16:00-20:00", 0, 180, 15);
 
 // Pole oznacujuce aktivne pokladne
 bool ACTIVE_CASH[CASH_COUNT] = {false}; // Aktivne pokladne pri plateni
 bool ACTIVE_CASH_IN_DELICATESSEN[CASH_COUNT_IN_DELICATESSEN] = {false}; // Aktivne pokladne v lahodkach
 
-size_t activeCashCount = CASH_SELLER_IN_DELICATESSEN; // Pocet aktivnych pokladni v lahodkach
+size_t activeCashCount = CASH_SELLER_IN_DELICATESSEN; // Pocet aktivnych vah v lahodkach
+size_t activeCash = CASH_SELLER; // Pocet aktivnych pokladni
 int arriveState = 0; // Denni rezim prevadzky
 bool interrupt = false; // Prerusenie pri ukoncni otvaracej doby, aby zakaznici zaplaili pri pokladni a opustili obchod
 
@@ -131,7 +132,7 @@ public:
 	Timeout(Process *process, double delay):
 		m_process(process)
 	{
-		Activate(Time + Uniform(1, delay));
+		Activate(Time + Normal(delay, 82));
 	}
 
 	void Behavior() override
@@ -167,6 +168,15 @@ private:
 	{
 		double time = Normal(mi, sigma);
 		return (time <= min) ? min : time;
+	}
+
+	int shopperInCash()
+	{
+		int count = 0;
+		for (size_t i = 0; i < CASH_SELLER; i++)
+			count += FacilityCashes[i].QueueLen();
+
+		return count;
 	}
 
 	void Behavior() override
@@ -380,12 +390,19 @@ private:
 		int index = 0;
 		for (size_t i = 1; i < CASH_COUNT; i++) {
 			if (FacilityCashes[i].QueueLen() <= MIN_PEOPLE_IN_CASH_QUEUE
-				&& ENABLE_REALLOCATION)
+					&& ENABLE_REALLOCATION) {
 				ACTIVE_CASH[i] = false;
+				activeCash--;
+			}
 
 			if (!ACTIVE_CASH[i] && ENABLE_REALLOCATION) {
-				if (FacilityCashes[index].QueueLen() >= MAX_PEOPLE_IN_CASH_QUEUE)
+				if (activeCash * MAX_PEOPLE_IN_CASH_QUEUE < shopperInCash())
+					continue;
+
+				if (FacilityCashes[index].QueueLen() >= MAX_PEOPLE_IN_CASH_QUEUE) {
 					ACTIVE_CASH[i] = true;
+					activeCash++;
+				}
 			}
 
 			if (FacilityCashes[i].QueueLen() < FacilityCashes[index].QueueLen()
@@ -404,7 +421,7 @@ private:
 			hisMorning(Time - m_time);
 		else if (m_dayMode == AFTERNOON)
 			hisAfternoon(Time - m_time);
-		else if (m_dayMode == NIGHT)
+		else if (m_dayMode == NOON)
 			hisNoon(Time - m_time);
 	}
 
