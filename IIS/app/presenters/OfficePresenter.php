@@ -128,13 +128,18 @@ class OfficePresenter extends BasePresenter
 		$userOfficeID = $this->getUser()->getIdentity()->getData()['ID_uzivatele'];
 		$officeID = $this->officeManager->getUserOffice($userOfficeID);
 
+		if (count($officeID) == 0) {
+			echo 'Predavač nemá priradenú pobočku, kde má predávať.';
+			return new Form;
+		}
+
 		$form = new Form;
 		$form->addGroup('');
 		// Pre bezneho uzivatela
 		if ($this->getUser()->getIdentity()->getRoles()[0] == 'member') {
 		//$form->addHidden('ID_pobocky')
 		//	->setDefaultValue($officeID);
-		$form->addSelect('ID_pobocky', 'Pobočka', $this->officeManager->getOfficesToSelectBox2($officeID))
+		$form->addSelect('ID_pobocky', 'Pobočka', $this->officeManager->getOfficesToSelectBox2($officeID[0]))
 			->setRequired(TRUE)
 			->setPrompt('Zvoľte pobočku')
 			//->setDisabled(TRUE)
@@ -182,13 +187,18 @@ class OfficePresenter extends BasePresenter
 		$userOfficeID = $this->getUser()->getIdentity()->getData()['ID_uzivatele'];
 		$officeID = $this->officeManager->getUserOffice($userOfficeID);
 
+		if (count($officeID) == 0) {
+			echo 'Predavač nemá priradenú pobočku, kde má predávať.';
+			return new Form;
+		}
+
 		$form = new Form;
 		$form->addGroup('');
 		// Pre bezneho uzivatela
 		if ($this->getUser()->getIdentity()->getRoles()[0] == 'member') {
 		//$form->addHidden('ID_pobocky')
 		//	->setDefaultValue($officeID);
-		$form->addSelect('ID_pobocky', 'Pobočka', $this->officeManager->getOfficesToSelectBox2($officeID))
+		$form->addSelect('ID_pobocky', 'Pobočka', $this->officeManager->getOfficesToSelectBox2($officeID[0]))
 			->setRequired(TRUE)
 			->setPrompt('Zvoľte pobočku')
 			//->setDisabled(TRUE)

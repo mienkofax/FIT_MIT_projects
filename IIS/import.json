@@ -1,0 +1,137 @@
+{
+  "doplatky": [
+	{
+	  "ID_pojistovny": "1",
+	  "ID_leku": "5",
+	  "cena": "165.00",
+	  "doplatek": "NULL",
+	  "hradene": "nehradene"
+	},
+	{
+	  "ID_pojistovny": "2",
+	  "ID_leku": "4",
+	  "cena": "140.00",
+	  "doplatek": "NULL",
+	  "hradene": "nehradene"
+	},
+	{
+	  "ID_pojistovny": "2",
+	  "ID_leku": "6",
+	  "cena": "165.00",
+	  "doplatek": "NULL",
+	  "hradene": "nehradene"
+	},
+	{
+	  "ID_pojistovny": "3",
+	  "ID_leku": "1",
+	  "cena": "450.00",
+	  "doplatek": "0.00",
+	  "hradene": "hradene"
+	},
+	{
+	  "ID_pojistovny": "3",
+	  "ID_leku": "2",
+	  "cena": "450.00",
+	  "doplatek": "0.00",
+	  "hradene": "nehradene"
+	},
+	{
+	  "ID_pojistovny": "3",
+	  "ID_leku": "3",
+	  "cena": "450.00",
+	  "doplatek": "100.00",
+	  "hradene": "doplatok"
+	},
+	{
+	  "ID_pojistovny": "3",
+	  "ID_leku": "6",
+	  "cena": "544.00",
+	  "doplatek": "44.50",
+	  "hradene": "doplatok"
+	},
+	{
+	  "ID_pojistovny": "3",
+	  "ID_leku": "7",
+	  "cena": "450.00",
+	  "doplatek": "0.00",
+	  "hradene": "nehradene"
+	},
+	{
+	  "ID_pojistovny": "4",
+	  "ID_leku": "4",
+	  "cena": "985.00",
+	  "doplatek": "50.50",
+	  "hradene": "doplatok"
+	},
+	{
+	  "ID_pojistovny": "4",
+	  "ID_leku": "5",
+	  "cena": "1250.00",
+	  "doplatek": "0.00",
+	  "hradene": "hradene"
+	},
+	{
+	  "ID_pojistovny": "4",
+	  "ID_leku": "6",
+	  "cena": "789.80",
+	  "doplatek": "0.00",
+	  "hradene": "nehradene"
+	},
+	{
+	  "ID_pojistovny": "4",
+	  "ID_leku": "7",
+	  "cena": "987.00",
+	  "doplatek": "123.00",
+	  "hradene": "hradene"
+	},
+	{
+	  "ID_pojistovny": "5",
+	  "ID_leku": "1",
+	  "cena": "780.00",
+	  "doplatek": "0.00",
+	  "hradene": "hradene"
+	},
+	{
+	  "ID_pojistovny": "5",
+	  "ID_leku": "2",
+	  "cena": "780.00",
+	  "doplatek": "0.00",
+	  "hradene": "nehradene"
+	},
+	{
+	  "ID_pojistovny": "5",
+	  "ID_leku": "3",
+	  "cena": "780.00",
+	  "doplatek": "500.00",
+	  "hradene": "doplatok"
+	},
+	{
+	  "ID_pojistovny": "6",
+	  "ID_leku": "7",
+	  "cena": "165.00",
+	  "doplatek": "NULL",
+	  "hradene": "doplatok"
+	},
+	{
+	  "ID_pojistovny": "7",
+	  "ID_leku": "1",
+	  "cena": "650.00",
+	  "doplatek": "0.00",
+	  "hradene": "hradene"
+	},
+	{
+	  "ID_pojistovny": "7",
+	  "ID_leku": "2",
+	  "cena": "650.00",
+	  "doplatek": "0.00",
+	  "hradene": "nehradene"
+	},
+	{
+	  "ID_pojistovny": "7",
+	  "ID_leku": "3",
+	  "cena": "550.00",
+	  "doplatek": "125.00",
+	  "hradene": "doplatok"
+	}
+  ]
+}

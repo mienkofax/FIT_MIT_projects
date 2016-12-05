@@ -18,6 +18,7 @@ services:
 	- App\Model\ReservationManager
 	- App\Model\SearchManager
 	- App\Forms\UserForms
+	- App\Model\AdministrationManager
 	router: App\RouterFactory::createRouter
 	autenticator: App\Model\AuthenticatorManager
 	authorizator: App\AccessListFactory

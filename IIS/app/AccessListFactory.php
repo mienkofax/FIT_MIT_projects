@@ -31,7 +31,7 @@ class AccessListFactory extends Permission
 		$this->allow('guest', 'Search', array('search', 'list'));
 
 		// Zoznam opravneni pre clena == predavac
-		$this->allow('member', 'Medicine', array('list', 'detail', 'edit', 'edit'));
+		$this->allow('member', 'Medicine', array('list', 'detail', 'edit', 'remove'));
 		$this->allow('member', 'Reservation', array('list', 'detail', 'edit', 'remove'));
 		$this->allow('member', 'Office', array('list', 'detail', 'placed', 'sell'));
 

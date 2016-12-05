@@ -19,18 +19,17 @@
 	<dt>Autoøi</dt>
 	<dd>Klára Neèasová <!-- Nahraïte skuteèným jménem a e-mailem autora a popisem èinnosti -->
 		<a href="mailto:xnecas24@stud.fit.vutbr.cz">xnecas24@stud.fit.vutbr.cz</a> -
-		správa u¾ívateµov, poboèiek, lekární, dodávateµov, rezervácií, liekov, predaj a naskladnenie liekov, prihlásenie a odhlásenie
+		správa u¾ívateµov, poboèiek, lekární, dodávateµov, rezervácií, liekov, predaja a naskladnenia liekov, prihlásenie a odhlásenie.
 	</dd>
-	<dd>Peter Tisovcik <!-- Nahraïte skuteèným jménem a e-mailem autora a popisem èinnosti -->
+	<dd>Peter Tisovèík <!-- Nahraïte skuteèným jménem a e-mailem autora a popisem èinnosti -->
 		<a href="mailto:xtisov00@stud.fit.vutbr.cz">xtisov00@stud.fit.vutbr.cz</a> -
-		databázový subsystém, sql príkazy a návrh ¹ablón
+		databázový subsystém, sql príkazy a návrh ¹ablón.
 	</dd>
 	<dt>URL aplikace</dt>
 	<dd><a href="http://iis.mienkofax.eu/">http://www.iis.mienkofax.eu/</a></dd>
 </dl>
 
 <h2>U¾ivatelé systému pro testování</h2>
-<p>Uveïte prosím existující zástupce <strong>v¹ech rolí u¾ivatelù</strong>.</p>
 <table>
 <tbody><tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
 <tr><td>admin</td><td>admin</td><td>Administrátor</td></tr>
@@ -39,14 +38,15 @@
 </tbody></table>
 
 <h2>Implementace</h2>
+<p>Vytvorený systém umo¾òuje kontrolu vstupných údajov, prípadne nápovedu pre u¾ívateµov v akom formáte majú by» vstupné údaje. Systém obsahuje tri druhy oprávnení. Ïalej umo¾òuje spravova» niekoµko poboèiek naraz a prideµova» im lieky, pois»ovne a dodávateµov.</p>
 
 <ul>
-	<li><strong>app</strong> <br>Zlo¾ka obsahuje hlavnú èas» aplikácie</li>
+	<li><strong>app</strong> <br>Zlo¾ka obsahuje hlavnú èas» aplikácie.</li>
 	<ul>
-		<li><strong>config</strong> <br>Konfiguraèné súbory pre Nette</li>
+		<li><strong>config</strong> <br>Konfiguraèné súbory pre Nette.</li>
 		<ul>
-			<li><i>config.local.neon</i> Lokálny konfiguraèný súbor pre pripojenie do databáze</li>
-			<li><i>config.local</i> Hlavný konfiguraèný súbor, nastavuje sa doba</li>
+			<li><i>config.local.neon</i> - Lokálny konfiguraèný súbor pre pripojenie do databáze.</li>
+			<li><i>config.local</i> - Hlavný konfiguraèný súbor, nastavuje sa doba expirácie session a DI (Dependency Injection).</li>
 		</ul>
 		<li><strong>forms</strong> </li>
 		<ul>
@@ -54,42 +54,43 @@
 		</ul>
 		<li><strong>model</strong> <br> Modely pre prácu s jednotlivými dátami v databáze. Vyberá príslu¹né dáta pre daný presenter.</li>
 		<ul>
-			<li><i>AuthenticatorManager.php</i> - Model pre prácu s prihlásenim. Kontroluje èi súhlasia prihlasovacie a registraèné údaje</li>
+			<li><i>AdministrationManager.php</i> - Model importuje doplatky na lieky v JSON formáte.</li>
+			<li><i>AuthenticatorManager.php</i> - Model pre prácu s prihlásenim. Kontroluje èi súhlasia prihlasovacie a registraèné údaje.</li>
 			<li><i>BaseManager.php</i> - Rozhranie pre modely, sprístupòuje prácu s databázou a overuje oprávnenia. </li>
 			<li><i>InsurenceManager.php</i> - Model pre prácu s jednotlivými pois»ovòami. Umo¾òuje editova» a vybera» údaje z databáze. Vyberá sa buï pre jednu alebo pre viacero pois»ovní. Obsahuje metódy pre získanie dostupných liekov k danej poboèke, ich typ a zoznam pois»ovní.</li>
-			<li><i>MedicineManager.php</i> - Model pre prácu s jednotlivými liekmi, Umo¾òuje editova» a vybera» údaje z databáze. Obsahuje metody pre získanie dostupných  poboèiek, rezervácií, pois»ovní k danému lieku.</li>
+			<li><i>MedicineManager.php</i> - Model pre prácu s jednotlivými liekmi, umo¾òuje editova» a vybera» údaje z databáze. Obsahuje metódy pre získanie dostupných poboèiek, rezervácií a pois»ovní k danému lieku.</li>
 			<li><i>MenuManager.php</i> - Model pre zistenie poètu záznamov pre jednotlivé tabuµky.</li>
-			<li><i>OfficeManager.php</i> - Model pre prácu s jednotlivými poboèkami. Umo¾òuje editova» a vybera» údaje z databáze, buï pre jednu alebo viacej poboèiek. Obsahuje metódy pre získanie dostupných liekov a zamestnancov na danej poboèke.</li>
-			<li><i>ReservationManager.php</i> - Model pre prácu s jednotlivými rezerváciami. Umo¾òuje editova» a vybera» údaje z databáze, buï pre jednu alebo vacero rezervácií. Obsahuje metódy pre získanie dostupných liekov a poboèiek, kde je daná rezervácia uskutoènená.</li>
-			<li><i>SupplierManager.php</i> - Model pre prácu s jednotlivými dodávateµmi. Umo¾òuje editova» a vybera» údaje z databáze, buï pre jedného alebo pre viacero dodávateµov. Obsahuje metody pre získanie dostupných poboèiek, ktoré zásobuje.</li>
-			<li><i>UserManager.php</i> - Model pre prácu s u¾ívateµmi. Pridanie, editova a odstraòovanie u¾ívateµov z databáze.
+			<li><i>OfficeManager.php</i> - Model pre prácu s jednotlivými poboèkami. Umo¾òuje editova» a vybera» údaje z databáze, buï pre jednu alebo viacej poboèiek. Obsahuje metódy pre získanie dostupných liekov a poètu zamestnancov na danej poboèke.</li>
+			<li><i>ReservationManager.php</i> - Model pre prácu s jednotlivými rezerváciami. Umo¾òuje editova» a vybera» údaje z databáze, buï pre jednu alebo viacero rezervácií. Obsahuje metódy pre získanie dostupných liekov a poètu poboèiek, kde je daná rezervácia uskutoènená.</li>
+			<li><i>SupplierManager.php</i> - Model pre prácu s jednotlivými dodávateµmi. Umo¾òuje editova» a vybera» údaje z databáze, buï pre jedného alebo viacero dodávateµov. Obsahuje metódy pre získanie dostupných poboèiek, ktoré zásobuje.</li>
+			<li><i>UserManager.php</i> - Model pre prácu s u¾ívateµmi. Pridanie, editovanie a odstraòovanie u¾ívateµov z databáze.
 		</ul>
-		<li><strong>presenters</strong> </li> Obsahuje prezentery, ktoré riadia zobrazovanie jednotlivých stránok. Pou¾ívajú modely pre získanie potrebných informácií.
+		<li><strong>presenters</strong> </li> Obsahuje presentery, ktoré riadia zobrazovanie jednotlivých stránok. Pou¾ívajú modely pre získanie potrebných informácií.
 		<ul>
-			<li><strong>Administration</strong> </li> Adresár so ¹ablónou, ktorý obsahuje domovskú stránku a prihlásenie.
-			<li><strong>Error</strong> </li> Adresár zo ¹ablónami pre chyby.
-			<li><strong>Insurence</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam pois»ovní, detail pois»ovne a pridávanie/editovanie poboèky.
+			<li><strong>Administration</strong> </li> Adresár so ¹ablónou, ktorý obsahuje domovskú stránku, prihlásenie a import doplatkov na lieky.
+			<li><strong>Error</strong> </li> Adresár so ¹ablónami pre chyby.
+			<li><strong>Insurence</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam pois»ovní, detail pois»ovne a pridávanie/editovanie pois»ovne.
 			<li><strong>Medicine</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam liekov, detail lieku a pridanie/editovanie lieku.
-			<li><strong>Office</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam poboèiek, detial poboèiek a pridanie/editovanie poboèiek.
+			<li><strong>Office</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam poboèiek, detail poboèiek a pridanie/editovanie poboèiek.
 			<li><strong>Reservation</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam rezervácii, detail rezervácii a pridanie/editovanie rezervovanie.
 			<li><strong>Supplier</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam dodávateµov, detail dodávateµov a pridanie/editovanie dodávateµov.
 			<li><strong>User</strong> </li> Adresár so ¹ablónami, ktorý obsahuje ¹ablóny pre zoznam u¾ívateµov, detail u¾ívateµov a pridanie/editovanie u¾ívateµov.
-			<li><i>@layout.latte</i> </li> Hlavný ¹ablónovací súbor, do ktorého sa vkladajú ¹ablóny, Obsahuje hlavièku, pätièku, menu a hlavnú kostru webu.
-			<li><i>AuthenticatorPresenter.php</i> </li> Spracovanie vykreslenia prihlásenia. Vykreslenie formulátor.
-			<li><i>BasePresenter.php</i> </li> Rozhranie pre spracovanie vykreslenia urèitého mdelu.
+			<li><i>@layout.latte</i> </li> Hlavný ¹ablónovací súbor, do ktorého sa vkladajú ¹ablóny. Obsahuje hlavièku, pätièku, menu a hlavnú kostru webu.
+			<li><i>AuthenticatorPresenter.php</i> </li> Spracovanie vykreslenia prihlásenia. Vykreslenie formulárov.
+			<li><i>BasePresenter.php</i> </li> Rozhranie pre spracovanie vykreslenia urèitého modelu.
 			<li><i>InsurencePresenter.php</i> </li> Spracovanie vykreslenia zoznamu pois»ovní, detailu pois»ovne a formulára pre pridanie alebo editovanie pois»ovne.
-			<li><i>MedicinePresenter.php</i> </li> Spracovanie vykreslenia zoznamu liekov, detialu lieku a formulára pre pridanie alebo editovanie lieku.
-			<li><i>OfficePresenter.php</i> </li> Spracovanie vykreslenia zoznamu poboèiek, detailu poboèky a formulára pre pridanie alebie editovanie poboèky.
-			<li><i>ReservationPresenter.php</i> </li> Spracovanie vykreslenia zoznamu rezervácii, detailu rezervácie a formulára pre pridanie alebo editovanie rezervácie.
+			<li><i>MedicinePresenter.php</i> </li> Spracovanie vykreslenia zoznamu liekov, detailu lieku a formulára pre pridanie alebo editovanie lieku.
+			<li><i>OfficePresenter.php</i> </li> Spracovanie vykreslenia zoznamu poboèiek, detailu poboèky a formulára pre pridanie alebo editovanie poboèky.
+			<li><i>ReservationPresenter.php</i> </li> Spracovanie vykreslenia zoznamu rezervácií, detailu rezervácie a formulára pre pridanie alebo editovanie rezervácie.
 			<li>SupplierPresenter.php<i></i> </li> Spracovanie vykreslenia zoznamu dodavateµov, detailu dotavateµa a formulára pre pridanie alebo editovanie dodávateµa.
 			<li><i>UserPresenter.php</i> </li> Spracovanie vykreslenia zoznamu u¾ívateµov, detailu u¾ívateµa a formulára pre pridanie alebo editovanie u¾ívateµa.
 		</ul>
 		<li><strong>router</strong> </li>
 		<ul>
-			<li><i>RouterFactory.php</i> </li> Obsahuje preklad medzi URL adresami a akciami v jednotlivych prezenteroch. Preklad je riadený definovanými pravidlami.
+			<li><i>RouterFactory.php</i> </li> Obsahuje preklad medzi URL adresami a akciami v jednotlivych presenteroch. Preklad je riadený definovanými pravidlami.
 		</ul>
 		<li><i>AccessListFactory.php</i> - Prístupové práva u¾ívateµov pre jednotlivé zdroje. Definícia pravidiel.</li>
-		<li><i>bootstrap.php</i> </li> - Iniciaizaèný súbor Nette.
+		<li><i>bootstrap.php</i> - Inicializaèný súbor Nette.</li>
 	</ul>
 	<li><strong>log</strong> - Logovací adresár.</li>
 	<li><strong>temp</strong> - Adresár s doèasnými súbormi.</li>
@@ -97,23 +98,16 @@
 	<li><strong>www</strong> - Adresár obsahujúci css a js èast spoloènú pre v¹etky èasti, obsahuje bootstrap.</li>
 	<li><i>xtisov00_xnecas24.sql</i> - SQL script databáze s uká¾kovými dátami.</li>
 </ul>
-<p>
-
-</p>
+<p>Oproti pôvodnému návrhu bola pridaná mo¾nos» pridávania, editovania a vypisovania pois»ovní. Niektoré vyhµadávania boli nahradené výpismi polo¾iek z dôvodu, ¾e sa predpokladá veµký poèet záznamov len u liekov, kde je vyhµadávanie implementované. V systéme nie sú modelované doklady za nákup liekov, sú modelované len rezervácie a to z toho dôvodu, ¾e táto implementácia by zahròovala kompletný návrh systému pre predaj liekov.</p>
 
 
 <h2>Instalace</h2>
 <ul>
 <li>Skopírova» obsah archívu do adresára, kde má by» umiestnený web.</li>
-<li>Nastavenie práva ostatným pre zápis do adresára <strong>temp</strong> a <strong>log</strong>.</li>
+<li>Nastavenie práv ostatným pre zápis do adresára <strong>temp</strong> a <strong>log</strong>.</li>
 <li>Nastavenie prihlasovacích údajov pre databázu v súbore app/config/config.local.neon.</li>
-<li>Po¾iadavky na server: PHP 5.6 alebo vy¹¹ie (plne kompatibilné s PHP 7.0), MySQL server s poporou PDO.</li>
-<li>Prihlási» sa do databáze typicky pomocou PHPMyAdmin a importova» obsah súboru xtisov00_xnecas24.sql</li>
+<li>Po¾iadavky na server: PHP 5.6 alebo vy¹¹ie (plne kompatibilné s PHP 7.0), MySQL server s podporou PDO.</li>
+<li>Prihlási» sa do databáze typicky pomocou PHPMyAdmin a importova» obsah súboru xtisov00_xnecas24.sql.</li>
 </ul>
-
-<h2>Známé problémy</h2>
-<p>Zde popi¹te, které body zadání (IDS a IIS) nejsou implementovány a z jakého dùvodu. Napø. &#8222;Z èasových dùvodù nebyla implementována správa u¾ivatelù.&#8221; Pomù¾ete tím zrychlit opravování, kdy¾ neimplementované funkce nebudeme muset dlouze hledat.</p>
-
-
 
 </body></html>

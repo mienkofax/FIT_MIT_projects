@@ -13,6 +13,7 @@ class RouterFactory
 	public static function createRouter()
 	{
 		$router = new RouteList;
+		$router[] = new Route('administration/<action>', 'Administration:import');
 		$router[] = new Route('search/<list>/<search>', 'Search:list');
 		$router[] = new Route('search', 'Search:search');
 		$router[] = new Route('[url]', 'Administration:default');

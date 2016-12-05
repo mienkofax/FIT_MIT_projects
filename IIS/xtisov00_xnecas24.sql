@@ -300,6 +300,7 @@ INSERT INTO `rezervace_leku_lek` (`ID_rezervace`, `ID_leku`, `pocet_rezervovanyc
 -- pobocka_zamestnanec
 INSERT INTO `pobocka_zamestnanec` (`ID_pobocky`, `ID_uzivatele`) VALUES
 (2, 2),
+(1, 10),
 (1, 4),
 (3, 5),
 (3, 6);
