@@ -59,7 +59,7 @@ const short WINE_TAPS_WAIT_TIME = 30 seconds; // Doba capovania sudoveho vina
 const short RETURNABLE_BOTTLES_WAIT_TIME = 80 seconds; // Doba stravena u automatu na vracanie flias
 const short INTERRUPT_WAIT_TIME_MIN = 10 seconds; // Doba vyriesenia problemu na pokladne
 const short INTERRUPT_WAIT_TIME_MAX = 20 seconds; // Doba vyriesenia problemu na pokladne
-const short DELICATESSEN_WAIT_TIME = 50 seconds; // Doba stravena v sekcii lahodky, pri vahach
+const short DELICATESSEN_WAIT_TIME = 70 seconds; // Doba stravena v sekcii lahodky, pri vahach
 
 // Doba stravena v jednotlivych sekciach
 const short PASTRY_WAIT_TIME_MIN = 100 seconds; // Doba stravena v sekcii pecivo
@@ -195,7 +195,7 @@ private:
 			// Krajanie chleba
 			if (Random()*COUNT_OF_PERCENT <= BREAD_SLICER_PERCENTAGE) {
 				Seize(FacilityBreadSlicer);
-				Wait(Exponential(BREAD_WAIT_TIME));
+				Wait(customNormal(BREAD_WAIT_TIME, 8));
 				Release(FacilityBreadSlicer);
 			}
 
@@ -229,7 +229,7 @@ private:
 				m_index = Uniform(0, WINE_TAPS_COUNT);
 
 				Seize(FacilityWineTaps[m_index]);
-				Wait(Exponential(WINE_TAPS_WAIT_TIME));
+				Wait(customNormal(WINE_TAPS_WAIT_TIME, 8));
 				Release(FacilityWineTaps[m_index]);
 				goto LOOP;
 			}
@@ -238,7 +238,7 @@ private:
 			m_percents -= WINE_TAPS_PERCENTAGE;
 			if (m_percents <= RETURNABLE_BOTTLES_PERCENTAGE) {
 				Seize(FacilityReturnableBottles);
-				Wait(Exponential(RETURNABLE_BOTTLES_WAIT_TIME));
+				Wait(customNormal(RETURNABLE_BOTTLES_WAIT_TIME, 26));
 				Release(FacilityReturnableBottles);
 				goto LOOP;
 			}
@@ -349,7 +349,7 @@ private:
 				Seize(FacilityCashesInDelicatessen[m_index]);	
 
 			delete timeout;
-			Wait(Exponential(DELICATESSEN_WAIT_TIME));
+			Wait(customNormal(DELICATESSEN_WAIT_TIME, 17));
 			Release(FacilityCashesInDelicatessen[m_index]);
 
 			/*
@@ -527,7 +527,7 @@ public:
 int main()
 {
 	// Alokacia pokladni podla poctu predavaciek a zakaznikov
-	for (size_t i = 0; i < CASH_COUNT; i++)
+	for (size_t i = 0; i < CASH_SELLER; i++)
 		ACTIVE_CASH[i] = true;
 
 	for (size_t i = 0; i < CASH_SELLER_IN_DELICATESSEN; i++)
