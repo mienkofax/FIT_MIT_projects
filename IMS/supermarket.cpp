@@ -16,20 +16,22 @@ using std::endl;
 #define seconds        * 1
 #define minutes        * 60
 #define hours          minutes * 60
+#define days           hours * 24
 #define percentages    + 0
 
-const double SIMULATION_TIME = ; // Doba behu simulacie
+const double SIMULATION_TIME = 30 days - 11 hours; // Doba behu simulacie
 const long ARRIVAL_CUSTOMER[] = {27 seconds, 24 seconds, 30 seconds}; // Prichod zakaznikov
 const double PAY_TIME_SHOPPING = 50 seconds; // Cas straveny pri plateni nakupu
 const bool ENABLE_REALLOCATION = false; // Povolenie zmeny kapacity pokladni na zaklade vytazenia
-const short CASH_COUNT = 2; // Pocet pokladni
+const bool ENABLE_REALLOCATION2 = false; // Povolenie zmeny kapacity vah na zaklade vytazenia
+const short CASH_COUNT = 4; // Pocet pokladni
 const short CASH_COUNT_IN_DELICATESSEN = 4; // Pocet pokladni v lahodkach
-const short WINE_TAPS_COUNT = 12; // Pocet vycapov
+const short WINE_TAPS_COUNT = 9; // Pocet vycapov
 const short MAX_PEOPLE_IN_CASH_QUEUE = 8; // Maximalny pocet zakaznikov vo fronte, pri prekroceni tejto hodnoty sa otvori nova pokladna (len pri ENABLE_REALLOCATION = true)
 const short MIN_PEOPLE_IN_CASH_QUEUE = 2; // Minimalny pocet zakaznikov vo fronte, pri prekroceni tejto hodnoty sa zatvori poklad (len pri ENABLE_REALLOCATION = true
 
-// Premenne pre realokaciu  v pokladniach
-const short CASH_SELLER = 4; // Pocet aktivnych pokladni (len pri ENABLE_REALLOCATION = false)
+// Pocet pevne otvorenych pokladni a vah bez realokacii
+const short CASH_SELLER = 2; // Pocet aktivnych pokladni (len pri ENABLE_REALLOCATION = false)
 const short CASH_SELLER_IN_DELICATESSEN = 1; // Pocet aktivnych pokladni v lahodkach (Len pri ENABLE_REALLOCATION = false)
 
 // Percentualne vyjadrenie prichodu do jednotlivych sekcii v obchode
@@ -46,7 +48,7 @@ const double ALCOHOL_PERCENTAGE = 57 percentages; // Vyber alkoholu
 const double DELICATESSEN_PERCENTAGE = 58 percentages; // Vyber lahodky bez vahy a obsluhy
 
 // Percentualne vyjadrenie vyuzitia obsluznych liniek
-const double BREAD_SLICER_PERCENTAGE = 11 percentages; // Krajac chleba
+const double BREAD_SLICER_PERCENTAGE = 4 percentages; // Krajac chleba
 const double WINE_TAPS_PERCENTAGE = 17 percentages; // Vycap vina
 const double RETURNABLE_BOTTLES_PERCENTAGE = 26 percentages; // Automat na vratenie flias
 const double TAKE_BASKET_PERCENTAGE = 39.6 percentages; // Zabratie kosika
@@ -73,7 +75,7 @@ const short DELICATESSEN_WAIT_TIME_MAX = 60 seconds; // Doba stravena v sekcii l
 const short ALCOHOL_WAIT_TIME_MIN = 40 seconds; // Doba stravena v sekcii alkohol
 const short ALCOHOL_WAIT_TIME_MAX = 80 seconds; // Doba stravena v sekcii alkohol
 
-const short DELICATESSEN_TIMEOUT = 5 minutes; // Doba, za ktoru zakaznik opusti frontu, musi byt vacsia ako DELICATESSEN_WAIT_TIME
+const short DELICATESSEN_TIMEOUT = 8 minutes; // Doba, za ktoru zakaznik opusti frontu, musi byt vacsia ako DELICATESSEN_WAIT_TIME
 
 const short SELLER_MANAGER_COMMING_TIME_MIN = 20 seconds; // Doba, za ktoru pride veduci
 const short SELLER_MANAGER_COMMING_TIME_MAX = 30 seconds; // Doba, za ktoru pride veduci
@@ -93,14 +95,16 @@ Facility FacilityCashesInDelicatessen[CASH_COUNT_IN_DELICATESSEN]; // Pokladne v
 Facility FacilityBreadSlicer("Krajac chleba");
 Facility FacilityWineTaps[WINE_TAPS_COUNT]; // Vycapne zariadenie na sudove vina
 Facility FacilityReturnableBottles("Automat na vratenie flias");
-Store StoreBaskets("Sklad kosikov", 150);
+Store StoreBaskets("Sklad kosikov", 135);
 
 // Spolocna fronta pre pokladne pri lahodkach 
 Queue QueueDelicatessen("Fronta lahodok");
-Histogram hisTimeInSHO("Doba stravena v systeme", 0, 30, 20);
+Histogram hisMorning("Doba stravena v systeme: 07:00-12:00", 0, 30, 10);
+Histogram hisNoon("Doba stravena v systeme: 12:00-16:00", 0, 30, 10);
+Histogram hisAfternoon("Doba stravena v systeme: 16:00-20:00", 0, 30, 10);
 
 // Pole oznacujuce aktivne pokladne
-bool ACTIVE_CASH[CASH_COUNT]; // Aktivne pokladne pri plateni
+bool ACTIVE_CASH[CASH_COUNT] = {false}; // Aktivne pokladne pri plateni
 bool ACTIVE_CASH_IN_DELICATESSEN[CASH_COUNT_IN_DELICATESSEN] = {false}; // Aktivne pokladne v lahodkach
 
 size_t activeCashCount = CASH_SELLER_IN_DELICATESSEN; // Pocet aktivnych pokladni v lahodkach
@@ -151,6 +155,7 @@ private:
 	bool m_close = false;
 	bool m_basket = false;
 	bool m_exitSection = false;
+	int m_dayMode;
 	double m_time;
 
 	bool exitSection()
@@ -178,6 +183,7 @@ private:
 	LOOP:
 		m_percents = Random()*COUNT_OF_PERCENT;
 		m_exitSection = exitSection();
+		m_dayMode = arriveState;
 
 		double last = m_percents;
 
@@ -192,8 +198,6 @@ private:
 				Wait(Exponential(BREAD_WAIT_TIME));
 				Release(FacilityBreadSlicer);
 			}
-
-			exitSection();
 
 			if (!interrupt)
 				goto LOOP;
@@ -270,9 +274,9 @@ private:
 		REPEAT:
 			/*
 			 * Realokacia pokladni ak je vo fronte nadbytok alebo nedostatok
-			 * zakaznikov. Plati len pri ENABLE_REALLOCATION = true;
+			 * zakaznikov. Plati len pri ENABLE_REALLOCATION2 = true;
 			 */
-			for (size_t i = 1; i < CASH_COUNT_IN_DELICATESSEN; i++) {
+			for (size_t i = 1; i < CASH_COUNT_IN_DELICATESSEN && ENABLE_REALLOCATION2; i++) {
 				// Ak je vo fronte nedostatok ludi, pokladna sa uzavrie
 				if (QueueDelicatessen.Length() <= MIN_PEOPLE_IN_CASH_QUEUE
 					&& ACTIVE_CASH_IN_DELICATESSEN[i]) {
@@ -288,7 +292,7 @@ private:
 					 * pocet otvorenych pokladni krat maximalny pocet zakaznikov
 					 * vo fronte je vacsi ako aktualna dlzka spolocnej fronty.
 					 */
-					if (activeCashCount * MAX_PEOPLE_IN_CASH_QUEUE > QueueDelicatessen.Length())
+					if (activeCashCount * MAX_PEOPLE_IN_CASH_QUEUE < QueueDelicatessen.Length())
 						continue;
 
 					ACTIVE_CASH_IN_DELICATESSEN[i] = true;
@@ -314,7 +318,7 @@ private:
 				 * A nie je povolena realokacia pokladni, tak je mozne pristupit
 				 * len k pokladniam, ktore obsluhuju predavaci.
 				 */
-				if (i >= CASH_SELLER_IN_DELICATESSEN && !ENABLE_REALLOCATION)
+				if (i >= CASH_SELLER_IN_DELICATESSEN && !ENABLE_REALLOCATION2)
 					break;
 
 				// Zakaznik moze pristupit len k aktivnym pokladniam
@@ -396,7 +400,12 @@ private:
 		if (m_basket)
 			Leave(StoreBaskets, 1);
 
-		hisTimeInSHO(Time - m_time);
+		if (m_dayMode == MORNING)
+			hisMorning(Time - m_time);
+		else if (m_dayMode == AFTERNOON)
+			hisAfternoon(Time - m_time);
+		else if (m_dayMode == NIGHT)
+			hisNoon(Time - m_time);
 	}
 
 public:
@@ -527,6 +536,7 @@ int main()
 	// Nastavenie zdielanej fronty vsetkym obsluznym zariadeniam
 	for (size_t i = 0; i < CASH_COUNT_IN_DELICATESSEN; i++) {
 		//FacilityCashesInDelicatessen[i].SetQueue(QueueDelicatessen);
+		FacilityCashesInDelicatessen[i].SetName("Vaha");
 
 		if (i < CASH_SELLER_IN_DELICATESSEN)
 			ACTIVE_CASH_IN_DELICATESSEN[i] = true;
@@ -536,7 +546,7 @@ int main()
 		FacilityWineTaps[i].SetName("Vycap vina");
 
 	for (size_t i = 0; i < CASH_COUNT; i++)
-		FacilityCashes[i].SetName("Pokladna ");
+		FacilityCashes[i].SetName("Pokladna");
 
 	RandomSeed(time(NULL)); // inicializacia generatora 
 	Init(0, SIMULATION_TIME); // start simulacie
@@ -558,6 +568,8 @@ int main()
 	QueueDelicatessen.Output();
 	StoreBaskets.Output();
 
-	hisTimeInSHO.Output();
+	hisMorning.Output();
+	hisAfternoon.Output();
+	hisNoon.Output();
 }
 
