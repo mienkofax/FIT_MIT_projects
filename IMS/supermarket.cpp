@@ -19,20 +19,20 @@ using std::endl;
 #define days           hours * 24
 #define percentages    + 0
 
-const double SIMULATION_TIME = 30 days - 9 hours; // Doba behu simulacie
-const long ARRIVAL_CUSTOMER[] = {27 seconds*3, 24 seconds*3, 30 seconds*3}; // Prichod zakaznikov
+const double SIMULATION_TIME = 30 days - 10.5 hours; // Doba behu simulacie , 30 min po ukonceni otvaracej doby
+const long ARRIVAL_CUSTOMER[] = {27 seconds, 24 seconds, 30 seconds}; // Prichod zakaznikov
 const double PAY_TIME_SHOPPING = 50 seconds; // Cas straveny pri plateni nakupu
 const bool ENABLE_REALLOCATION = true; // Povolenie zmeny kapacity pokladni na zaklade vytazenia
-const bool ENABLE_REALLOCATION2 = true; // Povolenie zmeny kapacity vah na zaklade vytazenia
-const short CASH_COUNT = 4; // Pocet pokladni
+const bool ENABLE_REALLOCATION2 = false; // Povolenie zmeny kapacity vah na zaklade vytazenia
+const short CASH_COUNT = 9; // Pocet pokladni
 const short CASH_COUNT_IN_DELICATESSEN = 4; // Pocet pokladni v lahodkach
 const short WINE_TAPS_COUNT = 9; // Pocet vycapov
 const short MAX_PEOPLE_IN_CASH_QUEUE = 8; // Maximalny pocet zakaznikov vo fronte, pri prekroceni tejto hodnoty sa otvori nova pokladna (len pri ENABLE_REALLOCATION = true)
 const short MIN_PEOPLE_IN_CASH_QUEUE = 2; // Minimalny pocet zakaznikov vo fronte, pri prekroceni tejto hodnoty sa zatvori poklad (len pri ENABLE_REALLOCATION = true
 
 // Pocet pevne otvorenych pokladni a vah bez realokacii
-const short CASH_SELLER = 2; // Pocet aktivnych pokladni (len pri ENABLE_REALLOCATION = false)
-const short CASH_SELLER_IN_DELICATESSEN = 1; // Pocet aktivnych pokladni v lahodkach (Len pri ENABLE_REALLOCATION = false)
+const short CASH_SELLER = 4; // Pocet aktivnych pokladni (len pri ENABLE_REALLOCATION = false)
+const short CASH_SELLER_IN_DELICATESSEN = 4; // Pocet aktivnych pokladni v lahodkach (Len pri ENABLE_REALLOCATION = false)
 
 // Percentualne vyjadrenie prichodu do jednotlivych sekcii v obchode
 const double COUNT_OF_PERCENT = 100 percentages; // Pocet percent
@@ -51,7 +51,7 @@ const double DELICATESSEN_PERCENTAGE = 58 percentages; // Vyber lahodky bez vahy
 const double BREAD_SLICER_PERCENTAGE = 11 percentages; // Krajac chleba
 const double WINE_TAPS_PERCENTAGE = 17 percentages; // Vycap vina
 const double RETURNABLE_BOTTLES_PERCENTAGE = 26 percentages; // Automat na vratenie flias
-const double TAKE_BASKET_PERCENTAGE = 39.6 percentages; // Zabratie kosika
+const double TAKE_BASKET_PERCENTAGE = 40 percentages; // Zabratie kosika
 
 // Doba stravena v obsluznych linkach 
 const short BREAD_WAIT_TIME = 30 seconds; // Doba krajania chleba
@@ -70,8 +70,8 @@ const short DAIRY_WAIT_TIME_MIN = 180; // Doba stravena v sekcii mliecne vyrobky
 const short DAIRY_WAIT_TIME_MAX = 320; // Doba stravena v sekcii mliecne vyrobky
 const short FRUITS_VEGETABLES_WAIT_TIME_MIN = 120 seconds; // Doba stravena v sekcii s ovocim a zeleninou
 const short FRUITS_VEGETABLES_WAIT_TIME_MAX = 160 seconds; // Doba stravena v sekcii s ovocim a zeleninou
-const short DELICATESSEN_WAIT_TIME_MIN = 20 seconds; // Doba stravena v sekcii lahodky
-const short DELICATESSEN_WAIT_TIME_MAX = 60 seconds; // Doba stravena v sekcii lahodky
+const short DELICATESSEN_WAIT_TIME_MIN = 40 seconds; // Doba stravena v sekcii lahodky
+const short DELICATESSEN_WAIT_TIME_MAX = 80 seconds; // Doba stravena v sekcii lahodky
 const short ALCOHOL_WAIT_TIME_MIN = 40 seconds; // Doba stravena v sekcii alkohol
 const short ALCOHOL_WAIT_TIME_MAX = 80 seconds; // Doba stravena v sekcii alkohol
 
@@ -181,6 +181,10 @@ private:
 
 	void Behavior() override
 	{
+		// Pre testovanie
+		//if (arriveState != AFTERNOON)
+		//	return;
+
 		m_time = Time;
 		double tmp = Time;
 
@@ -531,7 +535,7 @@ class GenInterrupt : public Event {
 	void Behavior() override
 	{
 		new SellerManager;
-		Activate(Time + Exponential(4 hours));
+		Activate(Time + Exponential(10 minutes));
 	}
 
 public:
