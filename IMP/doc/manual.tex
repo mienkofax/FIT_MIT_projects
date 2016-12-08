@@ -1,0 +1,117 @@
+\documentclass[10pt,a4paper,final]{article}
+% cestina a fonty
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage{times}
+\usepackage[czech]{babel}
+% odsazeni prvniho radku
+\usepackage{indentfirst}
+% balicky pro odkazy
+\usepackage[bookmarksopen,colorlinks,plainpages=false,urlcolor=blue,
+unicode,linkcolor=black]{hyperref}
+\pagestyle{plain}
+\usepackage{url}
+\DeclareUrlCommand\url{\def\UrlLeft{<}\def\UrlRight{>}
+ \urlstyle{tt}}
+% obrazky
+
+\usepackage[dvipdf]{graphicx}
+\usepackage{float}
+% velikost stranky
+\usepackage[top=2.5cm, left=2cm, text={17cm, 25cm}, ignorefoot]{geometry}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\thispagestyle{empty}
+
+% titulni strana
+\begin{center}
+	\Huge \textsc{Vysoké učení technické v~Brně}\\
+	\huge \textsc{Fakulta informačních technologií}\\
+	\vspace{\stretch{0.382}}
+	\includegraphics[keepaspectratio]{images/fit.eps}\\
+	\vspace{\stretch{0.382}}
+	\Huge MSP430: Interaktivní světelné noviny na FITkitu\\[5mm]
+	\Large Projekt do predmetu Mikroprocesorové a vstavané systémy (IMP)\\
+	\vspace{\stretch{0.618}}
+\end{center}
+{\large \today \hfill Peter Tisovčík}
+\newpage
+
+% nastaveni cislovani
+\pagestyle{plain}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\tableofcontents
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Úvod} \label{sec:uvod}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\noindent Cieľom projektu je vytvoriť v jazuku C jednoduchú aplikáciu pre \texttt{FITkit}. Aplikácia zobrazuje zadaný text na dvojriadkovom LCD \texttt{FITkitu} verzie 2.0. Aplikácia umožňuje zadávať text, ktorý sa má zobrazovať podobne ako pri písaní na tlačidlových telefónoch, kde po stlačení tlačidla \texttt{1} sa zobrazí písmeno \texttt{A} a po opakovanom stlačení sa zobrazia písmena \texttt{B} a \texttt{C}. Po uplynutí časového intervalu a stlačení opäť tlačidla \texttt{1} sa už neprepisuje znak na rovnakej pozícií ale na LCD sa zapíše ďalší znak. Okrem samostatného písania na LCD bolo potrebné vytvoriť efekty, ktoré je možné voliť a je možné medzi nimi prepínať. Aplikácia využívala len komponenty, ktoré sú priamo umiestnené na doske \texttt{FITkitu}. 
+\\\\
+Ako rozšírenie je implementované vymazanie textu na LCD a zastavenie vykonávania aktuálneho efektu. Pri písaní na klávesnici je implementovaná funkcia, ktorá vymaže posledný zadaný znak. Pre inforovanie o možnosti zadania nasledujúceho znaku je použitá LED dióda, ktorá sa rozsvieti kedy je možné zadať znak na rovnakom tlačidle, ktorý sa pridá za posledný zobrazený znak.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Ovládanie aplikácie}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\noindent Pre zadávanie znakov slúži alfanumerická klávesnica o veľkosti 4x4\cite{keyboard}. Na zadávanie znakov slúžia klávesy \texttt{2} -- \texttt{9} a \texttt{0}. Opakovaným stláčaním klávesy je možné vybrať požadované písmeno, ktoré je možné zobraziť danou klávesou. Klávesa \texttt{1} slúži na vymazanie posledného znaku s LCD \texttt{FITkitu}. Klávesa \texttt{*} slúži na uloženie zobrazeného reťazca, na ktorom sa vykonávajú efekty. Jednolivé efekty je možné voliť klávesami \texttt{A} -- \texttt{D}. Pre vymazanie LCD a zastavenie efektov slúži klávesa \texttt{\#}.
+Rozsvietenie zelenej LED diódy znamená, že je možné zadať rovnakú klávesu bez toho aby sa prepisoval aktuálne zobrazený znak na LCD. Platí to len pri písaní rovnakou klávesou na klávesnici ako napríklad napísanie znakov \texttt{AA}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stručný prehľad ovládania}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Klávesy a ich popis:
+\begin{itemize}
+	\item \texttt{2} -- \texttt{9}, \texttt{0} - zápis znakov na LCD
+	\item \texttt{1} - odstránenie posledného zapísaného znaku
+	\item \texttt{*} - uloženie reťazca z LCD pre efekty, vyžadované pred spustením efektu
+	\item \texttt{\#} - vymazanie LCD a zastavenie efektov
+	\item \texttt{A} - Postupné rozsvecovanie a zhasínanie zadaných znakov
+	\item \texttt{B} - Rotácia textu doľava
+	\item \texttt{C} - Prechod zadanými znakmi a znak, na ktorom je kurzor sa zobrazí ako malé písmeno \texttt{ZADAnYTEXT}, \texttt{ZADANyTEXT}
+	\item \texttt{B} - Rotácia riadkov zhora dole
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Popis implementácie}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\noindent Ako šablóna pre tento projekt bol použitý program \textit{Demo -- Klávesnice a LCD}, ktorý má už nastavené všetky potrebné veci v \texttt{FPGA}. Z tejto šablóny boli odstránené nepotrebné veci ako napríklad časť tela obsluhy klávesnice, ktorá používala v obsluhe klávesnice výpis na terminál a v hlavnej funkcii \texttt{main} sa prepínala LED diodá. Časť funkcie \texttt{keyboard\_idle()} bola použitá pre rozšírenie funkcionality v osekanej šablóny.
+\\\\
+Po spustení program inicializuje globálne premenné, nastaví sa predvolená hodnota do polí a zapne sa časovač na kanále \texttt{0}\cite{casovac}. Následne sa rozsvecuje zelená LED dióda v prípade, že čas potrebný medzi stlačením rovnakej klávesy je väčší ako 1.2 sekundy.
+\\\\
+Pre uloženie textu sú vytvorené tri polia. Prvé pole \texttt{data}, ktoré slúži na prácu zo zadaným textom a ich zobrazenie na LCD do doby pokiaľ sa nestlačí klávesa na uloženie, čím sa prekopírujú dáta do poľa \texttt{saveData}. Z tohto poľa sa následne kopírujú dáta podľa jednotlivých efektov do poľa \texttt{out}, ktoré obsahuje reťazec znakov daného efektu. Pole \texttt{saveData} je vytvorené kôli tomu aby bolo možné medzi jednotlivými efektami zadávať text na klávesnici a po jeho uložení, bude efekt pracovať s novými dátami.
+\\\\
+Na spracovanie jednotlivých znakov je použitá funkcia \texttt{keyboard\_idle()}, ktorá načíta stlačený znak a následne sa dostane na rad funkcia \texttt{map\_keyboard()}. Táto funkcia namapuje stlačené klávesy na písmená, prípadne spustí daný efekt zápisom znaku efektu do premennej \texttt{efekt}. Ďalej umožňuje vymazať LCD alebo znak z LCD. Ak je znak možné vypísať vráti sa \texttt{true}, ak je znak riadiaci vráti sa \texttt{false}. Po návrate volania tejto metódy sa skontroluje, či nie je prekročený maximálny čas pre opakované zadávanie jednej klávesy. V prípade, že je tento čas väčší ako 1.2 sekundy môže sa zadaný znak zapísať na nasledujúcu pozíciu. Táto podmienka je použitá len vtedy, keď sa predchádzajúci a aktuálne zadaný znak líši. Ak sa zhodujú, na LCD sa prepíše posledný znak novým znakom. Nový znak sa vypočíta ako počet stlačení pripočítaný k základnému znaku, ktorý je možné získať stlačením klávesy. Následne sa daný znak doplní do poľa \texttt{data} a zobrazí sa na LCD predpripravenou funkciou \texttt{LCD\_write\_string()}.
+\\\\
+V programe je časovač \texttt{Timer\_A()}, ktorý sa stará o zobrazenie jednotlivých krokov vybraného efektu. Časovač sa spúťa každých 0.5 sekundy a kontroluje, či sa v premennej \texttt{efekt} nenachádza hodnota \texttt{A} -- \texttt{D}. Na základe týchto znakov sa následne vyberajú jednotlivé efekty. Dôvod takejto implementácie je aby efekt mohol bežať v cykle bez toho aby blokoval ostatné operácie.
+\\\\
+\texttt{efekt1()} postupne rozsvecuje a zhasína zadané znaky. Najprv sa zistí, ktorým smerom má ísť a postupne odstraňuje alebo pridáva znaky do poľa \texttt{out}, ktoré sa zobrazujú. Keď sa dostane efekt na koniec reťazca alebo na začiatok poľa, zmení sa smer, ktorým sa zobrazujú znaky.
+\\\\
+\texttt{efekt2()} rotuje obidva riadky LCD doľava. Postupne prechádza pole \texttt{out} a znak na indexe \texttt{0} presunie na index \texttt{15}, podobne sa presenie znak z indexu \texttt{16} na index \texttt{31}. Ostatné znaky presunie z aktuálneho indexu na predchadzajúci index.
+\\\\
+\texttt{efekt3()} prechod zadanými znakmi a znak, na ktorom je kurzor sa zobrazí ako malé písmeno. Postupne sa prechádza znakmi a ich ASCI hodnota sa zväčšuje o \texttt{32}, čo je vlastne rozdiel medzi malým a veľkým písmenom v ASCI tabuľke. Ostatné znaky zostávajú veľké, ak bol znak malý odpočíta sa od neho hodnota \texttt{32}.
+\\\\
+\texttt{efekt4()} rotácia riadkov zhora dole. Postupne sa vymazáva obsah poľa \texttt{out} a necháva sa len prvý, len druhý alebo sa obsah poľa vymaže. Pri tomto efekte je nutné ešte posúvať text v rámci jednotlivých riadkov na LCD. Toto sa dá docieliť posuvom reťazca do prvej alebo do druhej polovice poľa.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Záver}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Program funguje ako jednoduchý zobrazovač noviniek na \texttt{FITkite}. Obsahuje všetky popísané funkcie a sú v ňon zahrnuté rozšírenia, ktoré boli navrhnuté. Pri testovaní bol odhalený problém, že pri niektorých efektoch sa na LCD zobrazuje znak \texttt{\_}. Tento problém pretrváva a nebol odstránený.
+
+
+
+\newpage
+\bibliographystyle{czplain}
+\renewcommand{\refname}{Literatúra}
+\raggedright
+\bibliography{literatura}
+\end{document}
