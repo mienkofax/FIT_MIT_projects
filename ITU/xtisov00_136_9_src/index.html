@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="index, follow">
+
+		<!-- Bootstrap core CSS -->
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/font-awesome.min.css" rel="stylesheet">
+
+		<!-- Custom styles for this site -->
+		<link href="css/custom.css" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+
+		<script type="text/javascript" src="js/nurbs.js"></script>
+		<script type="text/javascript" src="js/bspline.js"></script>
+	</head>
+	<body>
+		<a href="#myModal" role="button" class="help" data-toggle="modal"><i class="fa fa-question fa-3x help"></i></a>
+		<header>
+			<div class="container">
+				<h2>Demonstrace křivek v počítačové grafice</h2>
+			</div>
+		</header>
+
+		<div class="container center">
+			<div class="col-md-2 box box-left">
+				<h4>Výběr křivky</h4>
+
+				<div class="radio">
+					<label>
+						<input name="optionsRadios" type="radio" value="" onclick="fer()">Fergusonova křivka
+					</label>
+				</div>
+				<div class="radio">
+					<label>
+						<input name="optionsRadios" type="radio" value="" onclick="bspline()" checked>B-spline křivka
+					</label>
+				</div>
+				<div class="radio">
+					<label>
+						<input name="optionsRadios" type="radio" value="" onclick="nurbs()">NURBS křivka
+					</label>
+				</div>
+
+				<div class="left-inner-box" id="fer-left" style="display: none;">
+					<h4></h4>
+					<h4>Vlastnosti</h4>
+					<button type="button" id="novy-bod2" class="btn btn-warning btn-sm" >Přidat bod</button>
+					<button type="button" id="odstranit-bod2" class="btn btn-danger btn-sm" >Odstranit bod</button>
+					<h4></h4>
+					<button type="button" class="btn btn-custom" id="cmp2">Zkontrolovat!</button>
+				</div>
+				<div class="left-inner-box" id="bspline-left" style="display: block;">
+					<h4></h4>
+					<h4>Vlastnosti</h4>
+					<button type="button" id="novy-bod" class="btn btn-warning btn-sm" >Přidat bod</button>
+					<button type="button" id="odstranit-bod" class="btn btn-danger btn-sm" >Odstranit bod</button>
+					<h4></h4>
+					<h4>Nastavení</h4>
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" id="zobrazit2" checked> Zobrazit řídící polygon
+						</label>
+					</div>
+					<h4></h4>
+					<button type="button" class="btn btn-custom" id="cmp3">Zkontrolovat!</button>
+				</div>
+				<div class="left-inner-box" id="nurbs-left" style="display: none;">
+					<h4></h4>
+					<h4>Vlastnosti</h4>
+					<div class="green">
+						<div>Váha bodu P2:
+							<label id="L1">1</label>
+							<input id="P1" value="1" type="range" min="1" max="10">
+						</div>
+						<div>Váha bodu P3:
+							<label id="L2">1</label>
+							<input id="P2" value="1" type="range" min="1" max="10">
+						</div>
+					</div>
+
+					<button type="button" id="novy-bod3" class="btn btn-warning btn-sm" >Přidat bod</button>
+					<button type="button" id="odstranit-bod3" class="btn btn-danger btn-sm" >Odstranit bod</button>
+
+					<h4>Nastavení</h4>
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" id="zobrazit" checked> Zobrazit řídící polygon
+						</label>
+					</div>
+					<h4></h4>
+					<button type="button" class="btn btn-custom" id="cmp">Zkontrolovat!</button>
+				</div>
+			</div>
+
+			<div id="center-box" style="float: left; width: 58.333%; padding: 15px;">
+				<div class="canvas-menu">
+					<ul>
+						<li><a href="#exportA" role="button" id="exp" data-toggle="modal">Uložit</a></li>
+						<li><a href="#" id="resetL">Reset plátna</a></li>
+
+						<li><a href="#" id="vys">Výsledek <span id="res"><i class="fa fa-ban"></i></span></a></li>
+					</ul>
+				</div>
+				<div class="fer_box">
+					<canvas id="fer" style="display: none;" width="600" height="300"></canvas>
+				</div>
+				<canvas id="bspline" style="display: block;" height="600"></canvas>
+				<canvas id="nurbs" style="display: none;"></canvas>
+				<canvas id="tmp" style="display: none;"></canvas>
+
+				<!-- Ulohy Fergusonova krivka -->
+				<div class="panel-group" id="fer-acc" style="display: none;">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#fer-acc" href="#f1">Úloha 1</a>
+							</h4>
+						</div>
+						<div id="f1" class="panel-collapse collapse in">
+							<div class="panel-body">
+								<p>
+									Nastavte <b>pozici řídících bodů a velikost i orientaci tečných vektorů</b> tak, aby se Vámi definovaná křivka
+									co nejvíce podobala vzorové křivce níže. <br /> <br />
+									<img class="img-responsive" src="images/f1.png">
+								</p>
+							</div>
+							<div class="data" style="display: none">60,260,550,260,64,40,550,50</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#fer-acc" href="#f2">Úloha 2</a>
+							</h4>
+						</div>
+						<div id="f2" class="panel-collapse collapse">
+							<div class="panel-body">
+								<p>
+									Nastavte <b>pozici řídících bodů a velikost i orientaci tečných vektorů</b> tak, aby se Vámi definovaná křivka
+									co nejvíce podobala vzorové křivce níže. <br /> <br />
+									<img class="img-responsive" src="images/f2.png">
+								</p>
+							</div>
+							<div class="data" style="display: none">200,250,400,50,360,250,200,60</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#fer-acc" href="#f3">Úloha 3</a>
+							</h4>
+						</div>
+						<div id="f3" class="panel-collapse collapse">
+							<div class="panel-body">
+								<p>
+									Nastavte <b>pozici řídících bodů a velikost i orientaci tečných vektorů</b> tak, aby se Vámi definovaná křivka
+									co nejvíce podobala vzorové křivce níže. <br /> <br />
+									<img class="img-responsive" src="images/f3.png">
+								</p>
+							</div>
+							<div class="data" style="display: none">230,280,380,280,550,30,30,30</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- B-spline ulohy -->
+				<div class="panel-group" id="bspline-acc">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#bspline-acc" href="#b1">Úloha 1</a>
+							</h4>
+						</div>
+						<div id="b1" class="panel-collapse collapse in">
+							<div class="panel-body">
+								<p>
+									Nastavte <b>pozici řídících bodů</b> tak, aby se Vámi definovaná křivka
+									co nejvíce podobala vzorové křivce níže. <br /> <br />
+									<img class="img-responsive" src="images/b1.png">
+								</p>
+							</div>
+							<div class="data" style="display: none">0.13,0.22,0.10,0.94,0.91,0.07,0.37,0.41</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#bspline-acc" href="#b2">Úloha 2</a>
+							</h4>
+						</div>
+						<div id="b2" class="panel-collapse collapse">
+							<div class="panel-body">
+								<p>
+									Nastavte <b>pozici řídících bodů</b> tak, aby se Vámi definovaná křivka
+									co nejvíce podobala vzorové křivce níže. <br /> <br />
+									<img class="img-responsive" src="images/b2.png">
+								</p>
+							</div>
+							<div class="data" style="display: none">0.08,0.07,0.08,0.93,0.92,0.94,0.88,0.06</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#bspline-acc" href="#b3">Úloha 3</a>
+							</h4>
+						</div>
+						<div id="b3" class="panel-collapse collapse">
+							<div class="panel-body">
+								<p>
+									Nastavte <b>pozici řídících bodů</b> tak, aby se Vámi definovaná křivka
+									co nejvíce podobala vzorové křivce níže. <br /> <br />
+									<img class="img-responsive" src="images/b3.png">
+								</p>
+							</div>
+							<div class="data" style="display: none">0.08,0.07,0.08,0.93,0.89,0.07,0.88,0.94</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- NURBS ulohy -->
+				<div class="panel-group" id="nurbs-acc" style="display: none;">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#nurbs-acc" href="#n1">Úloha 1</a>
+							</h4>
+						</div>
+						<div id="n1" class="panel-collapse collapse in">
+							<div class="panel-body">
+								<p>
+									Nastavte <b>pozici a váhu řídících bodů</b> tak, aby se Vámi definovaná křivka
+									co nejvíce podobala vzorové křivce níže. <br /> <br />
+									<img class="img-responsive" src="images/n1.png">
+								</p>
+							</div>
+							<div class="data" style="display: none">0.13,0.22,0.10,0.94,0.91,0.07,0.37,0.41</div>
+							<div class="data2" style="display: none">2,7</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#nurbs-acc" href="#n2">Úloha 2</a>
+							</h4>
+						</div>
+						<div id="n2" class="panel-collapse collapse">
+							<div class="panel-body">
+								<p>
+									Nastavte <b>pozici a váhu řídících bodů</b> tak, aby se Vámi definovaná křivka
+									co nejvíce podobala vzorové křivce níže. <br /> <br />
+									<img class="img-responsive" src="images/n2.png">
+								</p>
+							</div>
+							<div class="data" style="display: none">0.08,0.07,0.08,0.93,0.92,0.94,0.88,0.06</div>
+							<div class="data2" style="display: none">2,8</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#nurbs-acc" href="#n3">Úloha 3</a>
+							</h4>
+						</div>
+						<div id="n3" class="panel-collapse collapse">
+							<div class="panel-body">
+								<p>
+									Nastavte <b>pozici a váhu řídících bodů</b> tak, aby se Vámi definovaná křivka
+									co nejvíce podobala vzorové křivce níže. <br /> <br />
+									<img class="img-responsive" src="images/n3.png">
+								</p>
+							</div>
+							<div class="data" style="display: none">0.08,0.07,0.08,0.93,0.89,0.07,0.88,0.94</div>
+							<div class="data2" style="display: none">2,8</div>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+
+			<div class="col-md-3 box box2">
+				<div class="panel-group" id="accordion">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion" href="#info1">Fergusonova křivka</a>
+							</h4>
+						</div>
+						<div id="info1" class="panel-collapse collapse in">
+							<div class="panel-body">
+								<p>
+									<ul>
+										<li>interpolační křivka</li>
+										<ul>
+											<li>křivka přímo prochází body</li>
+										</ul>
+										<li>určena dvěma řídícími body <i>P<sub>0</sub></i>, <i>P<sub>1</sub></i> a dvěma tečnými vektory <i><b>v<sub>0</sub></b></i>, <i><b>v<sub>1</sub></b></i> v nich</li>
+										<li>řídící body leží na křivce</li>
+										<ul>
+											<li>v bodě <i>P<sub>0</sub></i> křivka začíná</li>
+										</ul>
+										<ul>
+											<li>v bodě <i>P<sub>1</sub></i> křivka končí</li>
+										</ul>
+										<li>tečné vektory <i><b>v<sub>0</sub></b></i>, <i><b>v<sub>1</sub></b></i> určují směr křivky v řídících bodech</li>
+										<li>čím větší je velikost těchto vektorů, tím více se k nim výsledná křivka přibližuje</li>
+										<li>jestliže mají vektory nulovou velikost, křivka se transformuje na úsečku <i>P<sub>0</sub></i><i>P<sub>1</sub></i></li>
+										<li>jeden segment je mezi dvěma body</li>
+										<li>navazování segmentů</li>
+										<ul>
+											<li>totožnost řídících bodů a shodnost tečných vektorů</li>
+										</ul>
+										<li>nelokální změna tvaru křivky (posunem jednoho bodu)</li>
+										<li>Hermitovy vzorce</li>
+										<ul>
+											<li>bázové funkce</li>
+										</ul>
+										<li>výsledný tvar Fergusonovy křivky lze ovlivnit:</li>
+										<ul>
+											<li>polohou řídících bodů <i>P<sub>0</sub></i> a <i>P<sub>1</sub></i></li>
+											<li>směrem tečných vektorů <b><i>v<sub>0</sub></i></b> a <b><i>v<sub>1</sub></i></b></li>
+											<li>velikostí tečných vektorů <b><i>v<sub>0</sub></i></b> a <b><i>v<sub>1</sub></i></b></li>
+										</ul>
+										<li>více informaci <a href="http://personal.tucna.net/cult/ferguson.html">zde</a></li>
+									</ul>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion" href="#info2">B-spline křivka</a>
+							</h4>
+						</div>
+						<div id="info2" class="panel-collapse collapse">
+							<div class="panel-body">
+								<p>
+									<ul>
+										<li>aproximační křivka</li>
+										<ul>
+											<li>křivka může, ale nemusí procházet body</li>
+										</ul>
+										<li>určena <i>n + 1</i> body</li>
+										<li>křivka stupně <i>k</i> &rarr; spojitost <i>k + 1</i></li>
+										<li>navazování segmentů</li>
+										<ul>
+											<li>žádné podmínky</li>
+										</ul>
+										<li>uzlový vektor <i>U<sub>t</sub></i></li>
+										<ul>
+											<li>hodnoty parametru <i>t</i> v uzlech</li>
+											<li>neklesající</li>
+											<li>délka <i>m + 1</i>, kde <i>m = n + k + 1</i></li>
+											<li>parametr <i>t</i> nemusí být v rozsahu 0 až 1</li>
+											<li>uniformní &rarr; <i>t<sub>i+1</sub> - t<sub>i</sub> = konst.</i></li>
+											<li>násobné uzly způsobí zdegenerování segmentu do jediného bodu</li>
+											<li>lokální změna tvaru křivky</li>
+											<ul>
+												<li>pomocí změny uzlového vektoru můžeme ovlivňovat hladkost křivky ve vybraných bodech</li>
+											</ul>
+										</ul>
+										<li>řídící polygon je rovinný útvar, jehož vrcholy tvoří řídící body křivky</li>
+										<li>křivka je invariantní (neměnná) vůči rotaci, posunutí a změně měřítka</li>
+										<li>vykreslování algoritmem de Boor</li>
+										<li>polynomy B-spline křivky</li>
+										<ul>
+											<li>bázové funkce</li>
+											<li>rekurentní definice</li>
+											<li>mají nezápornou hodnotu</li>
+											<li>jednotkový součet</li>
+											<ul>
+												<li>křivka neopouští konvexní obálku</li>
+											</ul>
+										</ul>
+										<li>více informaci <a href="http://personal.tucna.net/cult/b-spline-curves.html">zde</a></li>
+									</ul>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion" href="#info3">NURBS křivka</a>
+							</h4>
+						</div>
+						<div id="info3" class="panel-collapse collapse">
+							<div class="panel-body">
+								<p>
+									<ul>
+										<li><b>N</b>on <b>U</b>niform <b>R</b>ational <b>B</b>-<b>S</b>pline</li>
+										<li>aproximační křivka</li>
+											<ul>
+												<li>křivka může, ale nemusí procházet body</li>
+											</ul>
+										</li>
+										<li>zobecnění B-spline křivek</li>
+										<li>určena <i>n + 1</i> body</li>
+										<li>racionální křivka &rarr; váhové koeficienty <i>w<sub>i</sub></i> i-tého řídícího bodu</li>
+										<li>uzlový vektor <i>U<sub>t</sub></i></li>
+											<ul>
+												<li>neuniformní &rarr; <i>t<sub>i+1</sub> - t<sub>i</sub> != konst.</i></li>
+											</ul>
+										</li>
+										<li>umožňuje vkládání řídícího bodu při zachování tvaru</li>
+										<li>přesné vyjádření kuželoseček</li>
+										<li>více informací <a href="https://www.root.cz/clanky/krivky-nurbs-1/">zde</a></li>
+									</ul>
+								</p>
+							</div>
+						</div>
+					</div>
+			</div>
+		</div>
+
+		<div id="myModal" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h3 class="modal-title">Nápověda</h3>
+					</div>
+					<div class="modal-body">
+						<h4>O aplikaci</h4>
+
+						Tato aplikace Vám pomůže <b>porozumět problematice Fergusonových, B-spline a NURBS křivek</b>. <br />
+						<br />
+						U každého typu křivky jsou k dispozici tři <b>úlohy</b>, které by měly sloužit k:
+							<ul>
+								<li>ujasnění, čím je daná křivka definována</li>
+								<li>praktickému vyzkoušení, co ovlivňuje tvar dané křivky</li>
+							</ul>
+						Cílem je <b>co nejvíce napodobit tvar vzorové křivky</b> dané úlohy.
+
+						<h4>Ovládání</h4>
+						<b>Hlavní lišta</b>
+							<ul>
+								<li>nápověda k aplikaci - kliknutí levým tlačítkem myši na ikonu otazníku</li>
+							</ul>
+						<b>Levé menu</b>
+							<ul>
+								<li>volba typu křivky (Fergusonova, B-spline nebo NURBS křivka)</li>
+								<li>nastavení váhy řídících bodů – posuvník (Slider) (NURBS křivka)</li>
+								<li>zobrazení řídícího polygonu – zaškrtávací pole (Check Box) (B-spline, NURBS křivka)</li>
+								<li>vyhodnocení úlohy – tlačítko Zkontrolovat!</li>
+							</ul>
+						<b>Horní lišta kreslícího plátna</b>
+							<ul>
+								<li>tlačítko Uložit – uložení křivky jako obrázek</li>
+								<li>tlačítko Reset plátna – nastavení křivky do výchozí pozice</li>
+								<li>výsledek vyhodnocení úlohy - ikona vedle textu Výsledek a barevné odlišení (správně - zelená, špatně - červená)</li>
+							</ul>
+						<b>Kreslící plátno</b>
+							<ul>
+								<li>posun řídících bodů křivky – stisk levého tlačítka myší nad daným bodem a následné tažení myší</li>
+								<li>změna orientace tečného vektoru (Fergusonova křivka) – stisk levého tlačítka myši nad koncem daného vektoru a následné tažení myší</li>
+								<li>zadání úloh spolu se vzorovou křivkou – pod kreslícím plátnem</li>
+							</ul>
+						<b>Pravé menu</b>
+							<ul>
+								<li>základní charakteristika jednotlivých typů křivek</li>
+							</ul>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Zavřít</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div id="exportA" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h3 class="modal-title">Křivka</h3>
+					</div>
+					<div class="modal-body" id="to-write">
+					</div>
+					<div class="modal-footer">
+						<a class="btn btn-primary" id="download">Uložit obrázek</a>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Zavřít</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<script>
+			var fer_width = document.getElementById("center-box").clientWidth - 30-2;
+			if (fer_width > 600)
+			document.getElementById("fer").setAttribute("width", fer_width);
+			//document.getElementById("fer").setAttribute("height", "400");
+
+			document.getElementById("bspline").setAttribute("width", document.getElementById("center-box").clientWidth - 30);
+			document.getElementById("nurbs").setAttribute("width", 200);
+			//document.getElementById("nurbs").setAttribute("height", "400");
+
+			exportObr = document.getElementById("exp");
+			exportObr.addEventListener('click', exportObrazka);
+
+			function exportObrazka() {
+				var canvas;
+				if (document.getElementById('fer').style.display == "block")
+					canvas = document.getElementById("fer");
+				else if (document.getElementById('bspline').style.display == "block")
+					canvas = document.getElementById("bspline");
+				else
+					canvas = document.getElementById("nurbs");
+
+				var img = canvas.toDataURL('image/png');
+				document.getElementById('to-write').innerHTML = '<img class="img-responsive" src="'+img+'">';
+
+				document.getElementById('download').addEventListener('click', function() {
+					this.href = img;
+					this.download = "nahlad";
+				});
+			}
+
+			function fer() {
+				document.getElementById("fer").style.display = "block";
+				document.getElementById("bspline").style.display = "none";
+				document.getElementById("nurbs").style.display = "none";
+
+				$("#info1").collapse('show');
+				$("#info2").collapse('hide');
+				$("#info3").collapse('hide');
+
+				document.getElementById("fer-acc").style.display = "block";
+				document.getElementById("bspline-acc").style.display = "none";
+				document.getElementById("nurbs-acc").style.display = "none";
+
+				document.getElementById("fer-left").style.display = "block";
+				document.getElementById("bspline-left").style.display = "none";
+				document.getElementById("nurbs-left").style.display = "none";
+			}
+
+			function bspline() {
+				document.getElementById("fer").style.display = "none";
+				document.getElementById("bspline").style.display = "block";
+				document.getElementById("nurbs").style.display = "none";
+
+				$("#info1").collapse('hide');
+				$("#info2").collapse('show');
+				$("#info3").collapse('hide');
+
+				document.getElementById("fer-acc").style.display = "none";
+				document.getElementById("bspline-acc").style.display = "block";
+				document.getElementById("nurbs-acc").style.display = "none";
+
+				document.getElementById("fer-left").style.display = "none";
+				document.getElementById("bspline-left").style.display = "block";
+				document.getElementById("nurbs-left").style.display = "none";
+			}
+
+			function nurbs() {
+				document.getElementById("fer").style.display = "none";
+				document.getElementById("bspline").style.display = "none";
+				document.getElementById("nurbs").style.display = "block";
+
+				$("#info1").collapse('hide');
+				$("#info2").collapse('hide');
+				$("#info3").collapse('show');
+
+				document.getElementById("fer-acc").style.display = "none";
+				document.getElementById("bspline-acc").style.display = "none";
+				document.getElementById("nurbs-acc").style.display = "block";
+
+				document.getElementById("fer-left").style.display = "none";
+				document.getElementById("bspline-left").style.display = "none";
+				document.getElementById("nurbs-left").style.display = "block";
+			}
+		</script>
+
+		<script type="text/javascript">
+		//var n2 = new NURBS("nurbs","tmp", .51, 3, 3, [.1,.5,.9,.3],[.2,.9,.2,.4],[1,1,1,1],[0,.001,.002,.5,1,1.001,2.002]);
+		//var n2 = new NURBS("nurbs","tmp", .51, 4,3, [.1,.5,.9,.3,.4,.4],[.2,.9,.2,.4,.3,.2],[1,1,1,1,1],[0,.001,.002,.25,.2501,.503,.504,.505,1,1.001,1.002]);
+		 //var n2 = new NURBS("nurbs","tmp", .51, 4, 3, [.1,.1,.9,.9,.1],[.1,.9,.9,.1,.1],[1,1,1,1,1],[0,.001,.002,.003,.5,.51,1,1.001,1.002]);
+		 //var n2 = new NURBS("nurbs","tmp", .51, 3, 3, [.1,.5,.9,.3],[.2,.9,.2,.4],[1,1,1,1],[0.001,0.002,0.003,.006,.7,1,1,1]);
+		// var n2 = new NURBS("nurbs","tmp", .51, 3, 3, [.1,.5,.9,.3],[.2,.9,.2,.4],[1,1,1,1],[0,.001,.002,   .5,1.0009,  1.001,2.002]);
+		// var n2 = new BSPLINE("bspline","tmp", .51, 3, 3, [.1,.5,.9,.3],[.2,.9,.2,.4],[1,1,1,1],[0,.001,.002,   .5,1.0009,  1.001,2.002]);
+		// var n2 = new NURBS("nurbs","tmp", .51, 3, 3, [.1,.5,.9,.3,.8],[.2,.9,.2,.4,.3],[1,1,1,1,1],[0,.001,.002,   0.613,.701, 0.89,.9, .91,1.004  ,1.001,1.002]);
+		//var n2 = new NURBS("nurbs","tmp", .51, 3, 3, [.08,.08,.89,.88],[.07,.93,.07,.94],[1,1,1,1],[0,.001,.002,   .5,1.0009,  1.001,2.002]);
+		var n2 = new NURBS("nurbs","tmp", .51, 3, 3, [.1,.4,.8,.3],[.2,.9,.5,.6],[1,1,1,1],[0,.001,.002,   .5,1.0009,  1.001,2.002]);
+		var n2 = new BSPLINE("bspline","tmp", .51, 3, 3, [.1,.5,.9,.9],[.2,.8,.6,.4],[1,1,1,1],[0,.001,.002, .5,1.0009,  1.001,2.002]);
+		</script>
+
+		<script type="text/javascript" src="js/curves.js"></script>
+
+
+	</body>
+</html>

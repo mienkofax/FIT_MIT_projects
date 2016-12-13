@@ -1,0 +1,162 @@
+html { height:100%; }
+body { position:absolute; top:0; bottom:0; right:0; left:0;
+	background: #444;
+	margin: 0px;
+	font-family: sans-serif;
+}
+
+header {
+	background: #222;
+	overflow: auto;
+	margin-bottom: 30px;
+}
+h2 {
+	text-align: center;
+	color: #eee;
+	margin: 10px;
+}
+.help {
+	position: absolute;
+	top: 3px;
+	right: 10px;
+}
+.help .fa-question {
+	color: #fff;
+}
+.help i:hover {
+	color: #bbb;
+}
+.canvas-menu {
+	background: #222;
+	overflow: auto;
+}
+.canvas-menu ul {
+	margin: 0px;
+	padding: 0px;
+	overflow: auto;
+}
+.canvas-menu ul li {
+	list-style-type: none;
+	float: left;
+}
+.canvas-menu ul li a {
+	padding: 4px 15px;
+	display: block;
+	color: #fff;
+}
+.canvas-menu ul li a:hover {
+	background: rgba(255,255,255,0.1);
+	color: #fff;
+	cursor: pointer;
+	text-decoration: none;
+}
+.canvas-menu ul li:last-of-type {
+	float: right;
+}
+.canvas-menu ul li:first-of-type a {
+	background: green;
+}
+.canvas-menu ul li:first-of-type a:hover {
+	background: rgba(0,128,0,0.6);
+}
+canvas {
+	background: url('../images/canvas.png');
+/*	width: 100%;
+	height: 500px;*/
+}
+
+.box {
+	background: #222;
+	border-radius: 2px;
+	margin-top: 40px;
+	color: #fff;
+}
+
+.box label {
+	color: #fff;
+}
+
+.box2 {
+	padding: 0px;
+}
+
+.bxox2 {
+	color: #fff;
+}
+.box2 a {
+	color: #fff;
+}
+.panel, .panel-default>.panel-heading {
+	background-color: #222;
+	border: none;
+	color: #fff;
+}
+.panel-heading:hover, .box2 .panel-heading:visited{
+	background: rgba(255,255,255,0.1);
+	color: #fff;
+}
+
+.fa-check {
+	color: green;
+}
+.fa-close {
+	color: red;
+}
+.btn-sm {
+	margin: 15px 0;
+	width: 100%;
+}
+.btn-custom {
+	color: #fff;
+	background-color: green;
+	border-color: green;
+	margin: 15px 0;
+	width: 100%;
+}
+.btn-custom:hover {
+	color: #aaa;
+
+}
+.green label {
+	color: green;
+}
+.box.box-left h4 {
+	border-bottom: 1px solid green;
+	padding: 0 10px 10px 15px;
+	margin: 15px -15px;
+}
+.box .panel-body {
+	border-top: 1px solid green !important;
+}
+
+.panel-heading {
+	padding: 0px;
+}
+.panel-heading .panel-title a {
+	display: block;
+	padding: 10px 15px;
+}
+.panel-heading .panel-title a:hover, .panel-heading .panel-title a:focus {
+	text-decoration: none;
+}
+
+ul {
+	padding: 0 0 0 15px;
+}
+#myModal ul {
+	padding-left: 40px;
+}
+.radio label:hover{
+	color: green;
+
+}
+.container.center{
+	width: 1170px;
+}
+.btn-danger {
+	background: #c9302c;
+}
+.btn-warning {
+	background: #d58512;
+	margin-bottom: 5px;
+}
