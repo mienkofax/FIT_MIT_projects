@@ -4,6 +4,7 @@ project(p1 CXX)
 find_library (POCO_FOUNDATION PocoFoundation)
 
 file(GLOB SOURCES
+	${PROJECT_SOURCE_DIR}/BTSInfo.cpp
 	${PROJECT_SOURCE_DIR}/CSVParser.cpp
 	${PROJECT_SOURCE_DIR}/GPSCoordinate.cpp
 	${PROJECT_SOURCE_DIR}/HataModel.cpp
