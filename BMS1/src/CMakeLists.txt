@@ -8,6 +8,7 @@ file(GLOB SOURCES
 	${PROJECT_SOURCE_DIR}/CSVParser.cpp
 	${PROJECT_SOURCE_DIR}/GPSCoordinate.cpp
 	${PROJECT_SOURCE_DIR}/HataModel.cpp
+	${PROJECT_SOURCE_DIR}/Location.cpp
 	${PROJECT_SOURCE_DIR}/UTMWrapper.cpp
 )
 
