@@ -8,6 +8,7 @@ file(GLOB TEST_SOURCES
 	${PROJECT_SOURCE_DIR}/CSVParserTest.cpp
 	${PROJECT_SOURCE_DIR}/GPSCoordinateTest.cpp
 	${PROJECT_SOURCE_DIR}/HataModelTest.cpp
+	${PROJECT_SOURCE_DIR}/UTMWrapperTest.cpp
 )
 
 include_directories(
