@@ -5,6 +5,7 @@ find_library(CPP_UNIT cppunit)
 find_library (POCO_FOUNDATION PocoFoundation)
 
 file(GLOB TEST_SOURCES
+	${PROJECT_SOURCE_DIR}/ApplicationTest.cpp
 	${PROJECT_SOURCE_DIR}/CSVParserTest.cpp
 	${PROJECT_SOURCE_DIR}/GPSCoordinateTest.cpp
 	${PROJECT_SOURCE_DIR}/HataModelTest.cpp
