@@ -5,6 +5,7 @@ find_library(CPP_UNIT cppunit)
 find_library (POCO_FOUNDATION PocoFoundation)
 
 file(GLOB TEST_SOURCES
+	${PROJECT_SOURCE_DIR}/CSVParserTest.cpp
 )
 
 include_directories(
