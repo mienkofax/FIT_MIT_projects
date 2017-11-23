@@ -8,6 +8,8 @@
 using namespace Poco;
 using namespace std;
 
+static const string MAP_LINK = "https://www.freemaptools.com/radius-around-point.htm?mt=r";
+
 Application::Application():
 	m_frequency(0),
 	m_mobileStationHeight(0)
@@ -152,4 +154,26 @@ void Application::setFrequency(double f)
 void Application::setMobileStationHeight(double Hm)
 {
 	m_mobileStationHeight = Hm;
+}
+
+string Application::toRadiusAroundPointMap() const
+{
+	string out = MAP_LINK;
+
+	for (size_t i = 0; i < m_measured.size(); i++) {
+		string data = "&r" + to_string(i + 1) + "=";
+
+		data += to_string(m_measured.at(i).first->gps()->DDLatitude());
+		data += "|";
+
+		data += to_string(m_measured.at(i).first->gps()->DDLongitude());
+		data += "|";
+
+		data += to_string(m_measured.at(i).second / 1000);
+		data += "|00FF00|1|FF0000";
+
+		out += data;
+	}
+
+	return out;
 }

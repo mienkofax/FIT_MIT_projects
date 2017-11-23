@@ -29,6 +29,8 @@ public:
 
 	GPSCoordinate::Ptr middlePointGPS() const;
 
+	std::string toRadiusAroundPointMap() const;
+
 protected:
 	/**
 	 * Save BTS from input file.
