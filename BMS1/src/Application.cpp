@@ -57,6 +57,10 @@ void Application::installBTSList()
 	while (!parser.eof()) {
 		const auto row = parser.nextRow();
 
+		// fix problem with empty last line
+		if (row.empty())
+			continue;
+
 		const int CID = NumberParser::parse(row[0]);
 		const int LAC = NumberParser::parse(row[1]);
 
