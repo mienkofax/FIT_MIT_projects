@@ -47,7 +47,7 @@ protected:
 	std::string m_btsFileName;
 	std::string m_measuredBTSFileName;
 	std::string m_outputFileName;
-	std::map<BTSInfoKey, BTSInfo::Ptr> m_btsInfo;
+	std::map<int, BTSInfo::Ptr> m_btsInfo;
 	std::vector<BTSInfo::Ptr> m_inputBTS;
 	std::vector<BTSDistance> m_measured;
 	GPSCoordinate::Ptr m_middlePointGPS;

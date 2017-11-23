@@ -6,19 +6,6 @@
 
 #include "GPSCoordinate.h"
 
-/**
- * Map key for BTS.
- */
-struct BTSInfoKey final {
-	int CID;
-	int LAC;
-
-	bool operator <(const BTSInfoKey &id) const
-	{
-		return CID < id.CID || (CID == id.CID && LAC < id.LAC);
-	}
-};
-
 class BTSInfo final {
 public:
 	typedef Poco::SharedPtr<BTSInfo> Ptr;

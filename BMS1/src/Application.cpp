@@ -67,7 +67,7 @@ void Application::installBTSList()
 		BTSInfo::Ptr bts = new BTSInfo(CID, LAC);
 		bts->setGPSCoordinate(GPSCoordinate::parseDMS(row[4]));
 
-		m_btsInfo.emplace(BTSInfoKey{CID, LAC}, bts);
+		m_btsInfo.emplace(CID, bts);
 	}
 }
 
@@ -90,9 +90,8 @@ void Application::installMeasuredBTS()
 			continue;
 
 		const int CID = NumberParser::parse(row[1]);
-		const int LAC = NumberParser::parse(row[0]);
 
-		auto it = m_btsInfo.find(BTSInfoKey{CID, LAC});
+		auto it = m_btsInfo.find(CID);
 		if (it == m_btsInfo.end()) {
 			cerr << "not found BTS, skip" << endl;
 			continue;
