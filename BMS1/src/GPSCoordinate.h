@@ -64,6 +64,8 @@ public:
 	 */
 	static GPSCoordinate::Ptr parseDMS(const std::string &coordinates);
 
+	bool isValid() const;
+
 private:
 	/**
 	 * Example of input: 49°11'23.10"N

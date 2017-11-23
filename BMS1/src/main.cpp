@@ -14,16 +14,24 @@ int main(int argc, char *argv[])
 		exit(Application::MISSING_MEASURED_BTS_FILE);
 	}
 
-	Application app;
+	try {
+		Application app;
 
-	app.setBTSFileName("bts.csv");
-	app.setMeasuredBTSFileName(argv[1]);
-	app.setOutputFileName("out.txt");
+		app.setBTSFileName("bts.csv");
+		app.setMeasuredBTSFileName(argv[1]);
+		app.setOutputFileName("out.txt");
 
-	app.setFrequency(FREQUENCY);
-	app.setMobileStationHeight(MOBILE_STATION_HEIGHT);
+		app.setFrequency(FREQUENCY);
+		app.setMobileStationHeight(MOBILE_STATION_HEIGHT);
 
-	app.start();
+		app.start();
+	}
+	catch (const Poco::Exception &ex) {
+		cerr << ex.message() << endl;
+	}
+	catch (...) {
+		cerr << "unhandled exception" << endl;
+	}
 
 	return EXIT_SUCCESS;
 }

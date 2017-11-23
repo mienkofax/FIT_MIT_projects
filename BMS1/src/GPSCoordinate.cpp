@@ -132,3 +132,9 @@ string GPSCoordinate::toDMSLongitudeString() const
 	       + NumberFormatter::format(iSecond, 2) + "\""
 	       + ((m_longitude.value() < 0) ? "W" : "E");
 }
+
+bool GPSCoordinate::isValid() const
+{
+	return !(m_latitude.isNull() || m_longitude.isNull()
+	       || isnan(m_latitude.value()) || isnan(m_longitude.value()));
+}

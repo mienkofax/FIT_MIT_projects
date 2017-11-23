@@ -36,12 +36,19 @@ void Application::start()
 	installBTSList();
 	installMeasuredBTS();
 
+	if (m_inputBTS.empty())
+		throw InvalidArgumentException("no input BTS file for calculation");
+
 	calculateDistance(m_frequency, m_mobileStationHeight);
 
 	Location loc;
 	const auto gps = loc.find(m_measured);
 
 	m_middlePointGPS = gps;
+
+	if (!gps->isValid())
+		throw RangeException("GPS coordinate is out of range");
+
 	saveToFile(gps);
 }
 
