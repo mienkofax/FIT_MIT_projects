@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 	}
 	catch (const Poco::Exception &ex) {
 		cerr << ex.message() << endl;
+		return EXIT_FAILURE;
 	}
 	catch (...) {
 		cerr << "unhandled exception" << endl;
