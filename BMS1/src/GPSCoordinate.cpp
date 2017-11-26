@@ -8,7 +8,7 @@
 using namespace Poco;
 using namespace std;
 
-static const string GOOGLE_LINK_PREFIX = "https://www.google.com/maps/place/";
+static const string GOOGLE_LINK_PREFIX = "www.google.com/maps/place/";
 
 GPSCoordinate::GPSCoordinate()
 {
