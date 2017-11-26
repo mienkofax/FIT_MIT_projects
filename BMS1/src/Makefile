@@ -21,7 +21,7 @@ OTHERS= Application.h \
 		Makefile
 
 all:
-	$(CC) $(FLAGS) $(FILES) -o p1 -L/usr/local/lib -L/usr/local/lib64 -lPocoFoundation -lPocoUtil
+	$(CC) $(FLAGS) $(FILES) -o p1 -L/usr/local/lib64 -lPocoFoundation -lPocoUtil
 
 clean:
 	/bin/rm -rf p1 $(LOGIN).zip
