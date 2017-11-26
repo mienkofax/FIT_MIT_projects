@@ -101,7 +101,7 @@ string GPSCoordinate::toDMSLatitudeString() const
 
 	double latitude = m_latitude;
 
-	if (latitude < 1)
+	if (latitude < 0)
 		latitude *= -1;
 
 	int iDegree = int(latitude);
@@ -121,7 +121,7 @@ string GPSCoordinate::toDMSLongitudeString() const
 
 	double longitude = m_longitude;
 
-	if (longitude < 1)
+	if (longitude < 0)
 		longitude *= -1;
 
 	int iDegree = int(longitude);
