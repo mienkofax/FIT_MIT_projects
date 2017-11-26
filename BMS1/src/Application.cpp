@@ -140,7 +140,7 @@ void Application::saveToFile(GPSCoordinate::Ptr gps)
 	ofstream out(m_outputFileName);
 
 	if (out.is_open()) {
-		out << gps->toGoogleMapLink() << endl;
+		out << gps->toGoogleMapLink() << "\n" << endl;
 		out.close();
 	}
 	else {
