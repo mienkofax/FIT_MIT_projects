@@ -38,6 +38,7 @@ string GPSCoordinate::toGoogleMapLink() const
 {
 	return GOOGLE_LINK_PREFIX
 		   + toDMSLatitudeString()
+		   + "+"
 		   + toDMSLongitudeString();
 }
 
