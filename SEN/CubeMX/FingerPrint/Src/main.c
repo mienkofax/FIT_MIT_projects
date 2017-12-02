@@ -41,6 +41,7 @@
 #include "stm32l4xx_hal.h"
 
 /* USER CODE BEGIN Includes */
+#include "AdafruitFingerPrint.h"
 
 /* USER CODE END Includes */
 
@@ -63,6 +64,17 @@ static void MX_USART1_UART_Init(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+
+#define PUSH_BUTTON 0
+
+HAL_StatusTypeDef readU(uint8_t *buffer, int len);
+HAL_StatusTypeDef writeU(uint8_t *buffer, int len);
+
+void fingerPrintEnroll();
+void fingerPrintDelete();
+void fingerPrintSearch();
+void blinkRedLED(size_t n, int timeout);
+void blinkBlueLED(size_t n, int timeout);
 
 /* USER CODE END 0 */
 
@@ -105,6 +117,35 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 
+	//check led status
+
+	  HAL_GPIO_TogglePin(L_GREEN_GPIO_Port, L_GREEN_Pin);
+	  HAL_Delay(150);
+	  HAL_GPIO_TogglePin(L_RED_GPIO_Port, L_RED_Pin);
+	  HAL_Delay(150);
+	  HAL_GPIO_TogglePin(L_BLUE_GPIO_Port, L_BLUE_Pin);
+	  HAL_Delay(150);
+
+	  HAL_GPIO_TogglePin(L_GREEN_GPIO_Port, L_GREEN_Pin);
+	  HAL_Delay(150);
+	  HAL_GPIO_TogglePin(L_RED_GPIO_Port, L_RED_Pin);
+	  HAL_Delay(150);
+	  HAL_GPIO_TogglePin(L_BLUE_GPIO_Port, L_BLUE_Pin);
+	  HAL_Delay(150);
+
+	  while (1) {
+		if (HAL_GPIO_ReadPin(BUTTON_3_GPIO_Port, BUTTON_3_Pin) == PUSH_BUTTON) {
+	  		HAL_GPIO_TogglePin(L_GREEN_GPIO_Port, L_GREEN_Pin);
+	  		fingerPrintEnroll();
+	  		HAL_GPIO_TogglePin(L_GREEN_GPIO_Port, L_GREEN_Pin);
+	  	}
+
+		if (HAL_GPIO_ReadPin(BUTTON_2_GPIO_Port, BUTTON_2_Pin) == PUSH_BUTTON) {
+			HAL_GPIO_TogglePin(L_GREEN_GPIO_Port, L_GREEN_Pin);
+			fingerPrintSearch();
+			HAL_GPIO_TogglePin(L_GREEN_GPIO_Port, L_GREEN_Pin);
+		}
+	  }
   }
   /* USER CODE END 3 */
 
@@ -247,6 +288,211 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+HAL_StatusTypeDef readU(uint8_t *buffer, int len)
+{
+	HAL_StatusTypeDef status = HAL_TIMEOUT;
+	status = HAL_UART_Receive(&huart1, (uint8_t *) buffer, len, 10000);
+
+	return status;
+}
+
+HAL_StatusTypeDef writeU(uint8_t *buffer, int len)
+{
+	return HAL_UART_Transmit(&huart1, buffer, len, HAL_MAX_DELAY);
+}
+
+void fingerPrintEnroll()
+{
+	struct AdafruitConfig conf = {0xffffffff, 0};
+	struct AdafruitPacket sentPacket = {{0}, 0};
+	struct AdafruitPacket receivePacket = {{0}, 0};
+	struct AdafruitPayload payload = {{0}, 0};
+
+	int ret = -1;
+
+	//verify password
+	sentPacket = verifyPassword(&conf);
+	writeU(sentPacket.data, sentPacket.len);
+	receivePacket.len = 12;
+	readU(receivePacket.data, 12);
+	ret = parsePacket(&receivePacket, &payload);
+
+	if (ret != PACKET_OK)
+		blinkRedLED(2, 150);
+	else
+		blinkBlueLED(1, 150);
+
+	//read image
+	while (1) {
+		sentPacket = readImage(&conf);
+		writeU(sentPacket.data, sentPacket.len);
+		receivePacket.len = 12;
+		readU(receivePacket.data, 12);
+		ret = parsePacket(&receivePacket, &payload);
+
+		if (ret != PACKET_OK || payload.data[1] != 0) {
+			blinkRedLED(1, 150);
+		}
+		else {
+			blinkBlueLED(1, 150);
+			break;
+		}
+	}
+
+	//convert image
+	sentPacket = convertImage(&conf, BUFFER_1);
+	writeU(sentPacket.data, sentPacket.len);
+	receivePacket.len = 12;
+	readU(receivePacket.data, 12);
+	ret = parsePacket(&receivePacket, &payload);
+
+	if (ret != PACKET_OK)
+		blinkRedLED(1, 150);
+	else
+		blinkBlueLED(1, 150);
+
+/*	//read image2
+	while (1) {
+		sentPacket = readImage(&conf);
+		writeU(sentPacket.data, sentPacket.len);
+		receivePacket.len = 12;
+		readU(receivePacket.data, 12);
+		ret = parsePacket(&receivePacket, &payload);
+
+		if (ret != PACKET_OK || payload.data[1] != 0) {
+			blinkRedLED(1, 150);
+		}
+		else {
+			blinkBlueLED(1, 150);
+			break;
+		}
+	}
+
+	//convert image2
+	sentPacket = convertImage(&conf, BUFFER_2);
+	writeU(sentPacket.data, sentPacket.len);
+	receivePacket.len = 12;
+	readU(receivePacket.data, 12);
+	ret = parsePacket(&receivePacket, &payload);
+
+	if (ret != PACKET_OK)
+		blinkRedLED(1, 150);
+	else
+		blinkBlueLED(1, 150);
+*/
+	//create model
+	sentPacket = createModel(&conf);
+	writeU(sentPacket.data, sentPacket.len);
+	receivePacket.len = 12;
+	readU(receivePacket.data, 12);
+	ret = parsePacket(&receivePacket, &payload);
+
+	if (ret != PACKET_OK)
+		blinkRedLED(1, 150);
+	else
+		blinkBlueLED(1, 150);
+
+	//store model
+	sentPacket = storeModel(&conf, BUFFER_1, 1);
+	writeU(sentPacket.data, sentPacket.len);
+	receivePacket.len = 12;
+	readU(receivePacket.data, 12);
+	ret = parsePacket(&receivePacket, &payload);
+
+	if (ret != PACKET_OK)
+		blinkRedLED(1, 150);
+	else
+		blinkBlueLED(1, 150);
+}
+
+void fingerPrintDelete()
+{
+
+}
+
+void fingerPrintSearch()
+{
+	struct AdafruitConfig conf = {0xffffffff, 0};
+	struct AdafruitPacket sentPacket = {{0}, 0};
+	struct AdafruitPacket receivePacket = {{0}, 0};
+	struct AdafruitPayload payload = {{0}, 0};
+
+	int ret = -1;
+
+	//verify password
+	sentPacket = verifyPassword(&conf);
+	writeU(sentPacket.data, sentPacket.len);
+	receivePacket.len = 12;
+	readU(receivePacket.data, 12);
+	ret = parsePacket(&receivePacket, &payload);
+
+	if (ret != PACKET_OK)
+		blinkRedLED(1, 150);
+	else
+		blinkBlueLED(1, 150);
+
+	//read image
+	while (1) {
+		sentPacket = readImage(&conf);
+		writeU(sentPacket.data, sentPacket.len);
+		receivePacket.len = 12;
+		readU(receivePacket.data, 12);
+		ret = parsePacket(&receivePacket, &payload);
+
+		if (ret != PACKET_OK || payload.data[1] != 0) {
+			blinkRedLED(1, 150);
+		}
+		else {
+			blinkBlueLED(1, 150);
+			break;
+		}
+	}
+
+	//convert image
+	sentPacket = convertImage(&conf, BUFFER_1);
+	writeU(sentPacket.data, sentPacket.len);
+	receivePacket.len = 12;
+	readU(receivePacket.data, 12);
+	ret = parsePacket(&receivePacket, &payload);
+
+	if (ret != PACKET_OK)
+		blinkRedLED(1, 150);
+	else
+		blinkBlueLED(1, 150);
+
+	// search
+	sentPacket = fastSearch(&conf);
+	writeU(sentPacket.data, sentPacket.len);
+	receivePacket.len = 16;
+	readU(receivePacket.data, 16);
+	ret = parsePacket(&receivePacket, &payload);
+
+	if (ret != PACKET_OK || payload.data[1] != 0)
+		blinkRedLED(1, 2000);
+	else {
+		blinkBlueLED(1, 2000);
+	}
+}
+
+void blinkRedLED(size_t n, int timeout)
+{
+	for (size_t i = 0; i < n; i++) {
+		HAL_GPIO_TogglePin(L_RED_GPIO_Port, L_RED_Pin);
+		HAL_Delay(timeout);
+		HAL_GPIO_TogglePin(L_RED_GPIO_Port, L_RED_Pin);
+		HAL_Delay(timeout);
+	}
+}
+
+void blinkBlueLED(size_t n, int timeout)
+{
+	for (size_t i = 0; i < n; i++) {
+		HAL_GPIO_TogglePin(L_BLUE_GPIO_Port, L_BLUE_Pin);
+		HAL_Delay(timeout);
+		HAL_GPIO_TogglePin(L_BLUE_GPIO_Port, L_BLUE_Pin);
+		HAL_Delay(timeout);
+	}
+}
 
 /* USER CODE END 4 */
 
