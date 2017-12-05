@@ -22,6 +22,8 @@ FILES= bms2A.cpp \
 	AbstractModulator.cpp \
 	Modulator.h \
 	Modulator.cpp \
+	Demodulator.h \
+	Demodulator.cpp \
 	Makefile
 
 zip:
