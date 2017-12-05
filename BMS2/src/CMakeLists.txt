@@ -3,6 +3,7 @@ project(bms2 CXX)
 
 file(GLOB SOURCES
 	${PROJECT_SOURCE_DIR}/AbstractModulator.cpp
+	${PROJECT_SOURCE_DIR}/Modulator.cpp
 	${PROJECT_SOURCE_DIR}/ModulatorException.cpp
 )
 

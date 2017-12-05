@@ -20,6 +20,8 @@ FILES= bms2A.cpp \
 	ModulatorException.cpp \
 	AbstractModulator.h \
 	AbstractModulator.cpp \
+	Modulator.h \
+	Modulator.cpp \
 	Makefile
 
 zip:
