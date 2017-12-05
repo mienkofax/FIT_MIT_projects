@@ -1,37 +1,35 @@
-/* 
- * File:   bms1A.cpp
- */
+#include <iostream>
 
-#include <cstdlib>
-#include <math.h>
+#include "ModulatorException.h"
+#include "Modulator.h"
 
-#include "sndfile.hh"
+using namespace std;
 
-#define SAMPLE_RATE 18000
-#define CHANELS 1
-#define FORMAT (SF_FORMAT_WAV | SF_FORMAT_PCM_24)
-#define AMPLITUDE (1.0 * 0x7F000000)
-#define FREQ (1000.0 / SAMPLE_RATE)
+int main(int argc, char** argv)
+{
+	if (argc != 2) {
+		cerr << "wrong arguments were entered" << endl;
+		return EXIT_FAILURE;
+	}
 
-/*
- * 
- */
-int main(int argc, char** argv) {
+	try {
+		Modulator modulator;
+		modulator.setInputFileName(argv[1]);
+		modulator.process();
+		modulator.save();
+	}
+	catch (const ModulatorException &ex) {
+		cerr << ex.message() << endl;
+		return EXIT_FAILURE;
+	}
+	catch (const std::exception &ex) {
+		cerr << ex.what() << endl;
+		return EXIT_FAILURE;
+	}
+	catch (...) {
+		cerr << "unknown error" << endl;
+		return EXIT_FAILURE;
+	}
 
-    SndfileHandle outputFile;
-    int *buffer = new int[SAMPLE_RATE];
-
-    
-    for (int i = 0; i < SAMPLE_RATE; i++)
-        buffer [i] = AMPLITUDE * sin(FREQ * 2 * i * M_PI);
-
-    
-    outputFile = SndfileHandle("sine.waw", SFM_WRITE, FORMAT, CHANELS, SAMPLE_RATE);
-
-    
-    outputFile.write(buffer, SAMPLE_RATE);
-
-    delete [] buffer;
-    return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
-
