@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.11)
 project(bms2 CXX)
 
 file(GLOB SOURCES
+	${PROJECT_SOURCE_DIR}/AbstractModulator.cpp
 	${PROJECT_SOURCE_DIR}/ModulatorException.cpp
 )
 

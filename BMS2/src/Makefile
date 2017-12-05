@@ -18,6 +18,8 @@ FILES= bms2A.cpp \
 	bms2B.cpp \
 	ModulatorException.h \
 	ModulatorException.cpp \
+	AbstractModulator.h \
+	AbstractModulator.cpp \
 	Makefile
 
 zip:
