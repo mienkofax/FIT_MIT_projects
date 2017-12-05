@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.11)
 project(bms2 CXX)
 
 file(GLOB SOURCES
-	${PROJECT_SOURCE_DIR}/sndfile.cpp
+	${PROJECT_SOURCE_DIR}/ModulatorException.cpp
 )
 
 include_directories(

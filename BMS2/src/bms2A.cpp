@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <math.h>
 
-#include "sndfile.cpp"
+#include "sndfile.hh"
 
 #define SAMPLE_RATE 18000
 #define CHANELS 1
