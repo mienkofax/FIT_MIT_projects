@@ -52,7 +52,8 @@ uint8_t rightShift(uint32_t n, uint8_t x)
 
 struct AdafruitPacket preparePacket(struct AdafruitConfig *conf, uint8_t packetType, struct AdafruitPayload *payload)
 {
-	uint8_t i = 0; // index
+	// index
+	uint8_t i = 0;
 	struct AdafruitPacket packet;
 
 	// Write start of header
@@ -76,7 +77,7 @@ struct AdafruitPacket preparePacket(struct AdafruitConfig *conf, uint8_t packetT
 	// Checksum = packet type (1 byte) + packet len (2 bytes) + payload (n bytes)
 	uint16_t checksum = packetType + ((uint8_t) len) + ((uint8_t) len >> 8);
 
-	// Write payload and calculation payload checksum
+	// Write payload and calculate payload checksum
 	for (size_t j = 0; j < payload->len; j++) {
 		packet.data[i++] = payload->data[j];
 		checksum += payload->data[j];
