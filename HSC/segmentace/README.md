@@ -114,3 +114,46 @@ void print_results(int frame, int threshold, int *hist, int n)
 	}
 ```
 
+### 5. bod
+
+- Do ```filter.cpp``` skopírovať z ```main_sw.c``` nasledujúce funkcie: ```buffer(),
+ clip_window(), shift_window(), system_input(), thresholding()``` a ```void pixel_processing()``` s nasledujúcim predpisom:
+```c++
+	void pixel_processing(t_pixel data_in, t_pixel &data_out, t_mcu_data mcu_data[MCU_SIZE])
+	{
+		static   ac_int<3,false>   threshold = 4;
+		static   ac_int<32,false>  frame = 1;
+		static   ac_int<1,false>   last_pixel;
+		t_pixel                    pix_filtered, window[9];
+
+		ac_int<4,false> mod10 = frame % 10;
+
+		if (!system_input(data_in, window, last_pixel))
+			return;
+
+		pix_filtered = median(window);
+
+		if (mod10 == 0)
+			mcu_data[FPGA_HISTOGRAM + pix_filtered]++;
+
+		data_out = thresholding(pix_filtered, threshold);
+
+		if (last_pixel) {
+			if (mod10 == 1 && frame != 1)
+				threshold = mcu_data[FPGA_THRESHOLD];
+
+			mcu_data[FPGA_FRAME_CNT] = frame;
+			frame++;
+		}
+	}
+```
+
+- ```filter()``` upraviť, tak aby volal metódu ```pixel_processing()``` nasledovne:
+```c++
+	else if (in_data_vld) {
+		pixel_processing(in_data, out_data, mcu_data);
+	}
+```
+
+- Upraviť dátové typy.
+
