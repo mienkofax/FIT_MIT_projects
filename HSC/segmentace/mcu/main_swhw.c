@@ -1,5 +1,6 @@
 #include <fitkitlib.h>
 #include "../fpga/src_filter/addr_space.h"
+#include "../cpu/common.h"
 
 /*******************************************************************************
  * Vypis uzivatelske napovedy (funkce se vola pri vykonavani prikazu "help")
@@ -50,6 +51,95 @@ void fpga_write(int addr, unsigned long data)
 	FPGA_SPI_RW_AN_DN(SPI_FPGA_ENABLE_WRITE, addr, (unsigned char *)&data, 2, 4);
 }
 
+
+/**
+ * Start content from main_sw.c
+ */
+
+/***************************************************************************
+ Funkce otsu() vypocte hodnotu prahu na zaklade histogramu pixelu snimku.
+
+ Vstupy:
+	hist    ukazatel na histogram
+	n       pocet polozek histogramu
+ Vystupy:
+	hodnota vypocteneho prahu
+***************************************************************************/
+int otsu(long *hist, int n)
+{
+	int   total = 0;
+	float sum = 0;
+	float sumB = 0, varMax = 0, varBetween;
+	int   wB = 0,  wF = 0, threshold = 0;
+	float mB, mF;
+	int   t;
+
+	for (t=0 ; t<n ; t++) {
+		sum += t * hist[t];
+		total += hist[t];
+	}
+
+	for (t=0 ; t<n; t++) {
+
+		wB += hist[t];             /* Weight Background */
+		if (wB == 0) continue;
+
+		wF = total - wB;           /* Weight Foreground */
+		if (wF == 0) break;
+
+		sumB += (float) (t * hist[t]);
+
+		mB = sumB / wB;            /* Mean Background */
+		mF = (sum - sumB) / wF;    /* Mean Foreground */
+
+		/* Calculate Between Class Variance */
+		varBetween = (float)wB * (float)wF * (mB - mF) * (mB - mF);
+
+		/* Check if new maximum found */
+		if (varBetween > varMax) {
+			varMax = varBetween;
+			threshold = t+1;
+		}
+	}
+
+	return threshold;
+}
+
+/**
+ * End copy content.
+ */
+
+/***************************************************************************
+ Pomocna procedura pro tisk vysledku
+
+ Vstupy:
+	frame       cislo sminku
+	threshold   vypocteny prah
+	hist        adresa histogramu
+	n           pocet polozek histogramu
+***************************************************************************/
+void print_results(int frame, int threshold, long *hist, int n)
+{
+	term_send_str("Frame: ");
+	term_send_num(frame);
+	term_send_crlf();
+
+	term_send_str("Histogram: ");
+	term_send_num(hist[0]);
+
+	int i;
+	for(i = 1; i < n; i++) {
+		term_send_str(", ");
+		term_send_num(hist[i]);
+	}
+
+	term_send_crlf();
+
+	term_send_str("Threshold: ");
+	term_send_num(threshold);
+	term_send_crlf();
+}
+
 /*******************************************************************************
  * Hlavni funkce
 *******************************************************************************/
@@ -71,6 +161,30 @@ int main(void)
 
 	term_send_str("Both FPGA and MCU are ready.");
 	term_send_crlf();
+
+	int new = 0, prev = 0, threshold = 0;
+	long unsigned his[PIXELS];
+	unsigned i;
+
+	while (1) {
+		new = fpga_read(FPGA_FRAME_CNT);
+		if (new != prev) {
+			if (new % 10 == 0) {
+				for (i = 0; i < PIXELS; i++){
+					his[i] = fpga_read(FPGA_HISTOGRAM + i);
+					fpga_write(FPGA_HISTOGRAM + i, 0);
+				}
+
+				threshold = otsu(his, PIXELS);
+				fpga_write(FPGA_THRESHOLD, threshold);
+			}
+
+			if (new % 100 == 0 && new <= FRAMES)
+				print_results(new, threshold, his, PIXELS);
+
+			prev = new;
+		}
+	}
 
 	/**************************************************************************/
 

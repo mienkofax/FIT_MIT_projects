@@ -82,4 +82,35 @@ void print_results(int frame, int threshold, int *hist, int n)
 
  - Následne je treba skompilovať na linuxe kód v adresári v cpu a overiť, či sa na fitkite a v terminaly vypíšu rovnaké hodnoty histogramu (chvíľu to trvá) a je nutné zakomentovať ```#define PROFILE```.
 
+### 4. bod
+
+- Prepísať v project.xml ```main_sw.c``` na ```main_swhw.c```.
+- Skopírovať funkcie ```otsu(), print_results``` do ```main_swhw.c```.
+- Do súboru ```main_swhw.c``` doplniť ```#include "../cpu/common.h"```.
+- V maine v súbore ```main_swhw.c``` upraviť main nasledovne:
+```c++
+	int new = 0, prev = 0, threshold = 0;
+	long unsigned his[PIXELS];
+	unsigned i;
+
+	while (1) {
+		new = fpga_read(FPGA_FRAME_CNT);
+		if (new != prev) {
+			if (new % 10 == 0) {
+				for (i = 0; i < PIXELS; i++){
+					his[i] = fpga_read(FPGA_HISTOGRAM + i);
+					fpga_write(FPGA_HISTOGRAM + i, 0);
+				}
+
+				threshold = otsu(his, PIXELS);
+				fpga_write(FPGA_THRESHOLD, threshold);
+			}
+
+			if (new % 100 == 0 && new <= FRAMES)
+				print_results(new, threshold, his, PIXELS);
+
+			prev = new;
+		}
+	}
+```
 
