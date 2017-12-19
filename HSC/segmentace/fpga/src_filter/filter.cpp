@@ -20,7 +20,7 @@ typedef ac_int<PIXEL_WIDTH,false> t_pixel_sw;
 ***************************************************************************/
 t_pixel median(t_pixel *window)
 {
-	ac_int<3, false>  i, j;
+	ac_int<4, false>  i, j;
 	t_pixel           max[10], max2[10];
 
 	Linit: for(i = 0; i < 9; i++)
@@ -213,8 +213,8 @@ t_pixel_sw thresholding(t_pixel_sw pixel, int threshold)
 ***************************************************************************/
 ac_int<1, false> system_input(t_pixel_sw din, t_pixel_sw *cliped_window, ac_int<1, false> *last_pixel)
 {
-	static ac_int<9, false>   c = 0, r = 0;
-	static ac_int<8, false>   c_filter = 0, r_filter = 0;
+	static ac_int<9, false>   c = 0, c_filter = 0;
+	static ac_int<8, false>   r = 0, r_filter = 0;
 	static ac_int<1, false>   output_vld = 0;
 	static t_pixel_sw         window[9];
 	t_pixel_sw                col_window[3];
@@ -257,7 +257,8 @@ void pixel_processing(t_pixel data_in, t_pixel &data_out, t_mcu_data mcu_data[MC
 
 	ac_int<4,false> mod10 = frame % 10;
 
-	if (!system_input(data_in, window, &last))
+	ac_int<1,false> dataOutCond = system_input(data_in, window, &last);
+	if (!dataOutCond)
 		return;
 
 	filtered = median(window);
@@ -294,7 +295,7 @@ void pixel_processing(t_pixel data_in, t_pixel &data_out, t_mcu_data mcu_data[MC
 void filter(t_pixel &in_data, bool &in_data_vld, t_pixel &out_data,
             t_mcu_data mcu_data[MCU_SIZE])
 {
-	static ac_int<1, false> mcu_ready = false;
+	static bool mcu_ready = false;
 
 	// Demo aplikace pro synchronizaci MCU - FPGA
 	if (!mcu_ready) {

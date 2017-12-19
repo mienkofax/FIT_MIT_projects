@@ -1,18 +1,18 @@
 //  Catapult University Version 10.0c/745553 (Production Release) Wed Oct 11 16:38:17 PDT 2017
-//  
+//
 //  Copyright (c) Mentor Graphics Corporation, 1996-2017, All Rights Reserved.
 //                       UNPUBLISHED, LICENSED SOFTWARE.
 //            CONFIDENTIAL AND PROPRIETARY INFORMATION WHICH IS THE
 //          PROPERTY OF MENTOR GRAPHICS OR ITS LICENSORS
-//  
+//
 //  Running on Windows 8 Fitkit@DESKTOP-NJUNEBJ  6.02 i686
-//  
-//  Package information: SIFLIBS v23.0_2.0, HLS_PKGS v23.0_1.0, 
+//
+//  Package information: SIFLIBS v23.0_2.0, HLS_PKGS v23.0_1.0,
 //                       DesignPad v2.78_1.0
-//  
-//  This version may only be used for academic purposes.  Some optimizations 
+//
+//  This version may only be used for academic purposes.  Some optimizations
 //  are disabled, so results obtained from this version may be sub-optimal.
-//  
+//
 solution new -state initial
 solution options defaults
 solution options set /Output/GenerateCycleNetlist false
@@ -62,9 +62,13 @@ solution library add Xilinx_RAMS
 go libraries
 directive set -CLOCKS {clk {-CLOCK_PERIOD 40.0 -CLOCK_EDGE rising -CLOCK_UNCERTAINTY 0.0 -CLOCK_HIGH_TIME 20.0 -RESET_SYNC_NAME rst -RESET_ASYNC_NAME arst_n -RESET_KIND sync -RESET_SYNC_ACTIVE high -RESET_ASYNC_ACTIVE low -ENABLE_ACTIVE high}}
 go assembly
-directive set /filter/core/main -PIPELINE_INIT_INTERVAL 2
+directive set /filter/core/main -PIPELINE_INIT_INTERVAL 4
 directive set /filter/out_data:rsc -MAP_TO_MODULE mgc_ioport.mgc_out_stdreg_en
 directive set /filter/in_data:rsc -MAP_TO_MODULE mgc_ioport.mgc_in_wire_en
 directive set /filter/mcu_data:rsc -MAP_TO_MODULE Xilinx_RAMS.BLOCK_SPRAM_RBW
+directive set /filter/core/main/Linit -UNROLL yes
+directive set /filter/core/main/L2 -UNROLL yes
+directive set /filter/core/main/L2/L1a -UNROLL yes
+directive set /filter/core/main/L2/L1b -UNROLL yes
 go architect
 go extract

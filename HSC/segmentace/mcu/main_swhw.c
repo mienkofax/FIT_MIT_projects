@@ -159,9 +159,6 @@ int main(void)
 	fpga_write(FPGA_MCU_READY, mcu_ready);
 	while(fpga_read(FPGA_MCU_READY) != 2);
 
-	term_send_str("Both FPGA and MCU are ready.");
-	term_send_crlf();
-
 	int new = 0, prev = 0, threshold = 0;
 	long unsigned his[PIXELS];
 	unsigned i;

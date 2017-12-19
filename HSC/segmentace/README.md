@@ -157,3 +157,24 @@ void print_results(int frame, int threshold, int *hist, int n)
 
 - Upraviť dátové typy.
 
+### 6. bod
+
+- Otvoriť Catapult a nastaviť working directory (Set Working Directory) na adresár ```fpga``` v ```segmentace```.
+
+- Spustenie scriptov sa vykonáva pomocou File -> Run Script.
+
+- Otvoriť script directives v adresári src_genpix. V adresári fpga sa vytvoril adresár
+
+- Otvoriť script directives v adresári src_genpix. V adresári fpga sa vytvoril adresár ```Catapult``` a v \on adresáre podľa toho aký ```*.tcl``` script sa spustil a vygeneroval výstup.
+
+- Vygenerovať výstup pre adresár ```gen_pixel```, ```File -> Run Script``` a otvoriť script ```fpga/src_genpix/directives.tcl```. Následne z adresára Catapult a aktuálneho vygenerovaného adresára prekopírovať ```concat_rtl.v```.
+
+- Podobne ako vyššie to isté spraviť aj pre ```src_filter```. Tam však nastane problém a treba to upraviť. V architecture treba nastaviť Pipeline init interval na 4 a urobiť unroll na všetky cykly. Po vygenerovaní nového ```*.tcl``` by mali pribudnúť nasledujúce riadky. Odporúčam vygenerovať nové tcl a ručne to nakopírovať do pôvondého. Potom znova prekopírovať ```concat_rtl.v```.
+```
+directive set /filter/core/main -PIPELINE_INIT_INTERVAL 4
+directive set /filter/core/main/Linit -UNROLL yes
+directive set /filter/core/main/L2 -UNROLL yes
+directive set /filter/core/main/L1a -UNROLL yes
+directive set /filter/core/main/L1b -UNROLL yes
+```
+
