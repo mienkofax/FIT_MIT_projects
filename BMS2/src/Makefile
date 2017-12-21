@@ -24,6 +24,8 @@ FILES= bms2A.cpp \
 	Modulator.cpp \
 	Demodulator.h \
 	Demodulator.cpp \
+	sndfile.hh \
+	sndfile.h \
 	Makefile
 
 zip:
