@@ -8,4 +8,4 @@ FILES= mcu/main_sw.c \
 	build/med_filtr.bin \
 	report.pdf
 zip:
-	zip xtisov00.zip $(FILES) 
+	zip projekt.zip $(FILES) 
