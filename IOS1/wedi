@@ -1,0 +1,290 @@
+#!/bin/sh
+
+#
+# @author Peter Tisovcik <xtisov00@fit.vutbr.cz
+#
+
+export LC_ALL=C
+m_pro=false
+l_pro=false
+a_pro=false
+b_pro=false
+ERR=0
+prepinac=false
+#WEDI_RC
+if [ -z "$WEDI_RC" ] ; then
+    echo "Neexistuje premenna WEDI_RC alebo nie je nastavena cesta." >&2
+    exit 1
+fi
+if [ -d "$WEDI_RC" ] ; then
+    echo "Existuje len adresar s rovnakym nazvom." >&2
+    exit 1
+fi
+
+#ak neexistuje subor vo $WEDI_RC, a ci sa ho podarilo vyvorit
+if [ ! -f "$WEDI_RC" ] ; then
+    touch "$WEDI_RC" 2>/dev/null
+    if [ "$?" -ne "0" ] ; then
+        echo "Nepodarilo sa vytvorit subor" >&2
+        exit 1
+    fi
+fi
+
+#EDITOR, VISUAL - osetrenie
+if [ -z "$EDITOR" ]; then
+    if [ -n "$VISUAL" ]; then
+        EDITOR=$VISUAL
+    else
+        echo "Nebol nastaveny editor v premennych EDITOR a VISUAL." >&2
+        exit 1
+    fi
+fi
+
+#zistenie ci existuje editor
+if [ -z "`which $EDITOR`" ]; then
+    echo "Neexistuje editor." >&2
+    exit 1
+fi
+
+#dopisanie udajov na koniec suboru
+#$1 - subor, ktory sa ma zapisat
+zapis () {
+    printf "%s|%s\n" "`date +%Y-%m-%d`" "`readlink -f -- "$1"`" >>"$WEDI_RC"
+}
+
+#zistenie ci existuje adresar
+is_dir () {
+    if [ ! -d "$1" ] ; then
+        echo "Bol zadany neexistujuci adresar." >&2
+        exit 1
+    fi
+}
+
+#funkcia overi ci bol zadany datum v spravnom formate
+#date - ulozia sa do premennej hodnoty datumu ak su v danom rozsahu
+#date_format - vyhladame format v tvare YYYY-MM-DD
+#$1 - premenna, v ktorej je ulozeny datum
+is_date () {
+    date=`echo "$1" | tr '-' ' ' | awk '$2 <= 12 && $3 <= 31{printf $1"-"$2"-"$3}'`
+    date_format=`echo "$1" | grep '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]$'`
+
+    if [ "$date" != "$date_format" ] ;  then
+        echo "Chybny format datumu." >&2
+        exit 1
+    fi
+}
+
+#funkcia spusti editor, popripadne vypise chybu
+#$1 - subor, ktory sa ma otvorit
+run_editor () {
+    if [ -z "$1" ] ; then
+        echo "V zadanom adresari neboli editovane ziadne subory." >&2
+        exit 1
+    fi
+
+    $EDITOR "$1"
+    OUT=$?
+    if [ -f "$1" ] ; then
+        zapis "$1"
+    fi
+    exit $OUT
+}
+
+#nahradenie specialnych znakov backslash, funkcia sluzi pre grep, aby to nebralo ako specialne znaky
+replace_char () {
+    echo "$1" | sed 's/[]!#[$^\\&"*]/\\&/g'
+}
+replace_file_name () {
+    echo "$1" | sed 's/\"/\\\"/' | sed 's/\@/8/'
+}
+
+#zobrazi najotvaranejsie subory
+#$1 - adresar, v ktorom sa ma hladat
+most () {
+    is_dir "$1"
+    rep_dir="`replace_char "$1"`"
+    #vyhlada sa cesta, zotriedi sa zisti sa pocet vyskytov,zotriedi sa podla poctu a vypise sa cesta
+    edit_path="$(while read -r line
+    do
+        line_data=`echo "$line" |  grep -o "${rep_dir}\/[^\/]*$"`
+        if [ -z "$line_data" ] ; then continue; fi
+        if [ -f "$line_data" ] ; then
+            echo "$line_data"
+        fi
+    done < "$WEDI_RC" | sort | uniq -c | sort -k1nr | grep -o "${rep_dir}\/[^\/]*$" | head -1)"
+    run_editor "$edit_path"
+}
+
+#funkcia zobrazi abecedne vypisany zoznam suborov, ktore boli v danom adresari editovane
+#overi sa ci existuje subor ak nie nevypise sa
+#$1 - adresar, z ktoreho sa vypise zoznam editovanych suborov
+list () {
+    is_dir "$1"
+    rep_dir="`replace_char "$1"`"
+    while read -r line
+    do
+        line_data=`echo "$line" |  grep -o "${rep_dir}\/[^\/]*$"`
+        if [ -z "$line_data" ] ; then continue; fi
+        if [ -f "$line_data" ]  ; then
+            echo "$line_data" | grep -o "[^\/]*$"
+        fi
+    done < "$WEDI_RC" | sort | uniq
+}
+
+#funkcia vypise subory, ktore boli editovane pred danym datumom
+#vypise subory v adresari, soradi ich, skontroluje ich podla datumu, vyhlada nazov suboru a vypise
+#$1 - absolutna cesta adresara
+#$2 - datu, po ktory sa ma hladat
+before () {
+    is_dir "$1"
+    is_date "$2"
+    rep_dir="`replace_char "$1"`"
+
+    while read -r line
+    do
+        date="`echo "$line" | grep -o "^[^\|]*" | tr -d '-'  `"
+        date2="`echo $2 | tr -d '-'`"
+        if [ "$date" -le "$date2" ] ; then
+            file="`echo $line |grep -o "${rep_dir}\/[^\/]*$" `"
+            if [ -f "$file" ] ; then
+                echo "$file"
+            fi
+        fi
+    done < "$WEDI_RC" | sort | uniq | grep -o "[^\/]*$"
+}
+
+after () {
+    is_dir "$1"
+    is_date "$2"
+    rep_dir="`replace_char "$1"`"
+
+    while read -r line
+    do
+        date="`echo "$line" | grep -o "^[^\|]*" | tr -d '-'  `"
+        date2="`echo $2 | tr -d '-'`"
+        if [ "$date" -ge "$date2" ] ; then
+            file="`echo $line |grep -o "${rep_dir}\/[^\/]*$"`"
+            if [ -f "$file" ] ; then
+                echo "$file"
+            fi
+        fi
+    done < "$WEDI_RC" | sort | uniq | grep -o "[^\/]*$"
+}
+#funkcia vypise posledny editovany subor
+#adresar, v ktorom sa ma vyhladavat
+last () {
+    real_path="`readlink -f -- "$1"`"
+    rep_dir="`replace_char "$real_path"`"
+
+    edit_path="$(while read -r line
+    do
+        line_data=`echo $line | grep -o "${rep_dir}\/[^\/]*$"`
+        if [ -z "$line_data" ] ; then continue; fi
+        if [ -f "$line_data" ] ; then
+            echo "$line_data"
+        fi
+    done < "$WEDI_RC" | tail -1)"
+    run_editor "$edit_path"
+}
+#osetrenie argumentov
+while getopts :mm:ll:b:a: o
+do
+    case "$o" in
+    #wedi -m [ADRESAR]
+    m)  m_pro=true
+        prepinac=true
+        ERR=`expr $ERR + 1` ;;
+    #wedi -l [ADRESAR]
+    l)  l_pro=true
+        prepinac=true
+        ERR=`expr $ERR + 1` ;;
+    #wedi -b DARUM [ADRESAR]
+    b)  b_pro=true
+        prepinac=true
+        ERR=`expr $ERR + 1` ;;
+    #wedi -a DATUM [ADRESAR]
+    a)  a_pro=true
+        prepinac=true
+        ERR=`expr $ERR + 1` ;;
+    *)  ERR=2 ;;
+    #default
+    esac
+done
+
+#ak bolo zadanych viac alebo ak boli zadane nespravne argumenty
+if [ "$ERR" -gt "1" ] ; then
+    echo "Boli zadane nespravne argumenty." >&2
+    exit 1
+fi
+
+#wedi -m [ADRESAR]
+if [ $m_pro = true ] ; then
+        #bez suboru
+        if [ $# -eq 1 ] ; then
+            most "`readlink -f -- .`"
+        #so suborom
+        elif [ $# -eq 2 ] ; then
+            most "`readlink -f -- "$2"`"
+        else
+            ERR=true
+        fi
+
+#wedi -l [ADRESAR]
+elif [ $l_pro = true ] ; then
+        #bez suboru
+        if [ $# -eq 1 ] ; then
+            list "`readlink -f -- .`"
+        #so suborom
+        elif [ $# -eq 2 ] ; then
+            list "`readlink -f -- "$2"`"
+        else
+            ERR=true
+        fi
+
+#wedi -b DARUM [ADRESAR]
+elif [ $b_pro = true ] ; then
+        #s datumom, bez suboru
+        if [ $# -eq 2 ] ; then
+            before "`readlink -f -- .`" "$2"
+        #s datumom, so suborom
+        elif [ $# -eq 3 ] ; then
+            before "`readlink -f -- "$3"`" "$2"
+        else
+            ERR=true
+        fi
+
+#wedi -a DATUM [ADRESAR]
+elif [ $a_pro = true ] ; then
+        #s datumom, bez suboru
+        if [ $# -eq 2 ] ; then
+            after "`readlink -f -- .`" "$2"
+        #s datumom, so suborom
+        elif [ $# -eq 3 ] ; then
+            after "`readlink -f -- "$3"`" "$2"
+        else
+            ERR=true
+        fi
+fi
+
+#wedi [ADRESAR]
+#bez argumentov, 0 argumentov a nenacitany ziaden prepinac
+if [ $# -eq 0 ] ; then
+    last "."
+#s argumentmi, 1 argument a nenacitany ziaden prepinac
+elif [ $# -eq 1 -a $prepinac = "false" ] ; then
+    #s argumentom, s adresarom
+    if [ -d "$1" ] ; then
+        last "$1"
+    #s argumentom, so suborom
+    else
+        run_editor "$1"
+    fi
+#ak bolo zadanych viac argumentov ako je mozne, wedi nieco nieco...
+elif [ "$prepinac" = false -a $# -ge 2 ] ; then
+    ERR=true
+fi
+
+if [ "$ERR" = "true" ] ; then
+    echo "Boli zadane nezname alebo chybne argumenty." >&2
+    exit 1
+fi
