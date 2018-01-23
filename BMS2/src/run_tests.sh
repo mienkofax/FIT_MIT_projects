@@ -148,3 +148,4 @@ testDemodulation "35 - Modulacia1, 24PCM, 25 vzoriek na signalovu jednotku: demo
 
 testDemodulation "36 - Modulacia1, 24PCM, 15 vzoriek na signalovu jednotku: wav obsahuje len synchronizaciu" "test36.wav" "OK" "OK"
 testDemodulation "37 - ukazkovy kod zo zadania" "test37.wav" "OK" "OK"
+testDemodulation "38 - testovaci vstup z referencneho hodnotenia" "test38.wav" "OK" "OK"
