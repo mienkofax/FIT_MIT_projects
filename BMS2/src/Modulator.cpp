@@ -18,7 +18,6 @@ using namespace std;
 const double CALC = FREQ * 2 * M_PI;
 
 Modulator::Modulator():
-	m_buffer(new int[SAMPLE_RATE]),
 	m_length(0)
 {
 }
@@ -70,8 +69,10 @@ void Modulator::process()
 	setSyncSequence(q);
 	loadData(q);
 
+	m_buffer = new int[q.size() * SAMPLES];
+
 	long i = 0;
-	while (!q.empty() && i < SAMPLE_RATE) {
+	while (!q.empty()) {
 		char c1, c2;
 
 		c1 = q.front();
@@ -79,7 +80,7 @@ void Modulator::process()
 		c2 = q.front();
 		q.pop();
 
-		for (int j = 0; j < SAMPLES && i < SAMPLE_RATE; i++, j++)
+		for (int j = 0; j < SAMPLES; i++, j++)
 			modulate(c1, c2, i);
 	}
 
