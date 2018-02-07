@@ -1,0 +1,6 @@
+subor2, riadok1
+subor2, riadok2
+subor2, riadok3
+subor2, riadok4
+subor2, riadok5
+subor2, riadok6

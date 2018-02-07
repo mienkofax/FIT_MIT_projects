@@ -1,0 +1,3 @@
+[submodule "FLP1/tests"]
+	path = FLP1/tests
+	url = git@github.com:mienkofax/simplify-bkg-tests.git
