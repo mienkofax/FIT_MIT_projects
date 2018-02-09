@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.11)
-project(sen-test-suite CXX)
+project(senTestSuite CXX)
 
 add_definitions(-std=c++11 -Wall -pedantic -Wextra)
 
@@ -16,7 +16,7 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/../../common
 )
 
-add_library(SENTestSuite ${TEST_SOURCES})
+add_library(senTestSuite-lib ${TEST_SOURCES})
 
 add_executable(${PROJECT_NAME} ../../common/test.cpp)
 
@@ -26,9 +26,9 @@ set(LIBS
 
 target_link_libraries(${PROJECT_NAME}
 	-Wl,--whole-archive
-	CommonPeto
-	SENTestSuite
-	senAPI
+	sen-lib
+	common-lib
+	senTestSuite-lib
 	-Wl,--no-whole-archive
 	${LIBS}
 )
