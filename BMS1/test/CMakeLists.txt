@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.11)
-project(test-suite CXX)
+project(bms1TestSuite CXX)
 
 find_library(CPP_UNIT cppunit)
 find_library (POCO_FOUNDATION PocoFoundation)
@@ -19,7 +19,7 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/../../common
 )
 
-add_library(TestSuite ${TEST_SOURCES})
+add_library(bms1TestSuite-lib ${TEST_SOURCES})
 
 add_executable(${PROJECT_NAME} ../../common/test.cpp)
 
@@ -30,9 +30,9 @@ set(LIBS
 
 target_link_libraries(${PROJECT_NAME}
 	-Wl,--whole-archive
-	CommonPeto
-	TestSuite
-	ExampleCmake
+	common-lib
+	bms1TestSuite-lib
+	bms1-lib
 	-Wl,--no-whole-archive
 	${LIBS}
 )

@@ -12,12 +12,12 @@ include_directories(
 	${PROJECT_SOURCE_DIR}
 )
 
-add_library(BMS2Lib ${SOURCES})
+add_library(bms2-lib ${SOURCES})
 
 add_executable("bms2A" ${PROJECT_SOURCE_DIR}/bms2A.cpp)
 target_link_libraries("bms2A"
 	-Wl,--whole-archive
-	BMS2Lib
+	bms2-lib
 	${PROJECT_SOURCE_DIR}/libsndfile.a
 	-Wl,--no-whole-archive
 )
@@ -25,8 +25,7 @@ target_link_libraries("bms2A"
 add_executable("bms2B" bms2B.cpp)
 target_link_libraries("bms2B"
 	-Wl,--whole-archive
-	BMS2Lib
+	bms2-lib
 	${PROJECT_SOURCE_DIR}/libsndfile.a
 	-Wl,--no-whole-archive
 )
-

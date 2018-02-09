@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.11)
-project(CommonPeto CXX)
+project(common-lib CXX)
 
 file(GLOB COMMON_SOURCES
 	${PROJECT_SOURCE_DIR}/TapOutputter.cpp

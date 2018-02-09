@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.11)
-project(p1 CXX)
+project(bms1 CXX)
 
 find_library (POCO_FOUNDATION PocoFoundation)
 
@@ -17,7 +17,7 @@ include_directories(
 	${PROJECT_SOURCE_DIR}
 )
 
-add_library(ExampleCmake ${SOURCES})
+add_library(bms1-lib ${SOURCES})
 
 add_executable(${PROJECT_NAME} main.cpp)
 
@@ -27,7 +27,7 @@ set(LIBS
 
 target_link_libraries(${PROJECT_NAME}
 	-Wl,--whole-archive
-	ExampleCmake
+	bms1-lib
 	-Wl,--no-whole-archive
 	${LIBS}
 )

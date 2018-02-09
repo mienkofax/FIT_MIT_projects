@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <unistd.h>
+
 #include "AdafruitFingerPrint.h"
 
 using namespace std;
