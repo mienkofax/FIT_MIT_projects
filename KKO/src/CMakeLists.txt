@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(kko CXX)
 
+set_source_files_properties(gif2bmp.c PROPERTIES LANGUAGE CXX)
+set_source_files_properties(main.c PROPERTIES LANGUAGE CXX)
+
 file(GLOB SOURCES
 	${PROJECT_SOURCE_DIR}/gif2bmp.c
 )
