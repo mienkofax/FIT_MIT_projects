@@ -20,6 +20,7 @@ clean:
 FILES= main.c \
 	gif2bmp.c \
 	gif2bmp.h \
+	gif2bmp.pdf \
 	Makefile
 
 zip:
