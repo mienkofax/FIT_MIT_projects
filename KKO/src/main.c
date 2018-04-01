@@ -91,8 +91,8 @@ int main(int argc, char *argv[])
 
 		if (out.is_open()) {
 			out << "login = xtisov00" << endl;
-			out << "uncodedSize = " << stat.gifSize << endl;
-			out << "codedSize = " << stat.bmpSize << endl << endl;
+			out << "uncodedSize = " << stat.bmpSize << endl;
+			out << "codedSize = " << stat.gifSize << endl << endl;
 			out.close();
 		}
 		else {
