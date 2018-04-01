@@ -23,16 +23,16 @@ public:
 	void testParseGIF();
 };
 
-class TestabeGIF : public GIF {
+class TestabeGIF : public GIFImage {
 public:
-	using GIF::GIF;
-	using GIF::parseHeader;
-	using GIF::parseLogicalScreenDescriptor;
-	using GIF::parseColors;
-	using GIF::parseImageDescriptor;
+	using GIFImage::GIFImage;
+	using GIFImage::parseHeader;
+	using GIFImage::parseLogicalScreenDescriptor;
+	using GIFImage::parseColors;
+	using GIFImage::parseImageDescriptor;
 
 	TestabeGIF():
-		GIF()
+		GIFImage()
 		{}
 };
 

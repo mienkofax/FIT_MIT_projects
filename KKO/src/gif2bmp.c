@@ -16,11 +16,11 @@ static map<Interlace, size_t> interlaceMap = {
 	{EVERY_MISSING_ODD_LINE, 2},
 };
 
-GIF::GIF()
+GIFImage::GIFImage()
 {
 }
 
-GIF::GIF(vector <uint8_t> &rawData, FILE *output)
+GIFImage::GIFImage(vector <uint8_t> &rawData, FILE *output)
 {
 	auto index = rawData.begin();
 	m_gifSize = rawData.size();
@@ -50,7 +50,7 @@ GIF::GIF(vector <uint8_t> &rawData, FILE *output)
 			parseExtensions(++index);
 		}
 		else if (*index == GIF_IMAGE_DESCRIPTOR) {
-			doLWZ(output, index);
+			doLZW(output, index);
 
 			if (m_graphicsControl.delayTime > 0) {
 				cerr << "input gif is animated, output bmp file contains first image from gif" << endl;
@@ -63,7 +63,7 @@ GIF::GIF(vector <uint8_t> &rawData, FILE *output)
 	}
 }
 
-void GIF::parseExtensions(vector<uint8_t>::iterator &index)
+void GIFImage::parseExtensions(vector<uint8_t>::iterator &index)
 {
 	switch (*index) {
 	case GIF_GRAPHICS_CONTROL_EXTENSION:
@@ -89,7 +89,7 @@ void GIF::parseExtensions(vector<uint8_t>::iterator &index)
 	}
 }
 
-void GIF::doLWZ(FILE *output, vector<uint8_t>::iterator &index)
+void GIFImage::doLZW(FILE *output, vector<uint8_t>::iterator &index)
 {
 	string inputBits;
 	map<int64_t, vector<Rgb>> hashColorIndexes;
@@ -228,7 +228,7 @@ void GIF::doLWZ(FILE *output, vector<uint8_t>::iterator &index)
 	exportToBMP(output);
 }
 
-void GIF::fillLocalColorTable(vector<uint8_t>::iterator &index)
+void GIFImage::fillLocalColorTable(vector<uint8_t>::iterator &index)
 {
 	if (m_imageDescriptor.localColorTable) {
 		parseColors({index, index + m_imageDescriptor.localColorTableSize * 3}, m_localColorTable);
@@ -239,7 +239,7 @@ void GIF::fillLocalColorTable(vector<uint8_t>::iterator &index)
 	}
 }
 
-void GIF::exportToBMP(FILE *output)
+void GIFImage::exportToBMP(FILE *output)
 {
 	if (m_outputColors.size() < size_t(m_screenDescriptor.width * m_screenDescriptor.height))
 		throw CustomException("problem with parse gif file, invalid count of colors");
@@ -260,7 +260,7 @@ void GIF::exportToBMP(FILE *output)
 	toBMP(interlaceOut, output, m_screenDescriptor.width, m_screenDescriptor.height);
 }
 
-void GIF::doInterlaceStep(vector<Rgb> &in, vector<Rgb> &out, Interlace interlace)
+void GIFImage::doInterlaceStep(vector<Rgb> &in, vector<Rgb> &out, Interlace interlace)
 {
 	static size_t j = 0;
 
@@ -283,7 +283,7 @@ void GIF::doInterlaceStep(vector<Rgb> &in, vector<Rgb> &out, Interlace interlace
 	}
 }
 
-void GIF::appendColor(const vector<Rgb> &colors, vector<Rgb> &outputColors)
+void GIFImage::appendColor(const vector<Rgb> &colors, vector<Rgb> &outputColors)
 {
 	for (const Rgb &it : colors) {
 		outputColors.push_back(it);
@@ -296,7 +296,7 @@ void GIF::appendColor(const vector<Rgb> &colors, vector<Rgb> &outputColors)
 	}
 }
 
-void GIF::toBMP(const vector<Rgb> &colors, FILE *output,
+void GIFImage::toBMP(const vector<Rgb> &colors, FILE *output,
 	uint16_t width, uint16_t height)
 {
 	BMPHeader header;
@@ -321,7 +321,7 @@ void GIF::toBMP(const vector<Rgb> &colors, FILE *output,
 	BMPWriteColors({colors.begin(), colors.begin()+width*height}, output, width, 4);
 }
 
-void GIF::BMPWriteColors(const vector<Rgb> &colors, FILE *output,
+void GIFImage::BMPWriteColors(const vector<Rgb> &colors, FILE *output,
 	uint16_t width, size_t colorResolution)
 {
 	const size_t alignCount = calculateAlign(width, colorResolution);
@@ -348,18 +348,18 @@ void GIF::BMPWriteColors(const vector<Rgb> &colors, FILE *output,
 	}
 }
 
-size_t GIF::bmpSize() const
+size_t GIFImage::bmpSize() const
 {
 	return BMP_HEADER_SIZE + BMP_INFO_HEADER_SIZE
 		   + m_screenDescriptor.width * m_screenDescriptor.height * 4;
 }
 
-size_t GIF::gifSize() const
+size_t GIFImage::gifSize() const
 {
 	return m_gifSize;
 }
 
-GifHeader GIF::parseHeader(const vector<uint8_t> &data)
+GifHeader GIFImage::parseHeader(const vector<uint8_t> &data)
 {
 	if (data.size() != GIF_HEADER_SIZE)
 		throw CustomException("gif header size is too short");
@@ -374,7 +374,7 @@ GifHeader GIF::parseHeader(const vector<uint8_t> &data)
 	return header;
 }
 
-GifScreenDescriptor GIF::parseLogicalScreenDescriptor(const vector<uint8_t> &data)
+GifScreenDescriptor GIFImage::parseLogicalScreenDescriptor(const vector<uint8_t> &data)
 {
 	if (data.size() != GIF_LOGICAL_SCREEN_DESCRIPTOR_SIZE)
 		throw CustomException("gif logical screen descriptor is too short");
@@ -392,7 +392,7 @@ GifScreenDescriptor GIF::parseLogicalScreenDescriptor(const vector<uint8_t> &dat
 	return desc;
 }
 
-void GIF::parseColors(const vector<uint8_t> &data, vector<Rgb> &colors)
+void GIFImage::parseColors(const vector<uint8_t> &data, vector<Rgb> &colors)
 {
 	if (data.size() % 3 != 0)
 		throw CustomException("colors data has invalid size");
@@ -406,7 +406,7 @@ void GIF::parseColors(const vector<uint8_t> &data, vector<Rgb> &colors)
 	}
 }
 
-GifImageDescriptor GIF::parseImageDescriptor(const vector<uint8_t> &data)
+GifImageDescriptor GIFImage::parseImageDescriptor(const vector<uint8_t> &data)
 {
 	if (data.size() != GIF_IMAGE_DESCRIPTOR_SIZE)
 		throw CustomException("image descriptor has invalid size");
@@ -427,7 +427,7 @@ GifImageDescriptor GIF::parseImageDescriptor(const vector<uint8_t> &data)
 	return desc;
 }
 
-GifGraphicsControl GIF::parseGraphicsControl(const vector<uint8_t> &data)
+GifGraphicsControl GIFImage::parseGraphicsControl(const vector<uint8_t> &data)
 {
 	GifGraphicsControl control;
 
@@ -445,7 +445,7 @@ GifGraphicsControl GIF::parseGraphicsControl(const vector<uint8_t> &data)
 	return control;
 }
 
-size_t GIF::calculateAlign(size_t width, size_t coloResolution) const
+size_t GIFImage::calculateAlign(size_t width, size_t coloResolution) const
 {
 	return ((-1 * coloResolution * width) % 4);
 }
@@ -467,7 +467,7 @@ int gif2bmp(tGIF2BMP *gif2bmp, FILE *inputFile, FILE *outputFile)
 	rawData.pop_back();
 
 	try {
-		GIF gif(rawData, outputFile);
+		GIFImage gif(rawData, outputFile);
 
 		gif2bmp->bmpSize = gif.bmpSize();
 		gif2bmp->gifSize = gif.gifSize();

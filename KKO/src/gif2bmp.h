@@ -231,7 +231,7 @@ private:
  * @see http://www.di.unito.it/~marcog/SM/BMPformat-Wiki.pdf
  * @see https://www.root.cz/clanky/graficky-format-bmp-pouzivany-a-pritom-neoblibeny/
  */
-class GIF {
+class GIFImage {
 public:
 	/**
 	 * Rozparsovanie vstupnych dat, postupne sa rozparsuje header block a overi sa
@@ -239,7 +239,7 @@ public:
 	 * Potom sa zisti, ci existuje globalna tabulka farieb ak ano nacita sa. Naslene sa
 	 * nacita zvysok suboru a to bud jednotlive rozsirenia az pokial nepride koniec.
 	 */
-	GIF(std::vector<uint8_t> &rawData, FILE *output);
+	GIFImage(std::vector<uint8_t> &rawData, FILE *output);
 
 	/**
 	 * Metoda zisti o ake rozsirenie sa jedna a rozparsuje ho ak je to potrebne.
@@ -256,7 +256,7 @@ public:
 	 * stringu sa potupne odoberaju jednotlive bity na zaklade dlzky LWZ slova.
 	 * Ak je tabulka plna zvacsi sa LWZ slovo o jedna az do dlzky 12bitov.
 	 */
-	void doLWZ(FILE *output, std::vector<uint8_t>::iterator &index);
+	void doLZW(FILE *output, std::vector<uint8_t>::iterator &index);
 
 	/**
 	 * Naplnenie tabulky farieb, v ktorej sa budu vyhladavat jednotlive
@@ -331,7 +331,7 @@ protected:
 	/**
 	 * Prazdny konstruktor pre moznost testovania.
 	 */
-	GIF();
+	GIFImage();
 
 	/**
 	 * Rozparsovanie header segmentu.
