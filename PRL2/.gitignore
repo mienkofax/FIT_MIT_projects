@@ -1,0 +1,5 @@
+pro
+cmake-build-debug
+build
+
+
