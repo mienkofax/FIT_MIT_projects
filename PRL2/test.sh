@@ -15,4 +15,4 @@ CPU=$((INPUT_SIZE * 2 - 2))
 mpic++ --prefix /usr/local/share/OpenMPI -std=c++11 -o ${BIN_NAME} pro.cpp
 mpirun --prefix /usr/local/share/OpenMPI -np ${CPU} ${BIN_NAME} ${VALUES}
 
-#rm -f ${BIN_NAME}
+rm -f ${BIN_NAME}
