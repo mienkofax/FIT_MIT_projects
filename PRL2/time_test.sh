@@ -60,8 +60,9 @@ AVG=0
 for k in $(seq 0 9)
 do
 	OUT="$(${BINNARY} ${INPUTS[$i]})"
-	TMP=$( echo $OUT | grep -o -E '[0-9]+.[0-9]*')
+	TMP="${OUT//[$'\t\r\n ']}"
+	TMP=$( echo $TMP | grep -P -o "[0-9]+" | head -1)
 	AVG=`echo $AVG + $TMP | bc`
 done
-echo `python -c "print $AVG / 10"`
+echo `python -c "print ${AVG} / 10"`
 done
