@@ -9,8 +9,18 @@
 
 using namespace std;
 
+void my_packet_handler(
+	u_char *args,
+	const struct pcap_pkthdr* header,
+	const u_char* packet
+);
+
 int main(int argc, char *argv[])
 {
+	if (argc != 3) {
+		cerr << "invalid number of arguments" << endl;
+		return EXIT_FAILURE;
+	}
 	string devName;
 	int c;
 	while ((c = getopt(argc, argv, "i:")) != -1) {
@@ -19,7 +29,7 @@ int main(int argc, char *argv[])
 			devName = optarg;
 			break;
 		default:
-			cerr << "invalid number of arguments" << endl;
+			cerr << "invalid arguments" << endl;
 			return EXIT_FAILURE;
 		}
 	}
@@ -48,37 +58,7 @@ int main(int argc, char *argv[])
 		cerr << err << endl;
 		return EXIT_FAILURE;
 	}
-
-	cout << sizeof(DHCPMessage)<< endl;
-	Tmp tt;
-	{
-
-		for (int i = 0; i < 6; i++) {
-			tt.dstMac[i] = 0xff;
-			tt.srcMac[i] = 0;
-			tt.srcAddr[i] = 0;
-			tt.dstAddr[i] = 0xff;
-		}
-		tt.ipType = 0x0008;
-		tt.version = 0x45;
-		tt.servField = 0;
-		tt.totLength = 0x2001;
-		tt.identification = 0;
-
-		tt.hdrFlags = 0x40;
-		tt.offset = 0;
-		tt.ttl = 0;
-		tt.protocol = 0x11;
-		tt.ipSum = 0;
-
-		tt.srcPort = 0x4400;
-		tt.dstPort = 0x4300;
-
-		tt.len = 0x0c01;
-		tt.udpCheckSum = 0;
-
-
-	}
+	srand(time(nullptr));
 
 	pcap_t *handle;
 	char errbuff[PCAP_ERRBUF_SIZE] = {0};
@@ -88,20 +68,73 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
+	struct bpf_program filter;
+	char filter_exp[] = "port 68";
+	bpf_u_int32 ip;
+	if (pcap_compile(handle, &filter, filter_exp, 0, ip) == -1) {
+		printf("Bad filter - %s\n", pcap_geterr(handle));
+		return 2;
+	}
+	if (pcap_setfilter(handle, &filter) == -1) {
+		printf("Error setting filter - %s\n", pcap_geterr(handle));
+		return 2;
+	}
 
 	DHCPMessage msg;
+	msg.setEthMAC({0x1c, 0x1b, 0x0d, 0x04, 0x7d, 0x50});
+	msg.setFakeClientMAC({0x2c, 0x1b, 0x0d, 0x04, 0x7d, 0x50});
+	msg.setTransactionID(0x78945);
 
-	struct pcap_pkthdr pcapHeader;
+	auto *buffer = new uint8_t[1024];
+	size_t velkost = msg.raw(buffer);
+	pcap_sendpacket(handle, (const u_char *) buffer, velkost);
 
-	Tmp wawa;
-	cout << "weee" << endl;
-	cout << pcap_sendpacket(handle, (const u_char *) &msg, sizeof(msg)) << endl;
-	//cout << sizeof(msg) << endl;
 
-//	TEthHeader header = {{0,1,2,3,4,5}, {6,7,8,9,10,11}, 6};
+	pcap_loop(handle, 10, my_packet_handler, NULL);
+	pcap_close(handle);
 
-//	cout << header.toString("\n") << endl;
-
-	srand(time(nullptr));
 	return EXIT_SUCCESS;
+}
+
+void my_packet_handler(
+	u_char *args,
+	const struct pcap_pkthdr* header,
+	const u_char* packet
+)
+{
+	/*const uint8_t *buf = (const uint8_t *) packet;
+
+	for (int k = 0; k < header->caplen; k++)
+		cout << PcapUtil::intToHex(buf[k], "0x") << " ";*/
+
+	TEthHeader *h1 = (TEthHeader *) packet;
+	cout << h1->toString("\n") << endl;
+
+	TIP4Header *h2 = (TIP4Header *) (packet + h1->raw().size());
+	cout << h2->toString("\n") << endl;
+
+	TUDPHeader *h3 = (TUDPHeader *) (packet + h1->raw().size() + h2->raw().size());
+	cout << h3->toString("\n") << endl;
+
+	TDHCPHeader *h4 = (TDHCPHeader *) (packet + h1->raw().size() + h2->raw().size() + h3->raw().size());
+	cout << h4->toString("\n") << endl;
+
+	if (h4->opCode == 2) {
+		h4->opCode = 3;
+
+		/*setEthMAC({0x1c, 0x1b, 0x0d, 0x04, 0x7d, 0x50});
+		msg.setFakeClientMAC({0x2c, 0x1b, 0x0d, 0x04, 0x7d, 0x50});
+		msg.setTransactionID(0x78945);*/
+
+	}
+
+
+
+	static int i = 0;
+	cout << i << "wawa" << endl;
+
+	if (i == 5)
+		pcap_breakloop((pcap_t*) args);
+
+	i++;
 }

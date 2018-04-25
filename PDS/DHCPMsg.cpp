@@ -1,3 +1,4 @@
+#include <netinet/in.h>
 #include "DHCPMsg.h"
 #include "PcapUtil.h"
 
@@ -8,13 +9,13 @@ string TEthHeader::toString(const string &separator) const
 	string repr;
 
 	repr += "destination MAC address: ";
-	for (uint8_t i : destinationMacAddr)
+	for (uint8_t i : dstMACAddr)
 		repr += PcapUtil::intToHex(i) + ":";
 	repr.pop_back();
 	repr += separator;
 
 	repr += "source MAC address: ";
-	for (uint8_t i : sourceMacAddr)
+	for (uint8_t i : srcMACAddr)
 		repr += PcapUtil::intToHex(i) + ":";
 	repr.pop_back();
 	repr += separator;
@@ -26,50 +27,50 @@ string TEthHeader::toString(const string &separator) const
 	return repr;
 }
 
-string TIpHeader::toString(const string &separator) const
+string TIP4Header::toString(const string &separator) const
 {
 	string repr;
 
 	repr += "IP (4b) version and IHL (4b): ";
-	repr += PcapUtil::intToHex(ipVersionAndIHL);
+	repr += PcapUtil::intToHex(versionAndIHL, "0x");
 	repr += separator;
 
 	repr += "DSCP (6b) and ECN (2b): ";
-	repr += PcapUtil::intToHex(ipDscpEAndECN);
+	repr += PcapUtil::intToHex(DSCPAndECN, "0x");
 	repr += separator;
 
 	repr += "Total length: ";
-	repr += to_string(ipTotalLength);
+	repr += to_string((totalLength[0] << 8) | totalLength[1]);
 	repr += separator;
 
 	repr += "Identification: ";
-	repr += PcapUtil::intToHex(ipIdentification);
+	repr += PcapUtil::intToHex(identification, "0x");
 	repr += separator;
 
 	repr += "Flags and fragmentation: ";
-	repr += PcapUtil::intToHex(ipFlagsAndFragmentOffset);
+	repr += PcapUtil::intToHex(flagsAndFragmentOffset, "0x");
 	repr += separator;
 
 	repr += "TTL: ";
-	repr += PcapUtil::intToHex(ipTtl);
+	repr += to_string(ttl);
 	repr += separator;
 
 	repr += "Protocol: ";
-	repr += PcapUtil::intToHex(ipProtocol);
+	repr += PcapUtil::intToHex(protocol, "0x");
 	repr += separator;
 
 	repr += "Header check sum: ";
-	repr += PcapUtil::intToHex(ipHeaderChecksum);
+	repr += PcapUtil::intToHex(headerChecksum, "0x");
 	repr += separator;
 
-	repr += "Destination IP addr: ";
-	for (uint8_t i : ipDestinationIPAddr)
+	repr += "Dst IP addr: ";
+	for (uint8_t i : dstIPAddr)
 		repr += to_string(i) + ".";
 	repr.pop_back();
 	repr += separator;
 
-	repr += "Source IP addr: ";
-	for (uint8_t i : ipSourceIPAddr)
+	repr += "Src IP addr: ";
+	for (uint8_t i : srcIPAddr)
 		repr += to_string(i) + ".";
 	repr.pop_back();
 	repr += separator;
@@ -77,24 +78,24 @@ string TIpHeader::toString(const string &separator) const
 	return repr;
 }
 
-string TUdpHeader::toString(const string &separator) const
+string TUDPHeader::toString(const string &separator) const
 {
 	string repr;
 
 	repr += "Source port: ";
-	repr += to_string(udpSourcePort);
+	repr += to_string(htons(udpSourcePort));
 	repr += separator;
 
 	repr += "Destination port: ";
-	repr += to_string(udpDestinationPort);
+	repr += to_string(htons(udpDestinationPort));
 	repr += separator;
 
 	repr += "Length: ";
-	repr += to_string(udpLength);
+	repr += to_string((udpLength[0] << 8) | udpLength[1]);
 	repr += separator;
 
 	repr += "Checksum port: ";
-	repr += to_string(udpChecksum);
+	repr += PcapUtil::intToHex(udpChecksum, "0x");
 	repr += separator;
 
 	return repr;
