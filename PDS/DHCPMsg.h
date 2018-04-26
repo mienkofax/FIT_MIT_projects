@@ -6,69 +6,19 @@
 #include <vector>
 #include <iostream>
 
-struct Tmp {
-	uint8_t dstMac[6];
-	uint8_t srcMac[6];
-	uint16_t ipType;
-
-	//IP header
-	uint8_t version;
-	uint8_t servField;
-	uint16_t totLength;
-	uint16_t identification;
-
-	uint8_t hdrFlags;
-	uint8_t offset;
-	uint8_t ttl;
-	uint8_t protocol;
-	uint16_t ipSum;
-
-	uint8_t srcAddr[4];
-	uint8_t dstAddr[4];
-
-	uint16_t srcPort;
-	uint16_t dstPort;
-	uint16_t len;
-	uint16_t udpCheckSum;
-
-	//DHCP zprava
-	uint8_t messageType;
-	uint8_t hwType;
-	uint8_t hwAddresLen;
-	uint8_t hops;
-	uint16_t transactionID[2];
-	uint16_t seconds;
-	uint16_t flags;
-
-	//IP adresy
-	uint8_t clientIP[4];
-	uint8_t yourIP[4];
-	uint8_t serverIP[4];
-	uint8_t gatewayIP[4];
-
-	uint8_t MAC[6];
-	uint16_t padding[5];
-	uint16_t serverHost[32];
-	uint16_t bootFile[64];
-	uint16_t cookie[2];
-
-	//DHCP options
-	uint8_t typeID;
-	uint8_t length;
-	uint8_t DHCPoperation;
-
-	uint8_t QtypeID;
-	uint8_t Qlength;
-	uint8_t Qmsg[13];
-
-	uint8_t endMSG;
+struct DHCPMsgInfo {
+	uint64_t fakeMACAddr;
+	uint64_t firstPacket;
+	uint64_t change;
+	uint64_t lastLacket;
+	uint8_t opCode;
 };
 
 /**
  * @see https://en.wikipedia.org/wiki/Ethernet_frame
  * size: 14B
  */
-struct TEthHeader {
+struct __attribute__((__packed__)) TEthHeader {
 	uint8_t dstMACAddr[6];
 	uint8_t srcMACAddr[6];
 	uint16_t ethType;
@@ -107,7 +57,7 @@ struct TEthHeader {
  *  - DSCPAndECN -
  *  - totalLength - velkost paketu bez L2 hlavicky
  */
-struct TIP4Header {
+struct __attribute__((__packed__)) TIP4Header {
 	uint8_t versionAndIHL;
 	uint8_t DSCPAndECN;
 	uint8_t totalLength[2];
@@ -170,7 +120,7 @@ struct TIP4Header {
  * @see https://en.wikipedia.org/wiki/User_Datagram_Protocol
  * size: 8B
  */
-struct TUDPHeader {
+struct __attribute__((__packed__)) TUDPHeader {
 	uint16_t udpSourcePort;
 	uint16_t udpDestinationPort;
 	uint8_t udpLength[2];
@@ -210,7 +160,7 @@ struct TUDPHeader {
  * @see http://www.networksorcery.com/enp/protocol/dhcp.htm
  * size: 28B
  */
-struct TDHCPHeader {
+struct __attribute__((__packed__)) TDHCPHeader {
 	uint8_t opCode;
 	uint8_t hardwareType;
 	uint8_t hardwareAddrLength;
@@ -229,7 +179,7 @@ struct TDHCPHeader {
 		hardwareType(0x01), // ethernet type
 		hardwareAddrLength(0x06),
 		hopCount(0),
-		transactionID(0x11223344),
+		transactionID(0),
 		numberOfSeconds(0),
 		flags(0x0080),
 		clientIPAddr{0x00},
@@ -282,7 +232,7 @@ struct TDHCPHeader {
  * @see http://www.networksorcery.com/enp/protocol/dhcp.htm
  * size: 214
  */
-struct TDHCPData {
+struct __attribute__((__packed__)) TDHCPData {
 	uint8_t clientHardwareAddress[16]; // 6B mac + 10B padding
 	uint8_t serverHostName[64];
 	uint8_t bootFilename[128];
@@ -377,7 +327,7 @@ struct TDHCPData {
 	std::string toString(const std::string &separator) const;
 };
 
-struct DHCPMessage {
+struct __attribute__((__packed__)) DHCPMessage {
 	TEthHeader ethHeader;
 	TIP4Header ipHeader;
 	TUDPHeader udpHeader;

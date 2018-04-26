@@ -4,6 +4,7 @@
 #include <set>
 #include <sstream>
 #include <iomanip>
+#include <chrono>
 
 class PcapUtil {
 public:
@@ -19,6 +20,13 @@ public:
 			   << std::setfill ('0') << std::setw(sizeof(T)*2)
 			   << std::hex << unsigned(value);
 		return stream.str();
+	}
+
+	static uint64_t timestamp()
+	{
+
+		return std::chrono::duration_cast< std::chrono::milliseconds >(
+			std::chrono::system_clock::now().time_since_epoch()).count();
 	}
 };
 
