@@ -58,7 +58,7 @@ struct __attribute__((__packed__)) TIP4Header {
 		flagsAndFragmentOffset(0x40), // do not fragment
 		ttl(0x40), // TTL 64
 		protocol(0x11), // protokol na dalsej vrstve, UDP
-		headerChecksum(0xc339),
+		headerChecksum(0xc939),
 		srcIPAddr{0x00},
 		dstIPAddr{0xff, 0xff, 0xff, 0xff} // L3 broadcast addr
 	{
@@ -145,11 +145,6 @@ struct __attribute__((__packed__)) TDHCPData {
 	uint8_t op2HardwareType;
 	uint8_t op2payload[6];
 
-	// option: Requested IP Address
-	uint8_t op3Type;
-	uint8_t op3Length;
-	uint8_t op3payload[4];
-
 	// option: Parameter Request List
 	uint8_t op4Type;
 	uint8_t op4Length;
@@ -174,9 +169,6 @@ struct __attribute__((__packed__)) TDHCPData {
 		op2Length(0x07),
 		op2HardwareType(0x01), // Ethernet
 		op2payload{0x00},
-		op3Type(0x32), // Request IP Address
-		op3Length(0x04),
-		op3payload{0x00},
 		op4Type(0x37), // Parameter Request List
 		op4Length(0x04),
 		op4payload{0x01, 0x03, 0x06, 0x2a}, //subnet mask, router, dns, ntp server

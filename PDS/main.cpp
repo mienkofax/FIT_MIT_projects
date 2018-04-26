@@ -133,8 +133,18 @@ int main(int argc, char *argv[])
 				wawa.setFakeClientMAC(fakeMAC);
 				wawa.dhcpData.op1payload = 0x03;
 
+				/*wawa.ipHeader.dstIPAddr[0] = 192;
+				wawa.ipHeader.dstIPAddr[1] = 168;
+				wawa.ipHeader.dstIPAddr[2] = 43;
+				wawa.ipHeader.dstIPAddr[3] = 1;
+*/
+
+				for (size_t p = 0; p < 6; p++) {
+					wawa.dhcpData.op2payload[p] = fakeMAC.at(p);
+				}
+
 				for (size_t i = 0; i < 4; i++) {
-					wawa.dhcpData.op3payload[i] = dhcpMsg->dhcpHeader.yourIPAddr[i];
+				//	wawa.dhcpData.op3payload[i] = dhcpMsg->dhcpHeader.yourIPAddr[i];
 					wawa.dhcpData.op5payload[i] = dhcpMsg->dhcpHeader.serverIPAddr[i];
 				}
 
