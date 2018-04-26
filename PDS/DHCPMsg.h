@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <vector>
 #include <iostream>
+#include <stdexcept>
 
 struct DHCPMsgInfo {
 	uint64_t fakeMACAddr;
@@ -30,32 +31,12 @@ struct __attribute__((__packed__)) TEthHeader {
 	{
 	}
 
-	std::vector<uint8_t> raw() const
-	{
-		std::vector<uint8_t> raw;
-
-		for (auto i : dstMACAddr)
-			raw.push_back(i);
-
-		for (auto i : srcMACAddr)
-			raw.push_back(i);
-
-		raw.push_back(ethType);
-		raw.push_back(ethType >> 8);
-
-		return raw;
-	}
-
 	std::string toString(const std::string &separator) const;
 };
 
 /**
  * @see https://en.wikipedia.org/wiki/IPv4
  * size: 20
- *
- *  - versionAndIHL - verzia ip (4) a velkost hlavicky (20B)
- *  - DSCPAndECN -
- *  - totalLength - velkost paketu bez L2 hlavicky
  */
 struct __attribute__((__packed__)) TIP4Header {
 	uint8_t versionAndIHL;
@@ -66,8 +47,8 @@ struct __attribute__((__packed__)) TIP4Header {
 	uint8_t ttl;
 	uint8_t protocol;
 	uint16_t headerChecksum;
-	uint8_t dstIPAddr[4];
 	uint8_t srcIPAddr[4];
+	uint8_t dstIPAddr[4];
 
 	TIP4Header():
 		versionAndIHL(0x45),
@@ -77,40 +58,10 @@ struct __attribute__((__packed__)) TIP4Header {
 		flagsAndFragmentOffset(0x40), // do not fragment
 		ttl(0x40), // TTL 64
 		protocol(0x11), // protokol na dalsej vrstve, UDP
-		headerChecksum(0xc939),
-		dstIPAddr{0xff, 0xff, 0xff, 0xff}, // L3 broadcast addr
-		srcIPAddr{0x00}
+		headerChecksum(0xc339),
+		srcIPAddr{0x00},
+		dstIPAddr{0xff, 0xff, 0xff, 0xff} // L3 broadcast addr
 	{
-	}
-
-	std::vector<uint8_t> raw() const
-	{
-		std::vector<uint8_t> raw;
-
-		raw.push_back(versionAndIHL);
-		raw.push_back(DSCPAndECN);
-		raw.push_back(totalLength[0]);
-		raw.push_back(totalLength[1]);
-
-		raw.push_back(identification);
-		raw.push_back(identification >> 8);
-
-		raw.push_back(flagsAndFragmentOffset);
-		raw.push_back(flagsAndFragmentOffset >> 8);
-
-		raw.push_back(ttl);
-		raw.push_back(protocol);
-
-		raw.push_back(headerChecksum & 0xff);
-		raw.push_back(headerChecksum >> 8);
-
-		for (auto i : srcIPAddr)
-			raw.push_back(i);
-
-		for (auto i : dstIPAddr)
-			raw.push_back(i);
-
-		return raw;
 	}
 
 	std::string toString(const std::string &separator) const;
@@ -132,25 +83,6 @@ struct __attribute__((__packed__)) TUDPHeader {
 		udpLength{0x12, 0x13},
 		udpChecksum(0)
 	{
-	}
-
-	std::vector<uint8_t> raw() const
-	{
-		std::vector<uint8_t> raw;
-
-		raw.push_back(udpSourcePort);
-		raw.push_back(udpSourcePort >> 8);
-
-		raw.push_back(udpDestinationPort);
-		raw.push_back(udpDestinationPort >> 8);
-
-		raw.push_back(udpLength[0]);
-		raw.push_back(udpLength[1]);
-
-		raw.push_back(udpChecksum);
-		raw.push_back(udpChecksum >> 8);
-
-		return raw;
 	}
 
 	std::string toString(const std::string &separator) const;
@@ -189,42 +121,6 @@ struct __attribute__((__packed__)) TDHCPHeader {
 	{
 	}
 
-	std::vector<uint8_t> raw() const
-	{
-		std::vector<uint8_t> raw;
-
-		raw.push_back(opCode);
-		raw.push_back(hardwareType);
-		raw.push_back(hardwareAddrLength);
-		raw.push_back(hopCount);
-
-		//TODO spravne zarovnat
-		raw.push_back(transactionID);
-		raw.push_back(transactionID >> 8);
-		raw.push_back(transactionID >> 16);
-		raw.push_back(transactionID >> 24);
-
-		raw.push_back(numberOfSeconds);
-		raw.push_back(numberOfSeconds >> 8);
-
-		raw.push_back(flags);
-		raw.push_back(flags >> 8);
-
-		for (auto i : clientIPAddr)
-			raw.push_back(i);
-
-		for (auto i : yourIPAddr)
-			raw.push_back(i);
-
-		for (auto i : serverIPAddr)
-			raw.push_back(i);
-
-		for (auto i : gatewayIPAddr)
-			raw.push_back(i);
-
-		return raw;
-	}
-
 	std::string toString(const std::string &separator) const;
 };
 
@@ -259,6 +155,11 @@ struct __attribute__((__packed__)) TDHCPData {
 	uint8_t op4Length;
 	uint8_t op4payload[4];
 
+	// option: DHCP server identifier
+	uint8_t op5Type;
+	uint8_t op5Length;
+	uint8_t op5payload[4];
+
 	uint8_t end;
 
 	TDHCPData():
@@ -279,49 +180,11 @@ struct __attribute__((__packed__)) TDHCPData {
 		op4Type(0x37), // Parameter Request List
 		op4Length(0x04),
 		op4payload{0x01, 0x03, 0x06, 0x2a}, //subnet mask, router, dns, ntp server
+		op5Type(0x36), // DHCP server identifier
+		op5Length(0x04),
+		op5payload{0x00},
 		end(0xff)
 	{
-	}
-
-	std::vector<uint8_t> raw() const
-	{
-		std::vector<uint8_t> raw;
-
-		for (auto i : clientHardwareAddress)
-			raw.push_back(i);
-
-		for (auto i : serverHostName)
-			raw.push_back(i);
-
-		for (auto i : bootFilename)
-			raw.push_back(i);
-
-		for (auto i : magicCookie)
-			raw.push_back(i);
-
-		raw.push_back(op1Type);
-		raw.push_back(op1Length);
-		raw.push_back(op1payload);
-
-		raw.push_back(op2Type);
-		raw.push_back(op2Length);
-		raw.push_back(op2HardwareType);
-		for (auto i : op2payload)
-			raw.push_back(i);
-
-		raw.push_back(op3Type);
-		raw.push_back(op3Length);
-		for (auto i : op3payload)
-			raw.push_back(i);
-
-		raw.push_back(op4Type);
-		raw.push_back(op4Length);
-		for (auto i : op4payload)
-			raw.push_back(i);
-
-		raw.push_back(end);
-
-		return raw;
 	}
 
 	std::string toString(const std::string &separator) const;
@@ -336,12 +199,31 @@ struct __attribute__((__packed__)) DHCPMessage {
 
 	DHCPMessage()
 	{
+		recalculareHeadersSize();
+	}
+
+	void recalculareHeadersSize()
+	{
 		ipHeader.totalLength[0] = uint8_t(l3Size() >> 8);
 		ipHeader.totalLength[1] = uint8_t(l3Size() & 0xff);
 
 		udpHeader.udpLength[0] = uint8_t(l4Size() >> 8);
 		udpHeader.udpLength[1] = uint8_t(l4Size() & 0xff);
 	}
+
+	std::string toString(const std::string &separator) const
+	{
+		std::string repr;
+
+		repr += ethHeader.toString(separator);
+		repr += ipHeader.toString(separator);
+		repr += udpHeader.toString(separator);
+		repr += dhcpHeader.toString(separator);
+		repr += dhcpData.toString(separator);
+
+		return repr;
+	}
+
 
 	void setEthMAC(const std::vector<uint8_t> &mac)
 	{
@@ -362,41 +244,24 @@ struct __attribute__((__packed__)) DHCPMessage {
 
 	uint16_t l3Size() const
 	{
-		return ipHeader.raw().size()
-			+ udpHeader.raw().size()
-			+ dhcpHeader.raw().size()
-			+ dhcpData.raw().size();
+		return sizeof(TIP4Header)
+			+ sizeof(TUDPHeader)
+			+ sizeof(TDHCPHeader)
+			+ sizeof(TDHCPData);
 	}
 
 	uint16_t l4Size() const
 	{
-		return udpHeader.raw().size()
-			   + dhcpHeader.raw().size()
-			   + dhcpData.raw().size();
+		return sizeof(TUDPHeader)
+			+ sizeof(TDHCPHeader)
+			+ sizeof(TDHCPData);
 	}
 
-	size_t raw(uint8_t *buffer) const
+	static DHCPMessage* fromRaw(uint8_t *buffer, size_t size)
 	{
-		size_t index = 0;
+		if (size < sizeof(DHCPMessage))
+			throw std::invalid_argument("nespravna velkost struktury");
 
-		for (auto i : ethHeader.raw())
-			buffer[index++] = i;
-
-		for (auto i : ipHeader.raw())
-			buffer[index++] = i;
-
-		for (auto i : udpHeader.raw())
-			buffer[index++] = i;
-
-		for (auto i : dhcpHeader.raw())
-			buffer[index++] = i;
-
-		for (auto i : dhcpData.raw())
-			buffer[index++] = i;
-
-		return index;
+		return (DHCPMessage *) buffer;
 	}
-
-
 };
-
