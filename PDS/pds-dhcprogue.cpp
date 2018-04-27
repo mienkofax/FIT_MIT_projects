@@ -386,14 +386,14 @@ int main(int argc, char *argv[])
 	cout << params.toString() << endl;
 */
 	TCon con;
-	con.init("wlp8s0");
-
+	con.init("enp2s0");
+/*
 	struct pollfd pfd[1];
 	pfd[0].fd = con.listenSock;
 	pfd[0].events = POLLIN | POLLERR | POLLRDBAND;
 	pfd[0].revents = 0;
 
-	int milliseconds = 100 * 100;
+	int milliseconds = 1000 * 100;
 
 	while (true) {
 		int ret;
@@ -416,4 +416,16 @@ int main(int argc, char *argv[])
 		if (pfd[0].revents & (POLLRDBAND | POLLIN))
 			cout << "cout wawa" << endl;
 	}
+ */
+
+
+
+	system("ls -l / >| ls.output");
+int ret;
+	char buf[1024] = {0};
+	while ((ret = read(con.listenSock, buf, sizeof(buf)-1)) > 0) {
+			buf[ret] = 0x00;
+			printf("block read: \n<%s>\n", buf);
+		}
+		close(con.listenSock);
 }
