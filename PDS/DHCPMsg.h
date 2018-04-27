@@ -442,3 +442,81 @@ struct __attribute__((__packed__)) DHCPRequest {
 		return (DHCPMessage *) buffer;
 	}
 };
+
+/**
+ *
+ */
+struct __attribute__((__packed__)) DHCPServerOffer {
+	TEthHeader ethHeader;
+	TIP4Header ipHeader;
+	TUDPHeader udpHeader;
+	TDHCPHeader dhcpHeader;
+	TDHCPData dhcpData;
+
+	DHCPServerOffer()
+	{
+		recalculareHeadersSize();
+	}
+
+	void recalculareHeadersSize()
+	{
+		ipHeader.totalLength[0] = uint8_t(l3Size() >> 8);
+		ipHeader.totalLength[1] = uint8_t(l3Size() & 0xff);
+
+		udpHeader.udpLength[0] = uint8_t(l4Size() >> 8);
+		udpHeader.udpLength[1] = uint8_t(l4Size() & 0xff);
+	}
+
+	std::string toString(const std::string &separator) const
+	{
+		std::string repr;
+
+		repr += ethHeader.toString(separator);
+		repr += ipHeader.toString(separator);
+		repr += udpHeader.toString(separator);
+		repr += dhcpHeader.toString(separator);
+		repr += dhcpData.toString(separator);
+
+		return repr;
+	}
+
+	void setEthMAC(const std::vector<uint8_t> &mac)
+	{
+		for (size_t i = 0; i < 6; i++)
+			ethHeader.srcMACAddr[i] = mac[i];
+	}
+
+	void setFakeClientMAC(const std::vector<uint8_t> &mac)
+	{
+		for (size_t i = 0; i < 6; i++)
+			dhcpData.clientHardwareAddress[i] = mac[i];
+	}
+
+	void setTransactionID(uint32_t id)
+	{
+		dhcpHeader.transactionID = id;
+	}
+
+	uint16_t l3Size() const
+	{
+		return sizeof(TIP4Header)
+			   + sizeof(TUDPHeader)
+			   + sizeof(TDHCPHeader)
+			   + sizeof(TDHCPData);
+	}
+
+	uint16_t l4Size() const
+	{
+		return sizeof(TUDPHeader)
+			   + sizeof(TDHCPHeader)
+			   + sizeof(TDHCPData);
+	}
+
+	static DHCPMessage* fromRaw(uint8_t *buffer, size_t size)
+	{
+		if (size < sizeof(DHCPMessage))
+			throw std::invalid_argument("nespravna velkost struktury");
+
+		return (DHCPMessage *) buffer;
+	}
+};
