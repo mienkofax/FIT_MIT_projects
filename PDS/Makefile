@@ -3,7 +3,7 @@ CFLAGS=-std=c++11
 LIB=-lpcap
 
 all:
-	$(GCC) pds-dhcpstarve.cpp Common.cpp ClientMessage.cpp PcapUtil.cpp\
+	$(GCC) pds-dhcpstarve.cpp Common.cpp ClientMessage.cpp Util.cpp \
 	 -o pds-dhcpstarve $(CFLAGS) $(LIB)
 	#$(GCC) $(CFLAGS) pds-dhcprouge.c -o pds-dhcprouge $(LIB)
 

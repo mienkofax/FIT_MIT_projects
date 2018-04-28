@@ -6,7 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <stdexcept>
-#include "PcapUtil.h"
+#include "Util.h"
 
 struct DHCPMsgInfo {
 	uint64_t fakeMACAddr;
@@ -18,7 +18,7 @@ struct DHCPMsgInfo {
 
 };
 
-struct PacketInfo {
+struct DHCPInfo {
 	uint8_t dhcpMessageType;
 	uint8_t dhcpServerIdentifier[4];
 
@@ -28,7 +28,7 @@ struct PacketInfo {
 		std::string repr;
 
 		repr += "messageType: ";
-		repr += PcapUtil::intToHex(dhcpMessageType, "0x");
+		repr += Util::intToHex(dhcpMessageType, "0x");
 		repr += separator;
 
 		repr += "identifier: ";
@@ -275,11 +275,11 @@ struct __attribute__((__packed__)) DHCPDiscovery {
 		op4payload{0x01, 0x03, 0x06, 0x2a}, //subnet mask, router, dns, ntp server
 		end(0xff)
 	{
-		recalculareHeadersSize();
+		recalculateHeadersSize();
 		ipHeader.headerChecksum = 0xd839;
 	}
 
-	void recalculareHeadersSize()
+	void recalculateHeadersSize()
 	{
 		ipHeader.totalLength[0] = uint8_t(l3Size() >> 8);
 		ipHeader.totalLength[1] = uint8_t(l3Size() & 0xff);
@@ -377,11 +377,11 @@ struct __attribute__((__packed__)) DHCPRequest {
 		op2payload{0x00},
 		end(0xff)
 	{
-		recalculareHeadersSize();
+		recalculateHeadersSize();
 		ipHeader.headerChecksum = 0xd239;
 	}
 
-	void recalculareHeadersSize()
+	void recalculateHeadersSize()
 	{
 		ipHeader.totalLength[0] = uint8_t(l3Size() >> 8);
 		ipHeader.totalLength[1] = uint8_t(l3Size() & 0xff);

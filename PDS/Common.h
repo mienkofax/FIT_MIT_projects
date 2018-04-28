@@ -6,7 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <stdexcept>
-#include "PcapUtil.h"
+#include "Util.h"
 
 /**
  * @see https://en.wikipedia.org/wiki/Ethernet_frame

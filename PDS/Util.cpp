@@ -9,38 +9,45 @@
 #include <sys/socket.h>
 
 #include <pcap.h>
+#include <iostream>
 
-#include "PcapUtil.h"
+#include "Util.h"
+#include <ifaddrs.h>
+#include <arpa/inet.h>
 
 using namespace std;
 
-set<string> PcapUtil::allDevices()
+int Util::allDevices(set<string> &devices)
 {
-	char err[PCAP_ERRBUF_SIZE];
-	pcap_if_t *devs;
+	struct ifaddrs *ifap, *ifa;
+	struct sockaddr_in *sa;
+	char *addr;
 
-	if(pcap_findalldevs(&devs, err) == -1)
-		throw invalid_argument("find all devs");
+	getifaddrs (&ifap);
+	for (ifa = ifap; ifa; ifa = ifa->ifa_next)
+		devices.insert(ifa->ifa_name);
 
-	set<string> devices;
-	for(pcap_if_t *dev = devs; dev; dev = dev->next)
-		devices.emplace(dev->name);
-
-	return devices;
+	freeifaddrs(ifap);
+	return 0;
 }
 
-uint64_t PcapUtil::randomUint64()
+uint8_t Util::randomUint8()
 {
-	return (uint64_t(rand()) << 32) | uint32_t(rand());
+	return (uint8_t) rand();
 }
 
-uint64_t PcapUtil::timestamp()
+uint32_t Util::randomUint32()
+{
+	return (uint32_t) rand();
+}
+
+uint64_t Util::timestamp()
 {
 	return (uint64_t) chrono::duration_cast< chrono::milliseconds >(
 		chrono::system_clock::now().time_since_epoch()).count();
 }
 
-int PcapUtil::MACAddress(const string &dev, uint8_t *mac)
+int Util::MACAddress(const string &dev, vector<uint8_t> &mac)
 {
 	struct ifreq s = {0};
 	int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
@@ -51,7 +58,7 @@ int PcapUtil::MACAddress(const string &dev, uint8_t *mac)
 	if (0 == ioctl(fd, SIOCGIFHWADDR, &s)) {
 		int i;
 		for (i = 0; i < 6; ++i)
-			mac[i] = (uint8_t) s.ifr_addr.sa_data[i];
+			mac.push_back((uint8_t) s.ifr_addr.sa_data[i]);
 
 		return 0;
 	}

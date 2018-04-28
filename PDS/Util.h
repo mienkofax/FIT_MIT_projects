@@ -4,15 +4,17 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <vector>
 
-class PcapUtil {
+class Util {
 public:
 	/**
 	 * Zistenie dostupnych rozhrani na komunikaciu.
 	 */
-	static std::set<std::string> allDevices();
+	static int allDevices(std::set<std::string> &devices);
 
-	uint64_t randomUint64();
+	static uint8_t randomUint8();
+	static uint32_t randomUint32();
 
 	/**
 	 * Pomocna metoda pre vypis cisla v hexadecimalnom formate.
@@ -36,6 +38,7 @@ public:
 	/**
 	 * Zistenie mac adresy daneho zariadenia.
 	 */
-	static int MACAddress(const std::string &dev, uint8_t *mac);
+	static int MACAddress(
+		const std::string &dev, std::vector<uint8_t> &mac);
 };
 

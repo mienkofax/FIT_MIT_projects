@@ -1,6 +1,6 @@
 #include "Common.h"
 #include <netinet/in.h>
-#include "PcapUtil.h"
+#include "Util.h"
 
 using namespace std;
 
@@ -10,18 +10,18 @@ string TEthHeader::toString(const string &separator) const
 
 	repr += "destination MAC address: ";
 	for (uint8_t i : dstMACAddr)
-		repr += PcapUtil::intToHex(i) + ":";
+		repr += Util::intToHex(i) + ":";
 	repr.pop_back();
 	repr += separator;
 
 	repr += "source MAC address: ";
 	for (uint8_t i : srcMACAddr)
-		repr += PcapUtil::intToHex(i) + ":";
+		repr += Util::intToHex(i) + ":";
 	repr.pop_back();
 	repr += separator;
 
 	repr += "ethernet type: ";
-	repr += PcapUtil::intToHex(ethType, "0x");
+	repr += Util::intToHex(ethType, "0x");
 	repr += separator;
 
 	return repr;
@@ -32,11 +32,11 @@ string TIP4Header::toString(const string &separator) const
 	string repr;
 
 	repr += "IP (4b) version and IHL (4b): ";
-	repr += PcapUtil::intToHex(versionAndIHL, "0x");
+	repr += Util::intToHex(versionAndIHL, "0x");
 	repr += separator;
 
 	repr += "DSCP (6b) and ECN (2b): ";
-	repr += PcapUtil::intToHex(DSCPAndECN, "0x");
+	repr += Util::intToHex(DSCPAndECN, "0x");
 	repr += separator;
 
 	repr += "Total length: ";
@@ -44,11 +44,11 @@ string TIP4Header::toString(const string &separator) const
 	repr += separator;
 
 	repr += "Identification: ";
-	repr += PcapUtil::intToHex(identification, "0x");
+	repr += Util::intToHex(identification, "0x");
 	repr += separator;
 
 	repr += "Flags and fragmentation: ";
-	repr += PcapUtil::intToHex(flagsAndFragmentOffset, "0x");
+	repr += Util::intToHex(flagsAndFragmentOffset, "0x");
 	repr += separator;
 
 	repr += "TTL: ";
@@ -56,11 +56,11 @@ string TIP4Header::toString(const string &separator) const
 	repr += separator;
 
 	repr += "Protocol: ";
-	repr += PcapUtil::intToHex(protocol, "0x");
+	repr += Util::intToHex(protocol, "0x");
 	repr += separator;
 
 	repr += "Header check sum: ";
-	repr += PcapUtil::intToHex(headerChecksum, "0x");
+	repr += Util::intToHex(headerChecksum, "0x");
 	repr += separator;
 
 	repr += "Dst IP addr: ";
@@ -95,7 +95,7 @@ string TUDPHeader::toString(const string &separator) const
 	repr += separator;
 
 	repr += "Checksum port: ";
-	repr += PcapUtil::intToHex(udpChecksum, "0x");
+	repr += Util::intToHex(udpChecksum, "0x");
 	repr += separator;
 
 	return repr;
@@ -130,7 +130,7 @@ string TDHCPHeader::toString(const string &separator) const
 	repr += separator;
 
 	repr += "Transaction ID: ";
-	repr += PcapUtil::intToHex(htonl(transactionID), "0x");
+	repr += Util::intToHex(htonl(transactionID), "0x");
 	repr += separator;
 
 	repr += "Number of seconds: ";
@@ -138,7 +138,7 @@ string TDHCPHeader::toString(const string &separator) const
 	repr += separator;
 
 	repr += "Flags: ";
-	repr += PcapUtil::intToHex(flags, "0x");
+	repr += Util::intToHex(flags, "0x");
 	repr += separator;
 
 	repr += "Client IP addr: ";
@@ -174,7 +174,7 @@ string TDHCPData::toString(const string &separator) const
 
 	repr += "Client hardware address: ";
 	for (uint8_t i : clientHardwareAddress)
-		repr += PcapUtil::intToHex(i) + " ";
+		repr += Util::intToHex(i) + " ";
 	repr += separator;
 
 	repr += "Server host name: ";

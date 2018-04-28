@@ -12,7 +12,7 @@ include_directories(
 )
 
 file(GLOB SOURCES_STARVE
-	${PROJECT_SOURCE_DIR}/PcapUtil.cpp
+	${PROJECT_SOURCE_DIR}/Util.cpp
 	${PROJECT_SOURCE_DIR}/ClientMessage.cpp
 	${PROJECT_SOURCE_DIR}/Common.cpp
 )
@@ -27,7 +27,7 @@ target_link_libraries("pds-dhcpstarve"
 )
 
 file(GLOB SOURCES_ROGUE
-	${PROJECT_SOURCE_DIR}/PcapUtil.cpp
+${PROJECT_SOURCE_DIR}/Util.cpp
 	${PROJECT_SOURCE_DIR}/DHCPMsg.cpp
 )
 

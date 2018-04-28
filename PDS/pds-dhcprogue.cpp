@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstring>
 #include <netinet/in.h>
-#include "PcapUtil.h"
+#include "Util.h"
 #include "DHCPMsg.h"
 
 #include <stdio.h>
@@ -239,7 +239,7 @@ int extractArguments(int argc, char *argv[], TParams *t)
 
 bool checkExistInterface(const std::string &interface)
 {
-	set<string> interfaces = PcapUtil::allDevices();
+	set<string> interfaces = Util::allDevices();
 
 	auto it = interfaces.find(interface);
 	return it != interfaces.end();
@@ -656,7 +656,7 @@ std::vector<uint8_t> mnau;
 cout << "size: " << ret << endl;
 for (size_t i = 0; i < ret; i++) {
 	mnau.push_back(buf[i]);
-	cout << PcapUtil::intToHex(buf[i], "0x") << " "<< endl;
+	cout << Util::intToHex(buf[i], "0x") << " "<< endl;
 }
 cout << "cout wawa" << endl;
 processPacket(mnau, &con);
@@ -670,7 +670,7 @@ break;*/
 
 				cout << "\nsize: " << ret << endl;
 				for (size_t i = 0; i < ret; i++) {
-					//	cout << PcapUtil::intToHex(buf[i], "0x") << " ";
+					//	cout << Util::intToHex(buf[i], "0x") << " ";
 					mnau.push_back(buf[i]);
 
 				}
@@ -695,7 +695,7 @@ int ret;
 
 		cout << "size: " << ret << endl;
 		for (size_t i = 0; i < ret; i++)
-			cout << PcapUtil::intToHex(buf[i], "0x") << " ";
+			cout << Util::intToHex(buf[i], "0x") << " ";
 
 
 	}
