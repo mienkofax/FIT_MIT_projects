@@ -5,16 +5,26 @@
 #include <getopt.h>
 #include <ctime>
 #include <cstring>
-#include "DHCPMsg.h"
+#include "Common.h"
 #include <unistd.h>
 #include <map>
 #include <chrono>
 #include <netinet/in.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
+
+#include "ClientMessage.h"
 
 using namespace std;
 
 int main(int argc, char *argv[])
 {
+	uint8_t mac[6];
+
+	int ret = PcapUtil::MACAddress("wlp8s0", mac);
+	for (auto a : mac)
+		cout << hex << unsigned(a) << ":";
+
 	if (argc != 3) {
 		cerr << "invalid number of arguments" << endl;
 		return EXIT_FAILURE;
@@ -58,7 +68,7 @@ int main(int argc, char *argv[])
 	}
 	srand(time(nullptr));
 
-	std::map<uint32_t, DHCPMsgInfo> packets;
+	//std::map<uint32_t, DHCPMsgInfo> packets;
 
 	pcap_t *handle;
 	char errbuff[PCAP_ERRBUF_SIZE] = {0};
@@ -82,7 +92,7 @@ int main(int argc, char *argv[])
 
 	for (size_t j = 0; j < 2; j++) {
 
-	vector<uint8_t> l2MAC = {{0x1c, 0x1b, 0x0d, 0x04, 0x7d, 0x50}}; //TODO nacitat z rozhrania
+	vector<uint8_t> l2MAC = {{0xf8, 0xd1, 0x11, 0x07, 0xb9, 0x3e}}; //TODO nacitat z rozhrania
 	vector<uint8_t> fakeMAC = {0x2c, 0xa4, 0x0d, 0x04, j, rand()};
 	uint32_t transactionID = 0xa078944 + j + rand();
 
@@ -93,8 +103,8 @@ int main(int argc, char *argv[])
 
 	pcap_sendpacket(handle, (const u_char *) &msg, sizeof(msg));
 
-	packets.emplace(make_pair(transactionID, DHCPMsgInfo{123,
-		PcapUtil::timestamp(),PcapUtil::timestamp(),PcapUtil::timestamp(),1}));
+	//packets.emplace(make_pair(transactionID, DHCPMsgInfo{123,
+	//	PcapUtil::timestamp(),PcapUtil::timestamp(),PcapUtil::timestamp(),1}));
 
 	uint64_t startTime = PcapUtil::timestamp();
 
@@ -149,10 +159,10 @@ int main(int argc, char *argv[])
 
 		//cout << info.toString("\n") << endl;
 
-		auto it = packets.find(dhcpMsg->dhcpHeader.transactionID);
-		if (it ==  packets.end())
-			cerr << "koniec" << endl;
-		else {
+		//auto it = packets.find(dhcpMsg->dhcpHeader.transactionID);
+	//	if (it ==  packets.end())
+		//	cerr << "koniec" << endl;
+		//else {
 			if (info.dhcpMessageType == 1)
 				cout << "discoery" << endl;
 			else if (info.dhcpMessageType == 2) {
@@ -170,7 +180,9 @@ int main(int argc, char *argv[])
 
 				for (size_t p = 0; p < 4; p++) {
 					wawa.op1payload[p] = dhcpMsg->dhcpHeader.yourIPAddr[p];
-					wawa.op2payload[p] = info.dhcpServerIdentifier[p];
+					wawa.op2payload[p] = dhcpMsg->dhcpHeader.serverIPAddr[p];
+
+					cout << dec << unsigned(dhcpMsg->dhcpHeader.serverIPAddr[p]) << endl;
 				}
 
 				pcap_sendpacket(handle, (const u_char *) &wawa, sizeof(wawa));
@@ -185,7 +197,7 @@ int main(int argc, char *argv[])
 			else {
 				cout << "unknown" << endl;
 			}
-		}
+		//}
 	}
 	}
 

@@ -13,7 +13,8 @@ include_directories(
 
 file(GLOB SOURCES_STARVE
 	${PROJECT_SOURCE_DIR}/PcapUtil.cpp
-	${PROJECT_SOURCE_DIR}/DHCPMsg.cpp
+	${PROJECT_SOURCE_DIR}/ClientMessage.cpp
+	${PROJECT_SOURCE_DIR}/Common.cpp
 )
 
 add_library(PDS-starve-lib ${SOURCES_STARVE})
