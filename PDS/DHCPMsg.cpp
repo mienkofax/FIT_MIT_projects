@@ -130,7 +130,7 @@ string TDHCPHeader::toString(const string &separator) const
 	repr += separator;
 
 	repr += "Transaction ID: ";
-	repr += PcapUtil::intToHex(transactionID, "0x");
+	repr += PcapUtil::intToHex(htonl(transactionID), "0x");
 	repr += separator;
 
 	repr += "Number of seconds: ";

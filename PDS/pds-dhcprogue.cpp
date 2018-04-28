@@ -4,6 +4,7 @@
 #include <cstring>
 #include <netinet/in.h>
 #include "PcapUtil.h"
+#include "DHCPMsg.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -24,11 +25,12 @@
 #include <time.h>
 
 #include <pcap.h>
+#include <vector>
 
 using namespace std;
 
 static const string helpMessage =
-"R(Help message)";
+	"R(Help message)";
 
 struct TIPv4 {
 	int raw[4];
@@ -291,7 +293,7 @@ struct TCon {
 	{
 		int ret;
 
-		listenSock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		listenSock = socket(PF_INET, SOCK_DGRAM, 0);
 		if (listenSock <= 0 ) {
 			cerr << "problem pri vytvoreni soketu" << endl;
 			return -1;
@@ -299,12 +301,12 @@ struct TCon {
 
 		int option = 1;
 		ret = setsockopt(
-				listenSock,
-				SOL_SOCKET,
-				SO_REUSEADDR,
-				&option,
-				sizeof(option)
-			);
+			listenSock,
+			SOL_SOCKET,
+			SO_REUSEADDR,
+			&option,
+			sizeof(option)
+		);
 
 		if (ret < 0) {
 			cerr << "problem pri zmene interface" << endl;
@@ -313,12 +315,12 @@ struct TCon {
 		}
 
 		ret = setsockopt(
-				listenSock,
-				SOL_SOCKET,
-				SO_BINDTODEVICE,
-				interface.c_str(),
-				interface.length() + 1
-			);
+			listenSock,
+			SOL_SOCKET,
+			SO_BINDTODEVICE,
+			interface.c_str(),
+			interface.length() + 1
+		);
 
 		if (ret < 0) {
 			cerr << "problem s nastavenim rozhrania, ste root?" << endl;
@@ -332,10 +334,10 @@ struct TCon {
 		addrIn.sin_port = htons(67);
 
 		ret = bind(
-				listenSock,
-				(struct sockaddr *) &addrIn,
-				sizeof(addrIn)
-			);
+			listenSock,
+			(struct sockaddr *) &addrIn,
+			sizeof(addrIn)
+		);
 
 		if (ret < 0) {
 			cerr << "chybny bind" << endl;
@@ -353,6 +355,47 @@ struct TCon {
 	}
 };
 
+static const std::vector<uint8_t> testVec = {
+	0x01, 0x01, 0x06, 0x00, 0x8c, 0xd0, 0x94, 0x73,
+	0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x08, 0x00, 0x27, 0x49,
+	0x03, 0xa4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x63, 0x82, 0x53, 0x63,
+	0x35, 0x01, 0x01, 0x0c, 0x07, 0x69, 0x73, 0x61,
+	0x32, 0x30, 0x31, 0x35, 0x37, 0x12, 0x01, 0x1c,
+	0x02, 0x03, 0x0f, 0x06, 0x77, 0x0c, 0x2c, 0x2f,
+	0x1a, 0x79, 0x2a, 0x79, 0xf9, 0x21, 0xfc, 0x2a,
+	0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00
+};
+
 /*
  *
 		//promenna pro ziskani adresy zarizeni a portu
@@ -361,6 +404,192 @@ struct TCon {
 	int sendAddrLen = sizeof(sendAddrPort);
  */
 #include <poll.h>
+
+void processPacket(const vector<uint8_t> &data, TCon *t)
+{
+	uint8_t buffer[data.size()];
+	for (size_t i = 0; i < data.size(); i++) {		buffer[i] = data[i];
+//cout << hex << unsigned(data[i]) << " ";
+	}
+
+	TDHCPHeader *header = (TDHCPHeader *) buffer;
+	TDHCPData *tdhcpData = (TDHCPData *) (buffer + sizeof(TDHCPHeader));
+	//cout << header->toString("\n");
+	cout << "--------" << endl;
+
+	uint8_t *options = buffer + sizeof(TDHCPHeader)+ sizeof(TDHCPData);
+	uint8_t type = 0;
+	for (size_t m = 0; m < (data.size() - sizeof(TDHCPHeader) - sizeof(TDHCPData)) ;m++) {
+		//	cout << hex << unsigned(*(options)) << " ";
+//options++;
+//continue;
+
+		switch (*options) {
+		case 0x35: // DHCP Message type
+			options++; // length
+			options++; // data
+			//cout << "0x35" <<  *options << endl;
+			type = *options;
+			m = 100000;
+			options++;
+			cout << unsigned(*options) << endl;
+			options++;
+			cout << unsigned(*options) << endl;
+			break;
+
+
+		case 0xff:
+			m = 100000;
+			break;
+		default: {
+			options++;
+			uint8_t length = *options;
+			options++;
+			options += length;
+		}
+		}
+	}
+
+	cout << "\nincome type: " << unsigned(type) << endl;
+	bool static offer = false;
+
+	if (type == 1 ) {
+		offer = true;
+		DHCPServerOffer offer;
+		offer.setEthMAC({0x08, 0x00, 0x27, 0x3d, 0x98, 0x95});
+		offer.udpHeader.udpDestinationPort = 0x4400; // 68
+		offer.udpHeader.udpSourcePort = 0x4300; // 67
+		offer.setTransactionID(header->transactionID);
+
+		offer.dhcpHeader.yourIPAddr[0] = 192;
+		offer.dhcpHeader.yourIPAddr[1] = 168;
+		offer.dhcpHeader.yourIPAddr[2] = 1;
+		offer.dhcpHeader.yourIPAddr[3] = 11;
+
+		offer.dhcpHeader.serverIPAddr[0] = 192;
+		offer.dhcpHeader.serverIPAddr[1] = 168;
+		offer.dhcpHeader.serverIPAddr[2] = 1;
+		offer.dhcpHeader.serverIPAddr[3] = 123;
+
+		offer.op36payload[0] = 192;
+		offer.op36payload[1] = 168;
+		offer.op36payload[2] = 1;
+		offer.op36payload[3] = 123;
+
+		offer.op01payload[0] = 255;
+		offer.op01payload[1] = 255;
+		offer.op01payload[2] = 255;
+		offer.op01payload[3] = 0;
+
+		offer.op1cpayload[0] = 192;
+		offer.op1cpayload[1] = 168;
+		offer.op1cpayload[2] = 1;
+		offer.op1cpayload[3] = 255;
+
+		offer.op03payload[0] = 192;
+		offer.op03payload[1] = 168;
+		offer.op03payload[2] = 1;
+		offer.op03payload[3] = 1;
+
+		offer.op06payload[0] = 192;
+		offer.op06payload[1] = 168;
+		offer.op06payload[2] = 1;
+		offer.op06payload[3] = 4;
+
+		offer.op06payload[4] = 8;
+		offer.op06payload[5] = 8;
+		offer.op06payload[6] = 8;
+		offer.op06payload[7] = 8;
+
+		offer.ipHeader.headerChecksum = 0xb639;
+
+		for (size_t i = 0; i < 6; i++)
+			offer.ethHeader.dstMACAddr[i] = tdhcpData->clientHardwareAddress[i];
+
+		for (size_t i = 0; i < 16; i++)
+			offer.dhcpData.clientHardwareAddress[i] = tdhcpData->clientHardwareAddress[i];
+
+
+		//cout << offer.toString("\n") << endl;
+
+		cout << "send offer" << endl;
+
+		pcap_sendpacket(t->sendSock, (const u_char *) &offer, sizeof(offer));
+	}
+	else if (type == 3) {
+		cout << "request" << endl;
+		DHCPServerOffer offer;
+		offer.setEthMAC({0x08, 0x00, 0x27, 0x3d, 0x98, 0x95});
+		offer.udpHeader.udpDestinationPort = 0x4400; // 68
+		offer.udpHeader.udpSourcePort = 0x4300; // 67
+		offer.setTransactionID(header->transactionID);
+
+		offer.dhcpHeader.yourIPAddr[0] = 192;
+		offer.dhcpHeader.yourIPAddr[1] = 168;
+		offer.dhcpHeader.yourIPAddr[2] = 1;
+		offer.dhcpHeader.yourIPAddr[3] = 11;
+
+		offer.dhcpHeader.serverIPAddr[0] = 192;
+		offer.dhcpHeader.serverIPAddr[1] = 168;
+		offer.dhcpHeader.serverIPAddr[2] = 1;
+		offer.dhcpHeader.serverIPAddr[3] = 123;
+
+		offer.op36payload[0] = 192;
+		offer.op36payload[1] = 168;
+		offer.op36payload[2] = 1;
+		offer.op36payload[3] = 123;
+
+		offer.op01payload[0] = 255;
+		offer.op01payload[1] = 255;
+		offer.op01payload[2] = 255;
+		offer.op01payload[3] = 0;
+
+		offer.op1cpayload[0] = 192;
+		offer.op1cpayload[1] = 168;
+		offer.op1cpayload[2] = 1;
+		offer.op1cpayload[3] = 255;
+
+		offer.op03payload[0] = 192;
+		offer.op03payload[1] = 168;
+		offer.op03payload[2] = 1;
+		offer.op03payload[3] = 1;
+
+		offer.op06payload[0] = 192;
+		offer.op06payload[1] = 168;
+		offer.op06payload[2] = 1;
+		offer.op06payload[3] = 4;
+
+		offer.op06payload[4] = 8;
+		offer.op06payload[5] = 8;
+		offer.op06payload[6] = 8;
+		offer.op06payload[7] = 8;
+
+		offer.op35payload = 0x05;
+
+		offer.ipHeader.headerChecksum = 0xb639;
+
+		for (size_t i = 0; i < 6; i++)
+			offer.ethHeader.dstMACAddr[i] = tdhcpData->clientHardwareAddress[i];
+
+		for (size_t i = 0; i < 16; i++)
+			offer.dhcpData.clientHardwareAddress[i] = tdhcpData->clientHardwareAddress[i];
+
+
+		cout << offer.toString("\n") << endl;
+
+		cout << "send" << endl;
+
+		pcap_sendpacket(t->sendSock, (const u_char *) &offer, sizeof(offer));
+		cout << "send request" << endl;
+//exit(1);
+	}
+	else  {
+		cout << "unknown" << endl;
+
+	}
+
+	//}
+}
 
 int main(int argc, char *argv[])
 {/*
@@ -386,8 +615,8 @@ int main(int argc, char *argv[])
 	cout << params.toString() << endl;
 */
 	TCon con;
-	con.init("enp2s0");
-/*
+	con.init("eth0");
+
 	struct pollfd pfd[1];
 	pfd[0].fd = con.listenSock;
 	pfd[0].events = POLLIN | POLLERR | POLLRDBAND;
@@ -413,19 +642,63 @@ int main(int argc, char *argv[])
 			return -5;
 		}
 
-		if (pfd[0].revents & (POLLRDBAND | POLLIN))
-			cout << "cout wawa" << endl;
+		if (pfd[0].revents & (POLLRDBAND | POLLIN)) {
+			/*int size;
+			uint8_t buf[1024] = {0};
+sleep(1);
+			size = read(con.listenSock, buf, sizeof(buf)-1);
+				buf[ret] = 0x00;
+
+
+
+
+std::vector<uint8_t> mnau;
+cout << "size: " << ret << endl;
+for (size_t i = 0; i < ret; i++) {
+	mnau.push_back(buf[i]);
+	cout << PcapUtil::intToHex(buf[i], "0x") << " "<< endl;
+}
+cout << "cout wawa" << endl;
+processPacket(mnau, &con);
+break;*/
+
+			int ret;
+			uint8_t buf[1024] = {0};
+			std::vector<uint8_t> mnau;
+			while ((ret = read(con.listenSock, buf, sizeof(buf)-1)) > 0) {
+				buf[ret] = 0x00;
+
+				cout << "\nsize: " << ret << endl;
+				for (size_t i = 0; i < ret; i++) {
+					//	cout << PcapUtil::intToHex(buf[i], "0x") << " ";
+					mnau.push_back(buf[i]);
+
+				}
+
+
+				for (size_t m = 0; m < 1024; m++)
+					buf[m] = 0;
+
+				cout << endl;
+				processPacket(mnau, &con);
+				mnau.clear();
+
+			}
+		}
 	}
- */
 
-
-
-	system("ls -l / >| ls.output");
+/*
 int ret;
-	char buf[1024] = {0};
+	uint8_t buf[1024] = {0};
 	while ((ret = read(con.listenSock, buf, sizeof(buf)-1)) > 0) {
 			buf[ret] = 0x00;
-			printf("block read: \n<%s>\n", buf);
-		}
-		close(con.listenSock);
+
+		cout << "size: " << ret << endl;
+		for (size_t i = 0; i < ret; i++)
+			cout << PcapUtil::intToHex(buf[i], "0x") << " ";
+
+
+	}
+
+*/
 }

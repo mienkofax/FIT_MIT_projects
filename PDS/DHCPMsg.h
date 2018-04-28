@@ -105,8 +105,8 @@ struct __attribute__((__packed__)) TUDPHeader {
 	uint16_t udpChecksum;
 
 	TUDPHeader():
-		udpSourcePort(0x4400), // 67
-		udpDestinationPort(0x4300), // 68
+		udpSourcePort(0x4400), // 68
+		udpDestinationPort(0x4300), // 67
 		udpLength{0x12, 0x13},
 		udpChecksum(0)
 	{
@@ -445,7 +445,12 @@ struct __attribute__((__packed__)) DHCPRequest {
 
 /**
  *
+ *
+ *
+ *
+ *
  */
+
 struct __attribute__((__packed__)) DHCPServerOffer {
 	TEthHeader ethHeader;
 	TIP4Header ipHeader;
@@ -453,7 +458,73 @@ struct __attribute__((__packed__)) DHCPServerOffer {
 	TDHCPHeader dhcpHeader;
 	TDHCPData dhcpData;
 
-	DHCPServerOffer()
+	// DHCP message type
+	uint8_t op35Type;
+	uint8_t op35Length;
+	uint8_t op35payload;
+
+	// DHCP server identifier
+	uint8_t op36Type;
+	uint8_t op36Length;
+	uint8_t op36payload[4];
+
+	// IP Address Lease time
+	uint8_t op33Type;
+	uint8_t op33Length;
+	uint32_t op33payload;
+
+	// subnet mask
+	uint8_t op01Type;
+	uint8_t op01Length;
+	uint8_t op01payload[4];
+
+	// broadcast address
+	uint8_t op1cType;
+	uint8_t op1cLength;
+	uint8_t op1cpayload[4];
+
+	// router
+	uint8_t op03Type;
+	uint8_t op03Length;
+	uint8_t op03payload[4];
+
+	// dns
+	uint8_t op06Type;
+	uint8_t op06Length;
+	uint8_t op06payload[8];
+
+	uint8_t end;
+
+	DHCPServerOffer():
+		op35Type(0x35),
+		op35Length(0x01),
+		op35payload(0x02),
+
+		op36Type(0x36),
+		op36Length(0x04),
+		op36payload{0x00},
+
+		op33Type(0x33),
+		op33Length(0x04),
+		op33payload(0x1234),
+
+		op01Type(0x01),
+		op01Length(0x04),
+		op01payload{0x00},
+
+		op1cType(0x1c),
+		op1cLength(0x04),
+		op1cpayload{0x00},
+
+		op03Type(0x03),
+		op03Length(0x04),
+		op03payload{0x00},
+
+		op06Type(0x06),
+		op06Length(0x08),
+		op06payload{0x00},
+
+		end(0xff)
 	{
 		recalculareHeadersSize();
 	}
@@ -499,17 +570,15 @@ struct __attribute__((__packed__)) DHCPServerOffer {
 
 	uint16_t l3Size() const
 	{
-		return sizeof(TIP4Header)
-			   + sizeof(TUDPHeader)
-			   + sizeof(TDHCPHeader)
-			   + sizeof(TDHCPData);
+		return sizeof(DHCPServerOffer)
+			   - sizeof(TEthHeader);
 	}
 
 	uint16_t l4Size() const
 	{
-		return sizeof(TUDPHeader)
-			   + sizeof(TDHCPHeader)
-			   + sizeof(TDHCPData);
+		return sizeof(DHCPServerOffer)
+			   - sizeof(TEthHeader)
+			   - sizeof(TIP4Header);
 	}
 
 	static DHCPMessage* fromRaw(uint8_t *buffer, size_t size)
