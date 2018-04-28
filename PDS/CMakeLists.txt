@@ -27,8 +27,9 @@ target_link_libraries("pds-dhcpstarve"
 )
 
 file(GLOB SOURCES_ROGUE
-${PROJECT_SOURCE_DIR}/Util.cpp
-	${PROJECT_SOURCE_DIR}/DHCPMsg.cpp
+	${PROJECT_SOURCE_DIR}/Util.cpp
+	${PROJECT_SOURCE_DIR}/Common.cpp
+	${PROJECT_SOURCE_DIR}/ServerMessage.cpp
 )
 
 add_library(PDS-rogue-lib ${SOURCES_ROGUE})
