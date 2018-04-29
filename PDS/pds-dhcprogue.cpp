@@ -194,6 +194,7 @@ struct TLeases {
 	TPool pool;
 	vector<TIPv4> free;
 	vector<TIPv4> checked;
+	uint64_t leaseTime;
 
 	TLeases(TPool p):
 		pool(p)
@@ -223,7 +224,7 @@ struct TLeases {
 		// vyberieme poslednu ip adresu
 		newIP = free.back();
 		auto it = leases.emplace(mac,
-			TLeaseItem{newIP, type, Util::timestamp() + 30});
+			TLeaseItem{newIP, type, Util::timestamp() + leaseTime});
 
 		// mac adresa sa tam nachadza
 		if (!it.second)
@@ -470,9 +471,9 @@ int directRead(TCon *con, vector<uint8_t> &bufferVec)
 
 	for (size_t i = 0; i < ret; i++) {
 		bufferVec.push_back(buf[i]);
-		cout << hex << unsigned(buf[i]) << " ";
+		//cout << hex << unsigned(buf[i]) << " ";
 	}
-	cout << endl;
+	//cout << endl;
 
 	return ret;
 }
@@ -548,7 +549,9 @@ int address(TCon *con, const string &name, TIPv4 &ip) {
 		return -3;
 	}
 
-	ip.fromString(host);
+	TIPv4 tmp = TIPv4::fromString(host);
+	for (size_t i = 0; i < 4; i++)
+		ip.raw[i] = tmp.raw[i];
 
 	return 0;
 }
@@ -680,7 +683,8 @@ void processPacket(
 			1,
 			payload.yourIPAddr);
 
-		const DHCPServerOffer offer = buildOffer(info, payload, mac);
+		DHCPServerOffer offer = buildOffer(info, payload, mac);
+		offer.op33payload = htonl(leases.leaseTime);
 
 		if (ret == -1) {
 			cerr << "empty pool" << endl;
@@ -696,7 +700,19 @@ void processPacket(
 		//cout << "send offer" << endl;
 	}
 	else if (type == 3) {
-		const DHCPServerOffer ack = buildACK(info, payload, mac);
+		DHCPServerOffer ack = buildACK(info, payload, mac);
+		auto it = leases.leases.find(
+			TMAC::fromArray((uint8_t *)&(info.clientHWAddress))
+			);
+		if (it == leases.leases.end()) {
+			cerr << "not registered mac addr" << endl;
+			return;
+		}
+		for (size_t i = 0; i < 4; i++)
+			ack.dhcpHeader.yourIPAddr[i] = it->second.ip.raw[i];
+
+		ack.op33payload = htonl(leases.leaseTime);
+
 		pcap_sendpacket(t->sendSock, (const u_char *) &ack, sizeof(ack));
 
 		//cout << "send request" << endl;
@@ -731,6 +747,7 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	TLeases leases(params.pool);
+	leases.leaseTime = params.leaseTime;
 	vector<uint8_t> vec;
 	const int milliseconds = 10 * 1000; // 10 s
 	while (!m_stop) {
