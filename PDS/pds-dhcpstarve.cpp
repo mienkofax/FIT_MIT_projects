@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
+#include <signal.h>
 
 #include "ClientMessage.h"
 
@@ -321,8 +322,18 @@ void oneResolution(TParam *t, const vector<uint8_t> &l2MAC)
 	}
 }
 
+
+bool m_stop = false;
+void signalHandler(int signum)
+{
+	cerr << "koniec aplikacie" << endl;
+	m_stop = true;
+}
+
 int main(int argc, char *argv[])
 {
+	signal(SIGINT, signalHandler);
+
 	srand(time(nullptr));
 	vector<uint8_t> senderMAC;
 	TParam t;
@@ -337,7 +348,7 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	while (true) {
+	while (!m_stop) {
 		oneResolution(&t, senderMAC);
 		usleep(50 * 1000); // 50 ms
 	}

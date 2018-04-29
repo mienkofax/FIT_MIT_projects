@@ -7,7 +7,7 @@ all:
 	-o pds-dhcpstarve $(CFLAGS) $(LIB)
 
 	$(GCC) pds-dhcprogue.cpp Common.cpp ServerMessage.cpp Util.cpp \
-	-o pds-dhcrogue $(CFLAGS) $(LIB)
+	-o pds-dhcprogue $(CFLAGS) $(LIB)
 
 clean:
 	/bin/rm -rf pds-dhcpstarve pds-dhcprouge
