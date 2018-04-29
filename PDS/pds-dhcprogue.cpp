@@ -28,11 +28,62 @@
 #include <vector>
 
 #include <poll.h>
+#include <map>
 
 using namespace std;
 
-static const string helpMessage =
-	"R(Help message)";
+struct TMAC {
+	uint8_t raw[6];
+
+	static TMAC fromArray(uint8_t *buffer)
+	{
+		TMAC mac;
+		for (size_t i = 0; i < 6; i++)
+			mac.raw[i] = buffer[i];
+
+		return mac;
+	}
+
+	bool operator ==(const TMAC &mac) const
+	{
+		for (size_t i = 0; i < 6; i++) {
+			if (raw[i] != mac.raw[i])
+				return false;
+		}
+
+		return true;
+	}
+
+	bool operator !=(const TMAC &mac) const
+	{
+		for (size_t i = 0; i < 6; i++) {
+			if (raw[i] != mac.raw[i])
+				return true;
+		}
+
+		return false;
+	}
+
+	bool operator <(const TMAC &ip) const
+	{
+		for (size_t i = 0; i < 6; i++) {
+			if (raw[i] < ip.raw[i])
+				return true;
+		}
+
+		return false;
+	}
+
+	bool operator >(const TMAC &mac) const
+	{
+		for (size_t i = 0; i < 6; i++) {
+			if (raw[i] > mac.raw[i])
+				return true;
+		}
+
+		return false;
+	}
+};
 
 /**
  * IP Pool.
@@ -53,6 +104,44 @@ struct TPool {
 			pool.substr(first.size() + 1, -1));
 
 		return tPool;
+	}
+
+	TIPv4 broadcastAddress() const
+	{
+		const auto mask = subnetMask();
+		TIPv4 ip = {0};
+
+		for (size_t i = 0; i < 4; i++) {
+			if (mask.raw[i] == 0)
+				ip.raw[i] = 255;
+			else
+				ip.raw[i] = start.raw[i];
+		}
+
+		return ip;
+	}
+
+	TIPv4 subnetMask() const
+	{
+		size_t i = 0;
+		for (; i < 4; i++) {
+			if (end.raw[i] != start.raw[i])
+				break;
+		}
+
+		switch (i) {
+		case 0:
+			return TIPv4::fromString("128.0.0.0");
+
+		case 1:
+			return TIPv4::fromString("255.0.0.0");
+
+		case 2:
+			return TIPv4::fromString("255.255.0.0");
+
+		default:
+			return TIPv4::fromString("255.255.255.0");
+		}
 	}
 
 	/**
@@ -85,10 +174,85 @@ struct TPool {
 		repr += "pool: \n";
 		repr += "\tstart: " + start.toString("") + "\n";
 		repr += "\tend  : " + end.toString("") + "\n";
-		repr += "\tsize : " + to_string(size());
+		repr += "\tsize : " + to_string(size()) + "\n";
+		repr += "\tmask : " + subnetMask().toString();
+		repr += "\tbcast: " + broadcastAddress().toString();
 		repr += separator;
 
 		return repr;
+	}
+};
+
+struct TLeaseItem {
+	TIPv4 ip;
+	uint8_t state; //offer, request, ack
+	uint64_t expiredTime;
+};
+
+struct TLeases {
+	map<TMAC, TLeaseItem> leases;
+	TPool pool;
+	vector<TIPv4> free;
+	vector<TIPv4> checked;
+
+	TLeases(TPool p):
+		pool(p)
+	{
+		TIPv4 ip = pool.start;
+		for (size_t i = 0; i < pool.size(); i++) {
+			free.push_back(ip);
+			ip++;
+		}
+	}
+
+	size_t freeSize() const
+	{
+		return free.size();
+	}
+
+	size_t checkedSize() const
+	{
+		return checked.size();
+	}
+
+	int insert(TMAC mac, uint8_t type, TIPv4 &newIP)
+	{
+		if (free.empty())
+			return -1;
+
+		// vyberieme poslednu ip adresu
+		newIP = free.back();
+		auto it = leases.emplace(mac,
+			TLeaseItem{newIP, type, Util::timestamp() + 30});
+
+		// mac adresa sa tam nachadza
+		if (!it.second)
+			return -2;
+
+		free.pop_back();
+		checked.push_back(newIP);
+
+		return 0;
+	}
+
+
+	void release()
+	{
+		const uint64_t now = Util::timestamp();
+		for (auto it = leases.begin(); it != leases.end(); ++it) {
+			if (it->second.expiredTime >= now)
+				continue;
+
+			free.push_back(it->second.ip);
+			leases.erase(it);
+
+			size_t i = 0;
+			for (;i < checked.size(); i++) {
+				if (checked.at(i) == it->second.ip)
+					break;
+			}
+			checked.erase(checked.begin() + i);
+		}
 	}
 };
 
@@ -212,39 +376,6 @@ int checkExistInterface(const string &interface)
 	return 0;
 }
 
-// http://www.microhowto.info/howto/calculate_an_internet_protocol_checksum_in_c.html
-uint16_t ip_checksum(void* vdata,size_t length) {
-	// Cast the data pointer to one that can be indexed.
-	char* data=(char*)vdata;
-
-	// Initialise the accumulator.
-	uint32_t acc=0xffff;
-	size_t i;
-
-	// Handle complete 16-bit blocks.
-	for (i=0;i+1<length;i+=2) {
-		uint16_t word;
-		memcpy(&word,data+i,2);
-		acc+=ntohs(word);
-		if (acc>0xffff) {
-			acc-=0xffff;
-		}
-	}
-
-	// Handle any partial block at the end of the data.
-	if (length&1) {
-		uint16_t word=0;
-		memcpy(&word,data+length-1,1);
-		acc+=ntohs(word);
-		if (acc>0xffff) {
-			acc-=0xffff;
-		}
-	}
-
-	// Return the checksum in network byte order.
-	return htons(~acc);
-}
-
 /**
  * Struktura obsahujuca file descriptory na sokety, pripadne
  * na handler pre posielanie udajov pomocou pcap kniznice.
@@ -321,6 +452,8 @@ struct TCon {
 			1000,               // to_ms
 			errBuffer           // error buffer
 		);
+
+		return 0;
 	}
 };
 
@@ -337,7 +470,7 @@ int directRead(TCon *con, vector<uint8_t> &bufferVec)
 
 	for (size_t i = 0; i < ret; i++) {
 		bufferVec.push_back(buf[i]);
-		cout << unsigned(buf[i]) << " ";
+		cout << hex << unsigned(buf[i]) << " ";
 	}
 	cout << endl;
 
@@ -365,8 +498,8 @@ int poolRead(
 	}
 
 	if (ret == 0) {
-		cerr << "timeout error" << endl;
-		return -4;
+		//cerr << "timeout error" << endl;
+		return 0;
 	}
 
 	if (pfd[0].revents & POLLERR) {
@@ -375,11 +508,49 @@ int poolRead(
 	}
 
 	if (pfd[0].revents & (POLLRDBAND | POLLIN)) {
-		cout << "read\n";
 		return directRead(con, bufferVec);
 	}
 
 	return -1;
+}
+
+/**
+ * http://man7.org/linux/man-pages/man3/getifaddrs.3.html
+ */
+int address(TCon *con, const string &name, TIPv4 &ip) {
+	int family;
+	struct ifreq ifreq;
+	char host[128];
+
+	memset(&ifreq, 0, sizeof ifreq);
+	strncpy(ifreq.ifr_name, name.c_str(), IFNAMSIZ);
+
+	if (ioctl(con->listenSock, SIOCGIFADDR, &ifreq) != 0)
+		return -1;
+
+	switch(family=ifreq.ifr_addr.sa_family) {
+	case AF_UNSPEC:
+		return -2;
+	case AF_INET:
+	case AF_INET6:
+		getnameinfo(
+			&ifreq.ifr_addr,
+			sizeof ifreq.ifr_addr,
+			host,
+			sizeof host,
+			0,
+			0,
+			NI_NUMERICHOST
+		);
+		break;
+	default:
+		cerr << "unknown family: " << family << endl;
+		return -3;
+	}
+
+	ip.fromString(host);
+
+	return 0;
 }
 
 bool m_stop = false;
@@ -389,7 +560,6 @@ void signalHandler(int signum)
 	m_stop = true;
 }
 
-
 /**
  * Zistenie o aky typ dhcp spravy sa jedna a o
  * identifikaciu servera.
@@ -397,7 +567,7 @@ void signalHandler(int signum)
 void extractOptions(
 	DHCPServerInfo &info, uint8_t *options, size_t size)
 {
-	for (size_t m = 0; m < size; m++) {
+	for (size_t m = 0; m < 30; m++) {
 		switch (*options) {
 		case 0x35:     // DHCP Message type
 			options++; // length
@@ -405,15 +575,6 @@ void extractOptions(
 			info.messageType = *options;
 			options++;
 			break;
-
-		case 0x36:     // DHCP server identifier
-			options++; // move to length
-			options++; //move to value
-
-			for (size_t p = 0; p < 4; p++)
-				info.serverIdentifier[p] = *(options + p);
-
-			options = options + 4;
 
 		default:
 			options++;
@@ -448,7 +609,58 @@ void extractPacketInformation(
 		info.clientHWAddress[i] = tdhcpData->clientHardwareAddress[i];
 }
 
-void processPacket(const vector<uint8_t> &data, TCon *t)
+DHCPServerOffer buildOffer(
+	DHCPServerInfo &info,
+	DHCPPayload &payload,
+	const vector<uint8_t> &mac
+	)
+{
+	DHCPServerOffer offer;
+	offer.setEthMAC(mac);
+	offer.udpHeader.udpDestinationPort = 0x4400; // 68
+	offer.udpHeader.udpSourcePort = 0x4300; // 67
+	offer.setTransactionID(info.transactionID);
+	offer.ipHeader.headerChecksum = 0xb639;
+
+	for (size_t i = 0; i < 4; i++) {
+		offer.dhcpHeader.yourIPAddr[i] = payload.yourIPAddr.raw[i];
+		offer.dhcpHeader.serverIPAddr[i] = payload.serverIPAddr.raw[i];
+		offer.op36payload[i] = payload.op36payload.raw[i];
+		offer.op01payload[i] = payload.op01payload.raw[i];
+		offer.op1cpayload[i] = payload.op1cpayload.raw[i];
+		offer.op03payload[i] = payload.op03payload.raw[i];
+		offer.op06payload[i] = payload.op06payload1.raw[i];
+		offer.op06payload[4 + i] = payload.op06payload2.raw[i];
+	}
+
+	for (size_t i = 0; i < 6; i++)
+		offer.ethHeader.dstMACAddr[i] = info.clientHWAddress[i];
+
+	for (size_t i = 0; i < 16; i++)
+		offer.dhcpData.clientHardwareAddress[i] = info.clientHWAddress[i];
+
+	return offer;
+}
+
+DHCPServerOffer buildACK(
+	DHCPServerInfo &info,
+	DHCPPayload &payload,
+	const vector<uint8_t> &mac
+)
+{
+	DHCPServerOffer ack =
+		buildOffer(info, payload, mac);
+	ack.op35payload = 0x05;
+
+	return ack;
+}
+
+void processPacket(
+	const vector<uint8_t> &data,
+	TCon *t,
+	DHCPPayload &payload,
+	const vector<uint8_t> &mac,
+	TLeases &leases)
 {
 	uint8_t buffer[data.size()];
 	for (size_t i = 0; i < data.size(); i++)
@@ -461,149 +673,40 @@ void processPacket(const vector<uint8_t> &data, TCon *t)
 		data.size()
 	);
 
-	cout << info.toString("\n") << endl;
-
 	uint8_t type = info.messageType;
-		if (type == 1 ) {
-		DHCPServerOffer offer;
-		offer.setEthMAC({0x08, 0x00, 0x27, 0x3d, 0x98, 0x95});
-		offer.udpHeader.udpDestinationPort = 0x4400; // 68
-		offer.udpHeader.udpSourcePort = 0x4300; // 67
-		offer.setTransactionID(info.transactionID);
+	if (type == 1) {
+		int ret = leases.insert(
+			TMAC::fromArray((uint8_t *)&(info.clientHWAddress)),
+			1,
+			payload.yourIPAddr);
 
-		offer.dhcpHeader.yourIPAddr[0] = 192;
-		offer.dhcpHeader.yourIPAddr[1] = 168;
-		offer.dhcpHeader.yourIPAddr[2] = 1;
-		offer.dhcpHeader.yourIPAddr[3] = 11;
+		const DHCPServerOffer offer = buildOffer(info, payload, mac);
 
-		offer.dhcpHeader.serverIPAddr[0] = 192;
-		offer.dhcpHeader.serverIPAddr[1] = 168;
-		offer.dhcpHeader.serverIPAddr[2] = 1;
-		offer.dhcpHeader.serverIPAddr[3] = 123;
-
-		offer.op36payload[0] = 192;
-		offer.op36payload[1] = 168;
-		offer.op36payload[2] = 1;
-		offer.op36payload[3] = 123;
-
-		offer.op01payload[0] = 255;
-		offer.op01payload[1] = 255;
-		offer.op01payload[2] = 255;
-		offer.op01payload[3] = 0;
-
-		offer.op1cpayload[0] = 192;
-		offer.op1cpayload[1] = 168;
-		offer.op1cpayload[2] = 1;
-		offer.op1cpayload[3] = 255;
-
-		offer.op03payload[0] = 192;
-		offer.op03payload[1] = 168;
-		offer.op03payload[2] = 1;
-		offer.op03payload[3] = 1;
-
-		offer.op06payload[0] = 192;
-		offer.op06payload[1] = 168;
-		offer.op06payload[2] = 1;
-		offer.op06payload[3] = 4;
-
-		offer.op06payload[4] = 8;
-		offer.op06payload[5] = 8;
-		offer.op06payload[6] = 8;
-		offer.op06payload[7] = 8;
-
-		offer.ipHeader.headerChecksum = 0xb639;
-
-		for (size_t i = 0; i < 6; i++)
-			offer.ethHeader.dstMACAddr[i] = info.clientHWAddress[i];
-
-		for (size_t i = 0; i < 16; i++)
-			offer.dhcpData.clientHardwareAddress[i] = info.clientHWAddress[i];
-
-
-		//cout << offer.toString("\n") << endl;
-
-		cout << "send offer" << endl;
+		if (ret == -1) {
+			cerr << "empty pool" << endl;
+			return;
+		}
+		else if (ret == -2) {
+			cerr << "duplicate mac" << endl;
+			return;
+		}
 
 		pcap_sendpacket(t->sendSock, (const u_char *) &offer, sizeof(offer));
+
+		//cout << "send offer" << endl;
 	}
 	else if (type == 3) {
-		cout << "request" << endl;
-		DHCPServerOffer offer;
-		offer.setEthMAC({0x08, 0x00, 0x27, 0x3d, 0x98, 0x95});
-		offer.udpHeader.udpDestinationPort = 0x4400; // 68
-		offer.udpHeader.udpSourcePort = 0x4300; // 67
-		offer.setTransactionID(info.transactionID);
+		const DHCPServerOffer ack = buildACK(info, payload, mac);
+		pcap_sendpacket(t->sendSock, (const u_char *) &ack, sizeof(ack));
 
-		offer.dhcpHeader.yourIPAddr[0] = 192;
-		offer.dhcpHeader.yourIPAddr[1] = 168;
-		offer.dhcpHeader.yourIPAddr[2] = 1;
-		offer.dhcpHeader.yourIPAddr[3] = 11;
-
-		offer.dhcpHeader.serverIPAddr[0] = 192;
-		offer.dhcpHeader.serverIPAddr[1] = 168;
-		offer.dhcpHeader.serverIPAddr[2] = 1;
-		offer.dhcpHeader.serverIPAddr[3] = 123;
-
-		offer.op36payload[0] = 192;
-		offer.op36payload[1] = 168;
-		offer.op36payload[2] = 1;
-		offer.op36payload[3] = 123;
-
-		offer.op01payload[0] = 255;
-		offer.op01payload[1] = 255;
-		offer.op01payload[2] = 255;
-		offer.op01payload[3] = 0;
-
-		offer.op1cpayload[0] = 192;
-		offer.op1cpayload[1] = 168;
-		offer.op1cpayload[2] = 1;
-		offer.op1cpayload[3] = 255;
-
-		offer.op03payload[0] = 192;
-		offer.op03payload[1] = 168;
-		offer.op03payload[2] = 1;
-		offer.op03payload[3] = 1;
-
-		offer.op06payload[0] = 192;
-		offer.op06payload[1] = 168;
-		offer.op06payload[2] = 1;
-		offer.op06payload[3] = 4;
-
-		offer.op06payload[4] = 8;
-		offer.op06payload[5] = 8;
-		offer.op06payload[6] = 8;
-		offer.op06payload[7] = 8;
-
-		offer.op35payload = 0x05;
-
-		offer.ipHeader.headerChecksum = 0xb639;
-
-			for (size_t i = 0; i < 6; i++)
-				offer.ethHeader.dstMACAddr[i] = info.clientHWAddress[i];
-
-			for (size_t i = 0; i < 16; i++)
-				offer.dhcpData.clientHardwareAddress[i] = info.clientHWAddress[i];
-
-
-			cout << offer.toString("\n") << endl;
-
-		cout << "send" << endl;
-
-		pcap_sendpacket(t->sendSock, (const u_char *) &offer, sizeof(offer));
-		cout << "send request" << endl;
+		//cout << "send request" << endl;
 	}
-	else {
-		cout << "unknown" << endl;
-
-	}
-
-	//}
 }
 
 int main(int argc, char *argv[])
 {
 	signal(SIGINT, signalHandler);
-	/*
+
 	if (argc != 13) {
 		cerr << "invalid number of arguments" << endl;
 		return EXIT_FAILURE;
@@ -612,25 +715,51 @@ int main(int argc, char *argv[])
 	TParams params;
 	if (extractArguments(argc, argv, &params) == -1) {
 		cerr << "invalid arguments" << endl;
-		cerr << helpMessage << endl;
 		return EXIT_FAILURE;
 	}
 
-	if (!checkExistInterface(params.interface)) {
+	if (checkExistInterface(params.interface) < 0) {
 		cerr << "spatny interface" << endl;
 		return EXIT_FAILURE;
 	}
 
-	cout << params.toString() << endl;
-*/
-	TCon con;
-	con.init("wlp8s0");
+	//cout << params.toString() << endl;
 
+	TCon con = {0};
+
+	if (con.init(params.interface) < 0)
+		return EXIT_FAILURE;
+
+	TLeases leases(params.pool);
 	vector<uint8_t> vec;
 	const int milliseconds = 10 * 1000; // 10 s
 	while (!m_stop) {
-		poolRead(&con, vec, milliseconds);
+		vec.clear();
+		int ret = poolRead(&con, vec, milliseconds);
+		if (ret == 0)
+			continue;
+		else if (ret < 0)
+			return EXIT_FAILURE;
 
-		processPacket(vec, &con);
+		DHCPPayload pay = {0};
+		TIPv4 tmpIP = {0};
+
+		if (address(&con, params.interface, tmpIP) < 0)
+			return EXIT_FAILURE;
+		pay.serverIPAddr = tmpIP;
+		pay.op36payload = pay.serverIPAddr;
+
+		pay.op01payload = params.pool.subnetMask();
+		pay.op1cpayload = params.pool.broadcastAddress();
+
+		pay.op03payload = params.gateway;
+		pay.op06payload1 = params.dnsServer;
+		pay.op06payload2 = params.dnsServer;
+
+		vector<uint8_t> mac;
+		Util::MACAddress(params.interface, mac);
+
+		leases.release();
+		processPacket(vec, &con, pay, mac, leases);
 	}
 }

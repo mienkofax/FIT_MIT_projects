@@ -82,6 +82,47 @@ struct TIPv4 {
 
 		return false;
 	}
+
+	TIPv4& operator++ (int)
+	{
+		bool move = false;
+		for (int i = 3; i >= 0; i--) {
+			if (move) {
+				move = false;
+
+				if (raw[i] == 0xff) {
+					raw[i] = 0;
+					move = true;
+					continue;
+				}
+
+				raw[i]++;
+				continue;
+			}
+
+			if (raw[i] == 0xff) {
+				raw[i] = 0;
+				move = true;
+				continue;
+			}
+
+			raw[i]++;
+			break;
+		}
+
+		return *this;
+	}
+};
+
+struct DHCPPayload {
+	TIPv4 yourIPAddr;
+	TIPv4 serverIPAddr;
+	TIPv4 op36payload;
+	TIPv4 op01payload;
+	TIPv4 op1cpayload;
+	TIPv4 op03payload;
+	TIPv4 op06payload1;
+	TIPv4 op06payload2;
 };
 
 
@@ -90,14 +131,12 @@ struct TIPv4 {
  */
 struct DHCPServerInfo {
 	uint8_t messageType;
-	uint8_t serverIdentifier[4];
 	uint8_t clientHWAddress[16];
 	uint8_t dstMACAddress[6];
 	uint32_t transactionID;
 
 	DHCPServerInfo():
 		messageType(0x00),
-		serverIdentifier{0x00},
 		clientHWAddress{0x00},
 		dstMACAddress{0x00},
 		transactionID(0x00)
@@ -110,12 +149,6 @@ struct DHCPServerInfo {
 
 		repr += "messageType: ";
 		repr += Util::intToHex(messageType, "0x");
-		repr += separator;
-
-		repr += "identifier: ";
-		for (auto i : serverIdentifier)
-			repr += std::to_string(i) + ".";
-		repr.pop_back();
 		repr += separator;
 
 		return repr;
