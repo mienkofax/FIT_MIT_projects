@@ -1,0 +1,56 @@
+# Logicky projekt RUBIKOVA KOSTKA do predmetu FLP 2017/2018
+# Autor: Peter Tisovcik (xtisov00@stud.fit.vutbr.cz)
+
+## O programe
+
+Program sluzi pre vypisanie navodu na zlozenie rubikovej kocky.
+Vstupom programu je popis zamiesanej kocky a vystupom je navod,
+ako zlozit tuto kocku. Navod obsahuje popis kocky po jednotlivych
+pohyboch, ktorymi je mozne kocku zlozit.
+
+Program testuje 12 moznych pohybov kockou a prehladava pomocou
+iterativneho prehladavani do hlbky.
+
+Najdene riesenie je vypisane na stdout v podobe jednotlivych krokov.
+
+### Preklad
+```
+make
+```
+
+### Vytvorenie archivu
+```
+make zip
+```
+
+### Spustenie
+```
+./flp18-log < test1.in
+./flp18-log < test2.in
+./flp18-log < test3.in
+./flp18-log < test4.in
+./flp18-log < test5.in
+```
+## Testovanie
+Overenie funkcnosti programu bolo vykonane na serveru merlin s piatimi
+testovanymi subormi, ktore obsahuju rozne zamiesanu kocku. Priemerny
+cas vypoctu bol vypocitany ako priemer z desiatich spusteni. Problem
+nastal pri teste test5.in, ktory pocital pomerne dlho, tento test
+neprebehol na merlinovi uspesne, ale na lokalnom stroji to fungovalo
+dobre. Pri testovani bolo zistene, ze cas narasta velmi strmo, ak
+je potrebnych aspon 7 tahov k uspesnemu zlozenie kocky.
+
+test1.in (2 tahy):
+- priemerny cas 10 hodnot: 0.01 sekund
+
+test2.in (4 tahy):
+- priemerny cas 10 hodnot: 0.142 sekund
+
+test3.in (5 tahov):
+- priemerny cas 10 hodnot: 1.714 sekund
+
+test4.in (6 tahov):
+- priemerny cas 10 hodnot: 10.782 sekund
+
+test5.in (7 tahov):
+- priemerny cas 10 hodnot: > 1329 sekund (iba na lokalnom stroji)
